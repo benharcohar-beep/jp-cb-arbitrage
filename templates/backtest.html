@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Backtest{% endblock %}
+{% block content %}
+
+<section class="alerts-head">
+  <h1>Backtest · model signal evaluation</h1>
+  <p>Walks the pricer forward day-by-day on real historical CB + equity data, then asks:
+    when the model said a bond was cheap, how did the bond move next?</p>
+</section>
+
+{% if not panel_stats %}
+<section class="empty">
+  <h2>No backtest yet.</h2>
+  <p>Run <code>python3 backtest.py</code> from the project directory.</p>
+</section>
+{% else %}
+
+<section class="summary">
+  <div class="card"><span class="lab">Bonds</span><span class="val">{{ panel_stats.n_bonds }}</span></div>
+  <div class="card"><span class="lab">Bond-day rows</span><span class="val">{{ "{:,}".format(panel_stats.n_rows) }}</span></div>
+  <div class="card"><span class="lab">Date range</span><span class="val" style="font-size:13px">{{ panel_stats.date_range }}</span></div>
+  <div class="card"><span class="lab">Avg cheap%</span><span class="val">{{ panel_stats.avg_cheap }}</span></div>
+  <div class="card"><span class="lab">Median cheap%</span><span class="val">{{ panel_stats.median_cheap }}</span></div>
+</section>
+
+<section class="alerts-head">
+  <h3 style="font-size:14px; margin-bottom:4px;">Signal performance — bonds with 5% ≤ cheap% ≤ 25% (anomalies filtered)</h3>
+  <p>Pure bond return (no delta hedge). Hit rate = % of signals with positive forward return.
+    The 25% cap excludes stale-conv-price bonds whose dealer mids never move.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th class="num">Horizon (d)</th>
+      <th class="num">N signals</th>
+      <th class="num">Avg fwd ret %</th>
+      <th class="num">Median fwd ret %</th>
+      <th class="num">Hit rate %</th>
+      <th class="num">Avg cheap decay (pp)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in summary %}
+    <tr {% if s.hit_rate >= 60 %}class="cheap-strong"{% endif %}>
+      <td class="num">{{ s.horizon_d }}</td>
+      <td class="num">{{ s.n }}</td>
+      <td class="num">{{ "{:+.2f}".format(s.avg_fwd_ret) }}</td>
+      <td class="num">{{ "{:+.2f}".format(s.median_fwd_ret) }}</td>
+      <td class="num">{{ "{:.1f}".format(s.hit_rate) }}</td>
+      <td class="num">{{ "{:+.2f}".format(s.avg_cheap_decay_pp) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if hedged_overall %}
+<section class="alerts-head" style="margin-top:32px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Δ-hedged backtest · realistic P&L with costs</h3>
+  <p>Each trade: long ¥100M face, short Δ × shares. 25bp half-spread on bond, 5bp on equity, 1% JPY financing carry, exit at +60d or when cheap% &lt; 1%.</p>
+</section>
+
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+  <div class="kpi"><span class="lab">Trades</span><span class="val">{{ "{:.0f}".format(hedged_overall.n_trades) }}</span></div>
+  <div class="kpi"><span class="lab">Win rate</span><span class="val">{{ "{:.0f}".format(hedged_overall.win_rate_pct) }}%</span></div>
+  <div class="kpi alert"><span class="lab">Avg net per trade</span><span class="val">{{ "{:+.0f}".format(hedged_overall.avg_net_return_bp) }}bp</span></div>
+  <div class="kpi"><span class="lab">Median net</span><span class="val">{{ "{:+.0f}".format(hedged_overall.median_net_return_bp) }}bp</span></div>
+  <div class="kpi"><span class="lab">Avg days held</span><span class="val">{{ "{:.0f}".format(hedged_overall.avg_days_held) }}</span></div>
+  <div class="kpi"><span class="lab">Total net P&L</span><span class="val" style="font-size:14px;">¥{{ "{:,.0f}".format(hedged_overall.total_net_pnl_jpy) }}</span></div>
+</section>
+
+{% if hedged_buckets %}
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Bucket</th>
+      <th class="num">N trades</th>
+      <th class="num">Avg days</th>
+      <th class="num">Avg gross bp</th>
+      <th class="num">Avg net bp</th>
+      <th class="num">Median net bp</th>
+      <th class="num">Hit rate %</th>
+      <th class="num">Avg costs bp</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for h in hedged_buckets %}
+    <tr {% if h.hit_rate_pct >= 65 %}class="cheap-strong"{% elif h.hit_rate_pct < 50 %}class="rich-mild"{% endif %}>
+      <td>{{ h.bucket }}</td>
+      <td class="num">{{ "{:.0f}".format(h.n) }}</td>
+      <td class="num">{{ "{:.1f}".format(h.avg_days) }}</td>
+      <td class="num">{{ "{:+.0f}".format(h.avg_gross_bp) }}</td>
+      <td class="num">{{ "{:+.0f}".format(h.avg_net_bp) }}</td>
+      <td class="num">{{ "{:+.0f}".format(h.median_net_bp) }}</td>
+      <td class="num">{{ "{:.0f}".format(h.hit_rate_pct) }}</td>
+      <td class="num">{{ "{:.0f}".format(h.avg_costs_bp) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endif %}
+
+{% if buckets %}
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Pure bond return by signal strength bucket</h3>
+  <p>Where the model actually has predictive power. The 5–15% range at 60-day horizon is the sweet spot.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Bucket</th>
+      <th class="num">Horizon (d)</th>
+      <th class="num">N</th>
+      <th class="num">Avg fwd ret %</th>
+      <th class="num">Median fwd ret %</th>
+      <th class="num">Hit rate %</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for b in buckets %}
+    <tr {% if b.hit_rate >= 65 %}class="cheap-strong"{% elif b.hit_rate < 50 %}class="rich-mild"{% endif %}>
+      <td>{{ b.bucket }}</td>
+      <td class="num">{{ b.horizon_d }}</td>
+      <td class="num">{{ b.n }}</td>
+      <td class="num">{{ "{:+.2f}".format(b.avg_fwd_ret) }}</td>
+      <td class="num">{{ "{:+.2f}".format(b.median_fwd_ret) }}</td>
+      <td class="num">{{ "{:.1f}".format(b.hit_rate) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Top historical signals (sorted by cheap%)</h3>
+  <p>Strongest cheap signals seen during the backtest period.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>RIC</th><th>Signal date</th>
+      <th class="num">Cheap%</th><th class="num">Horizon</th>
+      <th class="num">Fwd bond ret %</th>
+      <th class="num">Fwd cheap change pp</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rets %}
+    <tr class="{% if r.fwd_bond_ret_pct > 0 %}cheap-mild{% else %}rich-mild{% endif %}">
+      <td><a href="/bond/{{ r.ric }}">{{ r.issuer }}</a></td>
+      <td>{{ r.ric }}</td>
+      <td>{{ r.signal_date }}</td>
+      <td class="num">{{ "{:+.1f}".format(r.signal_cheap) }}</td>
+      <td class="num">{{ r.horizon_d }}d</td>
+      <td class="num">{{ "{:+.2f}".format(r.fwd_bond_ret_pct) }}</td>
+      <td class="num">{{ "{:+.2f}".format(r.fwd_cheap_change_pp) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<section class="alerts-head" style="margin-top:20px; font-size: 11px; color: var(--muted);">
+  <p><strong>Caveats</strong> — the backtest holds credit spread and JGB curve constant at today's level; doesn't model the short-equity hedge (pure bond P&L); JP CB dealer mids are sticky on illiquid days, biasing cheap signals. Treat as directional, not P&L-tradeable.</p>
+</section>
+
+{% endif %}
+{% endblock %}

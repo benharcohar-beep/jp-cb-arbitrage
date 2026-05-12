@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: jp-cb-arbitrage
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DEMO_MODE
+        value: "1"
+      - key: PYTHON_VERSION
+        value: "3.11"

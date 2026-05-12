@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}How it works{% endblock %}
+{% block content %}
+
+<section class="welcome">
+  <h1>How it works · the agentic workflow</h1>
+  <p class="lead">
+    A fully autonomous AI agent that runs every weekday at 8 AM. It pulls live market data, reprices the
+    Japanese convertible bond universe, validates against real ratings + credit + yields, and surfaces the
+    day's mispricings — without human intervention.
+  </p>
+</section>
+
+<div class="section-head">
+  <h2>The daily agent loop</h2>
+  <span class="sub">What runs every weekday at 08:04</span>
+</div>
+
+<section class="primer-body" style="margin-bottom:24px;">
+  <div class="primer-card">
+    <h4>1 · Wake up</h4>
+    <p>Scheduled Claude agent fires on a cron trigger. Checks if Refinitiv Workspace is reachable. If not, attempts to launch it via macOS computer-use; falls back to free sources (Yahoo Finance Japan, MoF JGB CSV) if Workspace can't be brought up.</p>
+  </div>
+  <div class="primer-card">
+    <h4>2 · Pull universe</h4>
+    <p>Refinitiv Search API enumerates currently-active JPY convertibles where <code>IsConvertible=true</code> and DocumentTitle matches "Convertible" (excludes structured products and Euro-yen notes). Result: ~70-90 real Japanese CBs.</p>
+  </div>
+  <div class="primer-card">
+    <h4>3 · Pull bond terms</h4>
+    <p>For each RIC: <strong>Mid/Bid/Ask</strong>, coupon, frequency, maturity, conversion price, call dates, issue size. Bid/Ask used as fallback when Mid is missing — recovers ~14 illiquid bonds per day.</p>
+  </div>
+  <div class="primer-card">
+    <h4>4 · Pull underlyings</h4>
+    <p>For each issuer, search-resolves the TSE ordinary-share RIC (e.g. <code>4385.T</code> for Mercari), then pulls <strong>spot, 60-day realised vol, dividend yield, market cap, issuer credit rating</strong>.</p>
+  </div>
+  <div class="primer-card">
+    <h4>5 · Pull JGB curve</h4>
+    <p>Real yields via <code>TR.MidYield</code> on benchmark bonds (<code>JP2YT=RR</code> through <code>JP30YT=RR</code>). Used as the risk-free curve for discounting.</p>
+  </div>
+  <div class="primer-card">
+    <h4>6 · Map ratings to spreads</h4>
+    <p>Each issuer's rating (long-term, with short-term ratings normalised) maps to a JPY senior unsecured corporate spread table calibrated to current market levels. AAA → 25bp, BBB → 190bp, NR/WR → 430bp.</p>
+  </div>
+  <div class="primer-card">
+    <h4>7 · Price each bond</h4>
+    <p><strong>Tsiveriotis-Fernandes binomial tree</strong> with 250+ steps for plain-vanilla bonds. The CB value splits into an equity component (discounted at risk-free) and a bond component (discounted at risk-free + credit spread). American conversion, soft calls with trigger %, puts, and discrete coupons all handled.</p>
+  </div>
+  <div class="primer-card">
+    <h4>8 · MC for reset bonds</h4>
+    <p>Bonds flagged as likely-reset (small-cap unrated zero-coupon) get re-priced with a <strong>Monte Carlo pricer</strong> (8000 paths, antithetic variates) that simulates the path-dependent downward conversion-price reset. Adds ~¥10 of value per ¥100 face for typical reset structures.</p>
+  </div>
+  <div class="primer-card">
+    <h4>9 · Detect anomalies</h4>
+    <p>Flag bonds where premium &gt; 200% with bond price &gt; 130 — almost certainly stale conversion price after a stock split or other corporate action. Backtest confirmed: 25%+ "cheap" signals had 0% hit rate. Now auto-suppressed from alerts.</p>
+  </div>
+  <div class="primer-card">
+    <h4>10 · Save snapshot + alert</h4>
+    <p>Day's pricing saved to <code>snapshots/screen_YYYYMMDD_HHMM.csv</code>. The agent diffs against yesterday's snapshot to detect new issuance and dropped illiquid bonds. Top high-confidence signals are flagged as <strong style="color:var(--green-700)">BUY</strong>; reset-flagged are <strong style="color:var(--amber)">WATCH</strong>; deep-rich are <strong style="color:var(--red)">AVOID</strong>.</p>
+  </div>
+</section>
+
+<div class="section-head">
+  <h2>The pricing model in one paragraph</h2>
+</div>
+
+<section style="background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 22px; box-shadow:var(--shadow-sm); margin-bottom:24px;">
+  <p style="margin:0; font-size:13.5px; line-height:1.65; max-width:850px;">
+    A convertible bond is a bond plus an embedded equity option. We model the underlying stock with
+    geometric Brownian motion, build a CRR binomial tree, and at each node decide:
+    <strong>hold the bond, convert to equity, or exercise put</strong>. The issuer can call if conditions are met.
+    Tsiveriotis-Fernandes (1998) splits the value into two components — equity-driven cashflows
+    discounted at the risk-free rate, and debt-driven cashflows discounted at risk-free + credit spread —
+    which correctly handles the asymmetric default risk between the two streams.
+    For Japanese bonds with downward conversion-price reset clauses
+    (path-dependent), we switch to Monte Carlo with explicit reset modelling
+    (trigger 80% × current conversion price, floor 70% × original).
+    Greeks come from finite differences; implied vol from bisection on the model price.
+  </p>
+</section>
+
+<div class="section-head">
+  <h2>Backtest results</h2>
+  <span class="sub">7,987 bond-day evaluations · Apr 2025 → Apr 2026</span>
+</div>
+
+<section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:24px;">
+  <div class="kpi" style="border-left:3px solid var(--green-500); padding:14px 16px;">
+    <span class="lab">5–10% cheap, 60d horizon</span>
+    <span class="val">71%</span>
+    <span style="font-size:11px;color:var(--muted);">hit rate, +7.4% avg fwd return</span>
+  </div>
+  <div class="kpi" style="border-left:3px solid var(--green-500); padding:14px 16px;">
+    <span class="lab">10–15% cheap, 60d horizon</span>
+    <span class="val">78%</span>
+    <span style="font-size:11px;color:var(--muted);">hit rate, +7.6% avg fwd return</span>
+  </div>
+  <div class="kpi" style="padding:14px 16px;">
+    <span class="lab">25%+ cheap (anomalies)</span>
+    <span class="val" style="color:var(--red)">0%</span>
+    <span style="font-size:11px;color:var(--muted);">hit rate — auto-suppressed now</span>
+  </div>
+</section>
+
+<section style="background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 22px; box-shadow:var(--shadow-sm); margin-bottom:24px;">
+  <h3 style="margin:0 0 10px; font-size:11px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:0.6px;">What the backtest shows</h3>
+  <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7;">
+    <li>The signal works in the <strong>5-15% cheap range over 60 days</strong> — 71-78% hit rate, mid-single-digit average bond returns.</li>
+    <li>Short-term (5-day) signals are noisy — JP CBs reprice over weeks, not days. Don't day-trade this.</li>
+    <li>Bonds flagged as 25%+ cheap are almost always data anomalies (stale conversion prices) — system now auto-detects and suppresses these.</li>
+    <li>Backtest is <strong>pure bond P&amp;L without delta-hedge</strong>. Real strategy P&amp;L will differ; the hedged-backtest module (in progress) will model the equity short.</li>
+  </ul>
+</section>
+
+<div class="section-head">
+  <h2>Honest limitations</h2>
+  <span class="sub">Things to know before trading anything from this</span>
+</div>
+
+<section style="background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 22px; box-shadow:var(--shadow-sm); margin-bottom:24px;">
+  <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7; color:var(--ink-soft);">
+    <li><strong>Credit spread is rating-based</strong>, not issuer-specific CDS. Real spreads vary 30bp (A+) to 500bp+ (BB). The CDS module is in progress; for now BBB-rated names trade with a single 190bp default.</li>
+    <li><strong>Reset detection is heuristic</strong> (zero-coupon + small issue + sub-IG rating), not based on parsed prospectuses. Some flagged bonds may not have resets; some unflagged bonds do.</li>
+    <li><strong>JGB curve is end-of-day</strong>, not intraday. Small effect at low rate levels.</li>
+    <li><strong>Transaction costs and financing are not modeled</strong>. The hedged-backtest will layer in 25bp on the bond and 5bp on the stock, plus financing carry.</li>
+    <li><strong>Many JP CBs are illiquid</strong>. Dealer mids can sit unchanged for weeks. The system uses bid/ask fallback to recover bonds with no mid, but the underlying liquidity problem remains.</li>
+    <li><strong>This is a screening tool, not a trading system.</strong> Always Δ-hedge with the underlying short, watch for issuer-level news that invalidates the model, and size positions for the optionality decay (theta).</li>
+  </ul>
+</section>
+
+{% endblock %}

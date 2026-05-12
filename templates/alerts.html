@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Alerts log{% endblock %}
+{% block content %}
+
+<section class="alerts-head">
+  <h1>Cheap signals — historical log</h1>
+  <p>Bonds that crossed the ≥5% cheap threshold in any snapshot, excluding reset-flagged.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Snapshot</th><th>Issuer</th><th>RIC</th><th>Rtg</th>
+      <th class="num">Cheap%</th><th class="num">Mkt</th><th class="num">Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr class="cheap-strong">
+      <td><code>{{ r.snapshot }}</code></td>
+      <td><a href="/bond/{{ r.ric }}">{{ r.issuer }}</a></td>
+      <td>{{ r.ric }}</td>
+      <td><span class="rtg">{{ r.rating }}</span></td>
+      <td class="num">{{ "{:+.1f}".format(r.cheap_pct) }}</td>
+      <td class="num">{{ "{:.2f}".format(r.mkt_px) }}</td>
+      <td class="num">{{ "{:.2f}".format(r.model_px) }}</td>
+    </tr>
+    {% endfor %}
+    {% if not rows %}
+    <tr><td colspan="7" class="muted">No alerts yet.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+
+{% endblock %}

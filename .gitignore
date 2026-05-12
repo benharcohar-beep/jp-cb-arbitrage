@@ -1,0 +1,40 @@
+# Refinitiv-licensed market data — never commit
+bonds.csv
+equities.csv
+jgb.csv
+cds_spreads.csv
+underlying_map.csv
+universe_search.csv
+snapshots/*.csv
+history/*.csv
+watchlist.json
+
+# But keep one demo snapshot for the hosted demo to render against
+!snapshots/demo_screen.csv
+!history/demo_panel.csv
+!history/demo_signal_summary.csv
+!history/demo_signal_bucket.csv
+!history/demo_hedged_summary.csv
+!history/demo_hedged_overall.csv
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs / scratch
+*.log
+_probe_*.py
+.cache/

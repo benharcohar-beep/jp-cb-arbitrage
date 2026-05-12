@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="welcome">
+  <h1>Japanese Convertible Bond Arbitrage Desk</h1>
+  <p class="lead">
+    Autonomous AI workflow that pulls live convertible-bond data from Refinitiv every weekday morning,
+    prices each bond using a <strong>Tsiveriotis-Fernandes binomial tree</strong>
+    (with Monte Carlo for path-dependent reset clauses), validates the result against real
+    issuer ratings + JGB yields + credit spreads, and surfaces the day's high-confidence cheap-to-model
+    opportunities. Backtested at <strong>71-78% hit rate</strong> over 60 days in the 5-15% cheap range.
+  </p>
+
+  <details class="primer">
+    <summary>What is convertible bond arbitrage? (click to expand)</summary>
+    <div class="primer-body">
+      <div class="primer-card">
+        <h4>The trade</h4>
+        <p>Buy a <strong>convertible bond</strong> (a bond that can be exchanged for the issuer's stock at a fixed conversion price), and short <strong>delta × shares</strong> of the underlying equity. The bond's price has both a debt component and an embedded equity option.</p>
+      </div>
+      <div class="primer-card">
+        <h4>Why mispricings happen</h4>
+        <p>Convertible bonds in Japan are dealer-quoted and illiquid. Dealer indicative quotes lag the underlying equity, so when the stock moves the implied option value gets stale — creating <strong>fair-vs-market gaps</strong> that the model surfaces.</p>
+      </div>
+      <div class="primer-card">
+        <h4>How the model decides "cheap"</h4>
+        <p>For each bond we compute model fair value = <strong>bond floor + embedded option value</strong>, using realised vol of the underlying, the issuer's credit spread, and the JGB yield curve. <strong>Cheap% = (model − market) / market</strong>.</p>
+      </div>
+      <div class="primer-card">
+        <h4>Action labels</h4>
+        <p><strong style="color:var(--green-700)">BUY</strong> = ≥5% cheap, high confidence, no data flags. <strong style="color:var(--amber)">WATCH</strong> = cheap but reset clause or stale-quote risk. <strong style="color:var(--red)">AVOID</strong> = rich vs model. Always Δ-hedge with the underlying short.</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<section class="summary">
+  <div class="kpi timestamp"><span class="lab">Snapshot</span><span class="val">{{ summary.snapshot.replace('screen_','').replace('.csv','') }}</span></div>
+  <div class="kpi"><span class="lab">Bonds priced</span><span class="val">{{ summary.n_bonds }}</span></div>
+  <div class="kpi"><span class="lab">Rated</span><span class="val">{{ summary.n_rated }}</span></div>
+  <div class="kpi"><span class="lab">MC priced</span><span class="val">{{ summary.n_reset }}</span></div>
+  <div class="kpi alert"><span class="lab">Buy signals</span><span class="val">{{ summary.n_alerts }}</span></div>
+  <div class="kpi"><span class="lab">Median spread</span><span class="val">{{ summary.median_spread }}bp</span></div>
+</section>
+
+{% if top %}
+<div class="section-head">
+  <h2>Today's plays</h2>
+  <span class="sub">Ranked by cheap-to-model · click any row to drill into the bond</span>
+</div>
+<section class="hero-list">
+  {% for r in top %}
+  {% set action = 'BUY' if r.confidence == 'High' and r.cheap_pct >= 5 and r.reset_flag != 'RESET' else 'WATCH' if r.cheap_pct >= 5 else 'AVOID' %}
+  {% set rank = loop.index %}
+  <a href="/bond/{{ r.ric }}" class="play-row">
+    <div class="play-rank">{{ rank }}</div>
+    <div class="play-main">
+      <div class="play-title">
+        <strong>{{ r.issuer }}</strong>
+        <span class="rtg {{ 'ig' if r.tier=='ig' else 'sub' if r.tier=='sub' else 'nr' }}">{{ r.rating }}</span>
+        <span class="engine engine-{{ (r.model_engine or 'tree')|lower }}">{{ r.model_engine or "Tree" }}</span>
+        {% if r.reset_flag == 'RESET' %}<span class="reset-tag">RESET {{ "{:.0%}".format(r.reset_prob or 0) }}</span>{% endif %}
+      </div>
+      <div class="play-detail">
+        Buy bond at <strong>{{ "{:.2f}".format(r.mkt_px) }}</strong>, model fair <strong>{{ "{:.2f}".format(r.model_px) }}</strong>.
+        Hedge with short <strong>{{ "{:,.0f}".format((r.delta or 0) * 1_000_000) }}</strong> shares of {{ r.underlying }} per ¥100M face.
+        HV60 {{ "{:.0%}".format(r.sigma) }} · spread {{ r.spread_bp }}bp · matures {{ r.maturity }}.
+      </div>
+    </div>
+    <div class="play-numbers">
+      <div class="play-cheap">
+        {{ "{:+.1f}%".format(r.cheap_pct) }}
+        <span class="lab">cheap</span>
+      </div>
+      <div class="play-prices">
+        <span class="action action-{{ action|lower }}">{{ action }}</span>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% if new_rics or dropped_rics %}
+<div class="section-head">
+  <h2>Recent activity</h2>
+  <span class="sub">Δ vs previous snapshot · the AI agent's daily diff</span>
+</div>
+<section class="activity">
+  <div class="activity-card">
+    <h3>New in universe ({{ new_rics|length }})</h3>
+    <p class="explain">Bonds the system started pricing today that weren't in yesterday's snapshot. Often a freshly-issued CB, a previously-illiquid bond getting a quote, or a name returning after a corporate action.</p>
+    <ul>
+      {% for r in new_rics %}
+        <li class="added">
+          <span><a href="/bond/{{ r.ric }}">{{ r.issuer }}</a> · <code>{{ r.ric }}</code></span>
+          <span style="color:{% if r.cheap_pct>=5 %}var(--green-700){% elif r.cheap_pct<=-5 %}var(--red){% else %}var(--muted){% endif %}; font-family: var(--mono); font-weight: 600;">{{ "{:+.1f}%".format(r.cheap_pct) }}</span>
+        </li>
+      {% else %}
+        <li class="muted" style="border:none;">No new bonds.</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="activity-card">
+    <h3>Dropped from universe ({{ dropped_rics|length }})</h3>
+    <p class="explain">Bonds priced yesterday that have no live quote today — typically illiquid names where the dealer mid hasn't updated. They'll re-appear when a quote comes back.</p>
+    <ul>
+      {% for r in dropped_rics %}
+        <li class="dropped">
+          <span>{{ r.issuer }} · <code>{{ r.ric }}</code></span>
+          <span class="muted">no live quote</span>
+        </li>
+      {% else %}
+        <li class="muted" style="border:none;">No drops.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+<div class="section-head">
+  <h2>Full universe</h2>
+  <span class="sub">click column to sort · ⊕ to add to watchlist · row colour by cheap%</span>
+</div>
+
+<div class="tabs" id="universe-tabs">
+  <button class="tab active" data-filter="all">All <span class="tab-count">{{ counts.all }}</span></button>
+  <button class="tab" data-filter="ig">Investment Grade <span class="tab-count">{{ counts.ig }}</span></button>
+  <button class="tab" data-filter="sub">Sub-IG <span class="tab-count">{{ counts.sub }}</span></button>
+  <button class="tab" data-filter="nr">Unrated <span class="tab-count">{{ counts.nr }}</span></button>
+  <button class="tab" data-filter="reset">Reset <span class="tab-count">{{ counts.reset }}</span></button>
+  <button class="tab" data-filter="anomaly">⚠ Anomaly <span class="tab-count">{{ counts.anomaly }}</span></button>
+</div>
+
+<table class="screen" id="universe-table">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>Equity</th><th>Rtg</th><th>Spd</th>
+      <th>Engine</th><th>Maturity</th>
+      <th class="num">Mkt</th><th class="num">Model</th>
+      <th class="num">Cheap%</th><th class="num">Prem%</th>
+      <th class="num">HV60</th><th class="num">IV</th>
+      <th class="num">Δ</th><th class="num">Vega</th>
+      <th>Conf</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    {% set cheap = r.cheap_pct or 0 %}
+    {% set band = "neutral" %}
+    {% if cheap >= 5 %}{% set band = "cheap-strong" %}
+    {% elif cheap >= 1 %}{% set band = "cheap-mild" %}
+    {% elif cheap <= -5 %}{% set band = "rich-strong" %}
+    {% elif cheap <= -1 %}{% set band = "rich-mild" %}
+    {% endif %}
+    {% set conf = r.confidence or "High" %}
+    <tr class="{{ band }}{% if r.reset_flag == 'RESET' %} reset{% endif %}{% if conf == 'Low' %} low-conf{% endif %}"
+        data-tier="{{ r.tier }}" data-reset="{% if r.reset_flag == 'RESET' %}1{% else %}0{% endif %}" data-anomaly="{% if conf == 'Low' %}1{% else %}0{% endif %}">
+      <td><a href="/bond/{{ r.ric }}">{{ r.issuer }}</a></td>
+      <td>{{ r.underlying }}</td>
+      <td><span class="rtg {{ 'ig' if r.tier=='ig' else 'sub' if r.tier=='sub' else 'nr' }}">{{ r.rating }}</span></td>
+      <td class="num">{{ r.spread_bp }}</td>
+      <td>
+        <span class="engine engine-{{ (r.model_engine or 'tree')|lower }}">{{ r.model_engine or "Tree" }}</span>
+        {% if r.reset_prob %}<span class="reset-prob">{{ "{:.0%}".format(r.reset_prob) }}</span>{% endif %}
+      </td>
+      <td>{{ r.maturity }}</td>
+      <td class="num">{{ "{:.2f}".format(r.mkt_px or 0) }}</td>
+      <td class="num">{{ "{:.2f}".format(r.model_px or 0) }}</td>
+      <td class="num cheap-cell">{{ "{:+.1f}".format(cheap) }}</td>
+      <td class="num">{{ "{:.0f}".format(r.premium_pct or 0) }}</td>
+      <td class="num">{{ "{:.2f}".format(r.sigma or 0) }}</td>
+      <td class="num">{% if r.iv %}{{ "{:.2f}".format(r.iv) }}{% else %}—{% endif %}</td>
+      <td class="num">{{ "{:.3f}".format(r.delta or 0) }}</td>
+      <td class="num">{{ "{:.2f}".format(r.vega or 0) }}</td>
+      <td>
+        <span class="conf-{{ conf|lower }}">{{ conf }}</span>
+        {% if r.anomaly_flags %}<span class="anomaly" title="{{ r.anomaly_flags }}">⚠</span>{% endif %}
+      </td>
+      <td><button class="small" onclick="addWatch(event, '{{ r.ric }}')">⊕</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+async function addWatch(ev, ric) {
+  ev.stopPropagation();
+  await fetch('/api/watchlist/' + encodeURIComponent(ric), {method:'POST'});
+  ev.target.textContent = '✓'; ev.target.disabled = true;
+}
+
+const tabs = document.querySelectorAll('#universe-tabs .tab');
+const rows = document.querySelectorAll('#universe-table tbody tr');
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  const f = t.dataset.filter;
+  rows.forEach(r => {
+    let show = true;
+    if (f === 'all') show = true;
+    else if (f === 'reset') show = r.dataset.reset === '1';
+    else if (f === 'anomaly') show = r.dataset.anomaly === '1';
+    else show = r.dataset.tier === f;
+    r.style.display = show ? '' : 'none';
+  });
+}));
+
+(function() {
+  const table = document.getElementById('universe-table');
+  if (!table) return;
+  const ths = table.querySelectorAll('th');
+  let curIdx = 8, asc = false;
+  ths.forEach((th, i) => {
+    if (i >= ths.length - 1) return;
+    th.addEventListener('click', () => {
+      if (curIdx === i) asc = !asc; else { curIdx = i; asc = false; }
+      ths.forEach(x => x.classList.remove('sorted-asc', 'sorted-desc'));
+      th.classList.add(asc ? 'sorted-asc' : 'sorted-desc');
+      const tbody = table.querySelector('tbody');
+      const rs = Array.from(tbody.querySelectorAll('tr'));
+      rs.sort((a, b) => {
+        let av = a.cells[i].textContent.trim().replace(/[+%,]/g,'');
+        let bv = b.cells[i].textContent.trim().replace(/[+%,]/g,'');
+        const an = parseFloat(av), bn = parseFloat(bv);
+        if (!isNaN(an) && !isNaN(bn)) return asc ? an - bn : bn - an;
+        return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+      });
+      rs.forEach(r => tbody.appendChild(r));
+    });
+  });
+})();
+</script>
+{% endblock %}

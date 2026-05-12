@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Watchlist{% endblock %}
+{% block content %}
+
+<section class="alerts-head">
+  <h1>Watchlist · portfolio view</h1>
+  <p>Aggregate Greeks and cheapness of the bonds you're tracking. Add bonds from the universe page.</p>
+</section>
+
+<section class="summary">
+  <div class="card"><span class="lab">Positions</span><span class="val">{{ portfolio.n }}</span></div>
+  <div class="card"><span class="lab">Total Δ shares (¥100M each)</span><span class="val">{{ "{:,}".format(portfolio.total_delta_shares) }}</span></div>
+  <div class="card"><span class="lab">Total Vega</span><span class="val">{{ portfolio.total_vega }}</span></div>
+  <div class="card"><span class="lab">Total θ /day</span><span class="val">{{ portfolio.total_theta }}</span></div>
+  <div class="card alert"><span class="lab">Avg cheap%</span><span class="val">{{ "{:+.1f}".format(portfolio.avg_cheap) }}</span></div>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>RIC</th><th>Equity</th><th>Rtg</th>
+      <th class="num">Mkt</th><th class="num">Model</th><th>Engine</th>
+      <th class="num">Cheap%</th><th class="num">Δ</th><th class="num">Vega</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td><a href="/bond/{{ r.ric }}">{{ r.issuer }}</a></td>
+      <td>{{ r.ric }}</td>
+      <td>{{ r.underlying }}</td>
+      <td><span class="rtg">{{ r.rating }}</span></td>
+      <td class="num">{{ "{:.2f}".format(r.mkt_px or 0) }}</td>
+      <td class="num">{{ "{:.2f}".format(r.model_px or 0) }}</td>
+      <td>{{ r.model_engine or "Tree" }}</td>
+      <td class="num">{{ "{:+.1f}".format(r.cheap_pct or 0) }}</td>
+      <td class="num">{{ "{:.3f}".format(r.delta or 0) }}</td>
+      <td class="num">{{ "{:.2f}".format(r.vega or 0) }}</td>
+      <td><button class="small" onclick="rmWatch('{{ r.ric }}')">remove</button></td>
+    </tr>
+    {% endfor %}
+    {% if not rows %}
+    <tr><td colspan="11" class="muted">Watchlist is empty. Add bonds from the universe page.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+
+<script>
+async function rmWatch(ric) {
+  await fetch('/api/watchlist/' + encodeURIComponent(ric), {method:'DELETE'});
+  location.reload();
+}
+</script>
+
+{% endblock %}
