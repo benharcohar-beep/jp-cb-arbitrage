@@ -1,6 +1,39 @@
-{% extends "base.html" %}
-{% block title %}Watchlist{% endblock %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Watchlist</title>
+  <link rel="stylesheet" href="static/app.css?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">JP</span>
+      <span class="title">CB Arbitrage Desk</span>
+      <span class="src">Refinitiv · LSEG Eikon</span>
+    </div>
+    <nav>
+      
+      
+      <a href="index.html">Universe</a>
+      <a href="watchlist.html">Watchlist</a>
+      <a href="backtest.html">Backtest</a>
+      <a href="alerts.html">Alerts log</a>
+      <a href="how-it-works.html">How it works</a>
+      
+    </nav>
+  </header>
+  
+  <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+  </div>
+  
+  <main>
+    
 
 <section class="alerts-head">
   <h1>Watchlist · portfolio view</h1>
@@ -25,30 +58,14 @@
     </tr>
   </thead>
   <tbody id="wl-body">
-    {% if rows %}
-    {% for r in rows %}
-    <tr>
-      <td><a href="{% if STATIC_SITE %}{{ ROOT|default('') }}bond/{{ r.ric.replace('=','_eq_') }}/{% else %}/bond/{{ r.ric }}{% endif %}">{{ r.issuer }}</a></td>
-      <td>{{ r.ric }}</td>
-      <td>{{ r.underlying }}</td>
-      <td><span class="rtg">{{ r.rating }}</span></td>
-      <td class="num">{{ "{:.2f}".format(r.mkt_px or 0) }}</td>
-      <td class="num">{{ "{:.2f}".format(r.model_px or 0) }}</td>
-      <td>{{ r.model_engine or "Tree" }}</td>
-      <td class="num">{{ "{:+.1f}".format(r.cheap_pct or 0) }}</td>
-      <td class="num">{{ "{:.3f}".format(r.delta or 0) }}</td>
-      <td class="num">{{ "{:.2f}".format(r.vega or 0) }}</td>
-      <td><button class="small" onclick="rmWatch('{{ r.ric }}')">remove</button></td>
-    </tr>
-    {% endfor %}
-    {% else %}
+    
     <tr id="wl-empty"><td colspan="11" class="muted">Watchlist is empty. Add bonds from the universe page.</td></tr>
-    {% endif %}
+    
   </tbody>
 </table>
 
 <script>
-{% if STATIC_SITE %}
+
 // Client-side watchlist via localStorage on static deploy.
 async function rmWatch(ric) {
   const key = 'jpcb_watchlist';
@@ -103,12 +120,24 @@ function updateAgg(rows) {
   document.getElementById('wl-cheap').textContent = (ac >= 0 ? '+' : '') + ac.toFixed(2);
 }
 hydrate();
-{% else %}
-async function rmWatch(ric) {
-  await fetch('/api/watchlist/' + encodeURIComponent(ric), {method:'DELETE'});
-  location.reload();
-}
-{% endif %}
+
 </script>
 
-{% endblock %}
+
+  </main>
+  <footer>
+    <span>Phase 2 build · pricer: Tsiveriotis-Fernandes binomial tree + MC for resets</span>
+  </footer>
+  <script>
+    async function runScreen() {
+      const btn = document.getElementById('run-now');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const r = await fetch('/api/run', {method:'POST'});
+        const j = await r.json();
+        location.reload();
+      } catch(e) { alert('Run failed: '+e); btn.disabled=false; btn.textContent='Run now'; }
+    }
+  </script>
+</body>
+</html>

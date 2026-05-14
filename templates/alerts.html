@@ -18,7 +18,7 @@
     {% for r in rows %}
     <tr class="cheap-strong">
       <td><code>{{ r.snapshot }}</code></td>
-      <td><a href="/bond/{{ r.ric }}">{{ r.issuer }}</a></td>
+      <td><a href="{% if STATIC_SITE %}{{ ROOT|default('') }}bond/{{ r.safe_ric }}/{% else %}/bond/{{ r.ric }}{% endif %}">{{ r.issuer }}</a></td>
       <td>{{ r.ric }}</td>
       <td><span class="rtg">{{ r.rating }}</span></td>
       <td class="num">{{ "{:+.1f}".format(r.cheap_pct) }}</td>

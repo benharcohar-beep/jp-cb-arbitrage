@@ -1,37 +1,68 @@
-{% extends "base.html" %}
-{% block title %}{{ bond.issuer }} · {{ bond.ric }}{% endblock %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kobe Steel · JP272792062=</title>
+  <link rel="stylesheet" href="../../static/app.css?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">JP</span>
+      <span class="title">CB Arbitrage Desk</span>
+      <span class="src">Refinitiv · LSEG Eikon</span>
+    </div>
+    <nav>
+      
+      
+      <a href="../../index.html">Universe</a>
+      <a href="../../watchlist.html">Watchlist</a>
+      <a href="../../backtest.html">Backtest</a>
+      <a href="../../alerts.html">Alerts log</a>
+      <a href="../../how-it-works.html">How it works</a>
+      
+    </nav>
+  </header>
+  
+  <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+  </div>
+  
+  <main>
+    
 
 <section class="bond-head">
   <div>
-    <a href="{% if STATIC_SITE %}{{ ROOT|default('') }}index.html{% else %}/{% endif %}" class="back">← back to universe</a>
-    <h1>{{ bond.issuer }}</h1>
-    <div class="sub">{{ bond.ric }} · underlying {{ bond.underlying }} · matures {{ bond.maturity }}</div>
+    <a href="../../index.html" class="back">← back to universe</a>
+    <h1>Kobe Steel</h1>
+    <div class="sub">JP272792062= · underlying 5406.T · matures 2030-12-13</div>
   </div>
   <div class="rating-block">
-    <span class="rtg-big">{{ bond.rating }}</span>
-    <span class="spread-big">{{ bond.spread_bp }}bp</span>
-    {% if bond.reset_flag == "RESET" %}<span class="reset-big">MC pricer · {{ "{:.0%}".format(bond.reset_prob or 0) }} reset prob</span>{% endif %}
-    {% if bond.anomaly_flags %}<span class="reset-big" style="background:rgba(239,68,68,0.2); color:var(--red)">{{ bond.anomaly_flags }}</span>{% endif %}
+    <span class="rtg-big">A</span>
+    <span class="spread-big">90bp</span>
+    
+    
   </div>
 </section>
 
 <section class="kpis">
-  <div class="kpi"><span class="lab">Market</span><span class="val">{{ "{:.2f}".format(bond.mkt_px) }}</span></div>
-  <div class="kpi"><span class="lab">Model · {{ bond.model_engine or "Tree" }}</span><span class="val">{{ "{:.2f}".format(bond.model_px) }}</span></div>
-  <div class="kpi cheap"><span class="lab">Cheap</span><span class="val">{{ "{:+.1f}%".format(bond.cheap_pct) }}</span></div>
-  {% if bond.model_mc_px and bond.model_tree_px %}
-  <div class="kpi"><span class="lab">MC vs Tree</span><span class="val">{{ "{:+.2f}".format((bond.model_mc_px or 0) - (bond.model_tree_px or 0)) }}</span></div>
-  {% endif %}
-  <div class="kpi"><span class="lab">Bond floor</span><span class="val">{{ "{:.2f}".format(bond.bond_floor) }}</span></div>
-  <div class="kpi"><span class="lab">Parity</span><span class="val">{{ "{:.2f}".format(bond.parity) }}</span></div>
-  <div class="kpi"><span class="lab">Premium</span><span class="val">{{ "{:.0f}%".format(bond.premium_pct) }}</span></div>
-  <div class="kpi"><span class="lab">HV60</span><span class="val">{{ "{:.0%}".format(bond.sigma) }}</span></div>
-  <div class="kpi"><span class="lab">IV</span><span class="val">{% if bond.iv %}{{ "{:.0%}".format(bond.iv) }}{% else %}—{% endif %}</span></div>
-  <div class="kpi"><span class="lab">Δ</span><span class="val">{{ "{:.3f}".format(bond.delta) }}</span></div>
-  <div class="kpi"><span class="lab">Γ</span><span class="val">{{ "{:.5f}".format(bond.gamma) }}</span></div>
-  <div class="kpi"><span class="lab">Vega</span><span class="val">{{ "{:.2f}".format(bond.vega) }}</span></div>
-  <div class="kpi"><span class="lab">θ /day</span><span class="val">{{ "{:+.3f}".format(bond.theta) }}</span></div>
+  <div class="kpi"><span class="lab">Market</span><span class="val">107.62</span></div>
+  <div class="kpi"><span class="lab">Model · Tree</span><span class="val">101.02</span></div>
+  <div class="kpi cheap"><span class="lab">Cheap</span><span class="val">-6.1%</span></div>
+  
+  <div class="kpi"><span class="lab">Bond floor</span><span class="val">88.11</span></div>
+  <div class="kpi"><span class="lab">Parity</span><span class="val">82.00</span></div>
+  <div class="kpi"><span class="lab">Premium</span><span class="val">31%</span></div>
+  <div class="kpi"><span class="lab">HV60</span><span class="val">32%</span></div>
+  <div class="kpi"><span class="lab">IV</span><span class="val">43%</span></div>
+  <div class="kpi"><span class="lab">Δ</span><span class="val">0.020</span></div>
+  <div class="kpi"><span class="lab">Γ</span><span class="val">0.00002</span></div>
+  <div class="kpi"><span class="lab">Vega</span><span class="val">0.59</span></div>
+  <div class="kpi"><span class="lab">θ /day</span><span class="val">+0.002</span></div>
 </section>
 
 <section class="hedge-suggestion">
@@ -58,8 +89,8 @@
         <div class="kpi"><span class="lab">Vega /1 vol pt</span><span class="val" id="s-vega">—</span></div>
       </div>
       <p style="margin-top:14px; font-size:12.5px; line-height:1.6; color:var(--ink-soft);">
-        Buy <strong>¥<span id="s-face">100</span>M face</strong> of this CB at market <strong>{{ "{:.2f}".format(bond.mkt_px) }}</strong> = <strong id="s-bond-cost-2">—</strong>.
-        Short <strong id="s-shares-2">—</strong> shares of {{ bond.underlying }} at ¥<strong>{{ "{:,.0f}".format(bond.spot) }}</strong>.
+        Buy <strong>¥<span id="s-face">100</span>M face</strong> of this CB at market <strong>107.62</strong> = <strong id="s-bond-cost-2">—</strong>.
+        Short <strong id="s-shares-2">—</strong> shares of 5406.T at ¥<strong>1,926</strong>.
         If model is right, expected gross convergence P&amp;L is <strong id="s-edge-2">—</strong>.
         After 25bp bond round-trip + 5bp equity round-trip transaction costs, net edge is <strong id="s-net">—</strong>.
         At 1% JPY financing on the long bond, daily carry costs <strong id="s-carry">—</strong> (offset by short rebate).
@@ -70,13 +101,13 @@
 
 <script>
 const bondData = {
-  mkt: {{ bond.mkt_px }},
-  model: {{ bond.model_px }},
-  cheap: {{ bond.cheap_pct }},
-  delta: {{ bond.delta }},
-  vega: {{ bond.vega }},
-  theta: {{ bond.theta }},
-  spot: {{ bond.spot }}
+  mkt: 107.625,
+  model: 101.02017018039528,
+  cheap: -6.136891818448053,
+  delta: 0.019503905200564,
+  vega: 0.594054237743336,
+  theta: 0.0022462709723356,
+  spot: 1926.5
 };
 
 function fmtJPY(x) {
@@ -129,14 +160,10 @@ updateSizing();
 
 <script>
 async function loadHistory() {
-  {% if STATIC_SITE %}
+  
   // Static site has no per-bond history endpoint; show empty chart
   return [];
-  {% else %}
-  const r = await fetch('/api/bond_history/' + encodeURIComponent('{{ bond.ric }}'));
-  const j = await r.json();
-  return j.rows || [];
-  {% endif %}
+  
 }
 
 (async () => {
@@ -167,4 +194,21 @@ if (data.length > 0) {
 })();
 </script>
 
-{% endblock %}
+
+  </main>
+  <footer>
+    <span>Phase 2 build · pricer: Tsiveriotis-Fernandes binomial tree + MC for resets</span>
+  </footer>
+  <script>
+    async function runScreen() {
+      const btn = document.getElementById('run-now');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const r = await fetch('/api/run', {method:'POST'});
+        const j = await r.json();
+        location.reload();
+      } catch(e) { alert('Run failed: '+e); btn.disabled=false; btn.textContent='Run now'; }
+    }
+  </script>
+</body>
+</html>

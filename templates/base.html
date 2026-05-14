@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}JP CB Arb Dashboard{% endblock %}</title>
-  <link rel="stylesheet" href="/static/app.css?v=5">
+  <link rel="stylesheet" href="{% if STATIC_SITE %}{{ ROOT|default('') }}{% endif %}static/app.css?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
@@ -17,17 +17,26 @@
       <span class="src">Refinitiv · LSEG Eikon</span>
     </div>
     <nav>
+      {% if STATIC_SITE %}
+      {% set R = ROOT|default('') %}
+      <a href="{{ R }}index.html">Universe</a>
+      <a href="{{ R }}watchlist.html">Watchlist</a>
+      <a href="{{ R }}backtest.html">Backtest</a>
+      <a href="{{ R }}alerts.html">Alerts log</a>
+      <a href="{{ R }}how-it-works.html">How it works</a>
+      {% else %}
       <a href="/">Universe</a>
       <a href="/watchlist">Watchlist</a>
       <a href="/backtest">Backtest</a>
       <a href="/alerts">Alerts log</a>
       <a href="/how-it-works">How it works</a>
       <button id="run-now" onclick="runScreen()">Run now</button>
+      {% endif %}
     </nav>
   </header>
   {% if DEMO_MODE %}
   <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
-    <strong>DEMO MODE</strong> · Hosted view with a cached snapshot from Apr 30 2026. The live version pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
   </div>
   {% endif %}
   <main>

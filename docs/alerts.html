@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Alerts log</title>
+  <link rel="stylesheet" href="static/app.css?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">JP</span>
+      <span class="title">CB Arbitrage Desk</span>
+      <span class="src">Refinitiv · LSEG Eikon</span>
+    </div>
+    <nav>
+      
+      
+      <a href="index.html">Universe</a>
+      <a href="watchlist.html">Watchlist</a>
+      <a href="backtest.html">Backtest</a>
+      <a href="alerts.html">Alerts log</a>
+      <a href="how-it-works.html">How it works</a>
+      
+    </nav>
+  </header>
+  
+  <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+  </div>
+  
+  <main>
+    
+
+<section class="alerts-head">
+  <h1>Cheap signals — historical log</h1>
+  <p>Bonds that crossed the ≥5% cheap threshold in any snapshot, excluding reset-flagged.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Snapshot</th><th>Issuer</th><th>RIC</th><th>Rtg</th>
+      <th class="num">Cheap%</th><th class="num">Mkt</th><th class="num">Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr class="cheap-strong">
+      <td><code>demo_screen</code></td>
+      <td><a href="bond/JP330437685_eq_/">Advantest</a></td>
+      <td>JP330437685=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+8.5</td>
+      <td class="num">121.45</td>
+      <td class="num">131.72</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>demo_screen</code></td>
+      <td><a href="bond/JP279962206_eq_/">Rohm</a></td>
+      <td>JP279962206=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+13.7</td>
+      <td class="num">131.50</td>
+      <td class="num">149.48</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260508_1331</code></td>
+      <td><a href="bond/JP279962168_eq_/">Rohm</a></td>
+      <td>JP279962168=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+16.5</td>
+      <td class="num">128.38</td>
+      <td class="num">149.56</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260508_1331</code></td>
+      <td><a href="bond/JP270026966_eq_/">Taiyo Yuden</a></td>
+      <td>JP270026966=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+20.4</td>
+      <td class="num">148.38</td>
+      <td class="num">178.60</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260508_1331</code></td>
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>JP271701055=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+30.8</td>
+      <td class="num">81.75</td>
+      <td class="num">106.93</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260506_2038</code></td>
+      <td><a href="bond/JP279962168_eq_/">Rohm</a></td>
+      <td>JP279962168=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.8</td>
+      <td class="num">128.38</td>
+      <td class="num">143.49</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260506_2038</code></td>
+      <td><a href="bond/JP270026966_eq_/">Taiyo Yuden</a></td>
+      <td>JP270026966=</td>
+      <td><span class="rtg">A</span></td>
+      <td class="num">+18.0</td>
+      <td class="num">148.38</td>
+      <td class="num">175.03</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260506_2038</code></td>
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>JP271701055=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+18.9</td>
+      <td class="num">81.75</td>
+      <td class="num">97.22</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260430_1029</code></td>
+      <td><a href="bond/JP330437685_eq_/">Advantest</a></td>
+      <td>JP330437685=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+8.5</td>
+      <td class="num">121.45</td>
+      <td class="num">131.72</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260430_1029</code></td>
+      <td><a href="bond/JP279962206_eq_/">Rohm</a></td>
+      <td>JP279962206=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+13.7</td>
+      <td class="num">131.50</td>
+      <td class="num">149.48</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260430_1027</code></td>
+      <td><a href="bond/JP279962168_eq_/">Rohm</a></td>
+      <td>JP279962168=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.2</td>
+      <td class="num">127.12</td>
+      <td class="num">141.34</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260430_1027</code></td>
+      <td><a href="bond/JP270026966_eq_/">Taiyo Yuden</a></td>
+      <td>JP270026966=</td>
+      <td><span class="rtg">A</span></td>
+      <td class="num">+14.6</td>
+      <td class="num">156.75</td>
+      <td class="num">179.67</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260430_1027</code></td>
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>JP271701055=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+19.1</td>
+      <td class="num">82.00</td>
+      <td class="num">97.63</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1836</code></td>
+      <td><a href="bond/JP258410505_eq_/">Park24</a></td>
+      <td>JP258410505=</td>
+      <td><span class="rtg">BBB</span></td>
+      <td class="num">+5.5</td>
+      <td class="num">100.12</td>
+      <td class="num">105.59</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1836</code></td>
+      <td><a href="bond/JP235717468_eq_/">Mercari</a></td>
+      <td>JP235717468=</td>
+      <td><span class="rtg">BBB</span></td>
+      <td class="num">+5.6</td>
+      <td class="num">90.62</td>
+      <td class="num">95.70</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1836</code></td>
+      <td><a href="bond/JP330437685_eq_/">Advantest</a></td>
+      <td>JP330437685=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.6</td>
+      <td class="num">121.45</td>
+      <td class="num">135.52</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1836</code></td>
+      <td><a href="bond/JP279962168_eq_/">Rohm</a></td>
+      <td>JP279962168=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.9</td>
+      <td class="num">127.12</td>
+      <td class="num">142.23</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1836</code></td>
+      <td><a href="bond/JP279962206_eq_/">Rohm</a></td>
+      <td>JP279962206=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+14.5</td>
+      <td class="num">131.50</td>
+      <td class="num">150.56</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1836</code></td>
+      <td><a href="bond/JP270026966_eq_/">Taiyo Yuden</a></td>
+      <td>JP270026966=</td>
+      <td><span class="rtg">A</span></td>
+      <td class="num">+16.9</td>
+      <td class="num">156.75</td>
+      <td class="num">183.26</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1836</code></td>
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>JP271701055=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+19.2</td>
+      <td class="num">82.00</td>
+      <td class="num">97.77</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1835</code></td>
+      <td><a href="bond/JP258410505_eq_/">Park24</a></td>
+      <td>JP258410505=</td>
+      <td><span class="rtg">BBB</span></td>
+      <td class="num">+5.5</td>
+      <td class="num">100.12</td>
+      <td class="num">105.59</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1835</code></td>
+      <td><a href="bond/JP235717468_eq_/">Mercari</a></td>
+      <td>JP235717468=</td>
+      <td><span class="rtg">BBB</span></td>
+      <td class="num">+5.6</td>
+      <td class="num">90.62</td>
+      <td class="num">95.70</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1835</code></td>
+      <td><a href="bond/JP330437685_eq_/">Advantest</a></td>
+      <td>JP330437685=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.6</td>
+      <td class="num">121.45</td>
+      <td class="num">135.52</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1835</code></td>
+      <td><a href="bond/JP279962168_eq_/">Rohm</a></td>
+      <td>JP279962168=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.9</td>
+      <td class="num">127.12</td>
+      <td class="num">142.23</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1835</code></td>
+      <td><a href="bond/JP279962206_eq_/">Rohm</a></td>
+      <td>JP279962206=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+14.5</td>
+      <td class="num">131.50</td>
+      <td class="num">150.56</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1835</code></td>
+      <td><a href="bond/JP270026966_eq_/">Taiyo Yuden</a></td>
+      <td>JP270026966=</td>
+      <td><span class="rtg">A</span></td>
+      <td class="num">+16.9</td>
+      <td class="num">156.75</td>
+      <td class="num">183.26</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1835</code></td>
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>JP271701055=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+19.2</td>
+      <td class="num">82.00</td>
+      <td class="num">97.77</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1408</code></td>
+      <td><a href="bond/JP330437685_eq_/">Advantest</a></td>
+      <td>JP330437685=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.6</td>
+      <td class="num">121.45</td>
+      <td class="num">135.52</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1408</code></td>
+      <td><a href="bond/JP279962168_eq_/">Rohm</a></td>
+      <td>JP279962168=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.9</td>
+      <td class="num">127.12</td>
+      <td class="num">142.23</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1408</code></td>
+      <td><a href="bond/JP279962206_eq_/">Rohm</a></td>
+      <td>JP279962206=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+14.5</td>
+      <td class="num">131.50</td>
+      <td class="num">150.56</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1408</code></td>
+      <td><a href="bond/JP270026966_eq_/">Taiyo Yuden</a></td>
+      <td>JP270026966=</td>
+      <td><span class="rtg">A</span></td>
+      <td class="num">+16.9</td>
+      <td class="num">156.75</td>
+      <td class="num">183.26</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1408</code></td>
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>JP271701055=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+19.2</td>
+      <td class="num">82.00</td>
+      <td class="num">97.77</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1232</code></td>
+      <td><a href="bond/JP258410505_eq_/">Park24</a></td>
+      <td>JP258410505=</td>
+      <td><span class="rtg">BBB</span></td>
+      <td class="num">+5.5</td>
+      <td class="num">100.12</td>
+      <td class="num">105.59</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1232</code></td>
+      <td><a href="bond/JP235717468_eq_/">Mercari</a></td>
+      <td>JP235717468=</td>
+      <td><span class="rtg">BBB</span></td>
+      <td class="num">+5.6</td>
+      <td class="num">90.62</td>
+      <td class="num">95.70</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1232</code></td>
+      <td><a href="bond/JP279962168_eq_/">Rohm</a></td>
+      <td>JP279962168=</td>
+      <td><span class="rtg">A+</span></td>
+      <td class="num">+11.9</td>
+      <td class="num">127.12</td>
+      <td class="num">142.23</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1232</code></td>
+      <td><a href="bond/JP270026966_eq_/">Taiyo Yuden</a></td>
+      <td>JP270026966=</td>
+      <td><span class="rtg">A</span></td>
+      <td class="num">+16.9</td>
+      <td class="num">156.75</td>
+      <td class="num">183.26</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1232</code></td>
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>JP271701055=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+19.2</td>
+      <td class="num">82.00</td>
+      <td class="num">97.77</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><code>20260429_1225</code></td>
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>JP271701055=</td>
+      <td><span class="rtg">NR</span></td>
+      <td class="num">+19.2</td>
+      <td class="num">82.00</td>
+      <td class="num">97.77</td>
+    </tr>
+    
+    
+  </tbody>
+</table>
+
+
+  </main>
+  <footer>
+    <span>Phase 2 build · pricer: Tsiveriotis-Fernandes binomial tree + MC for resets</span>
+  </footer>
+  <script>
+    async function runScreen() {
+      const btn = document.getElementById('run-now');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const r = await fetch('/api/run', {method:'POST'});
+        const j = await r.json();
+        location.reload();
+      } catch(e) { alert('Run failed: '+e); btn.disabled=false; btn.textContent='Run now'; }
+    }
+  </script>
+</body>
+</html>

@@ -52,7 +52,7 @@
   {% for r in top %}
   {% set action = 'BUY' if r.confidence == 'High' and r.cheap_pct >= 5 and r.reset_flag != 'RESET' else 'WATCH' if r.cheap_pct >= 5 else 'AVOID' %}
   {% set rank = loop.index %}
-  <a href="/bond/{{ r.ric }}" class="play-row">
+  <a href="{% if STATIC_SITE %}{{ ROOT|default('') }}bond/{{ r.safe_ric }}/{% else %}/bond/{{ r.ric }}{% endif %}" class="play-row">
     <div class="play-rank">{{ rank }}</div>
     <div class="play-main">
       <div class="play-title">
@@ -93,7 +93,7 @@
     <ul>
       {% for r in new_rics %}
         <li class="added">
-          <span><a href="/bond/{{ r.ric }}">{{ r.issuer }}</a> · <code>{{ r.ric }}</code></span>
+          <span><a href="{% if STATIC_SITE %}{{ ROOT|default('') }}bond/{{ r.safe_ric }}/{% else %}/bond/{{ r.ric }}{% endif %}">{{ r.issuer }}</a> · <code>{{ r.ric }}</code></span>
           <span style="color:{% if r.cheap_pct>=5 %}var(--green-700){% elif r.cheap_pct<=-5 %}var(--red){% else %}var(--muted){% endif %}; font-family: var(--mono); font-weight: 600;">{{ "{:+.1f}%".format(r.cheap_pct) }}</span>
         </li>
       {% else %}
@@ -156,7 +156,7 @@
     {% set conf = r.confidence or "High" %}
     <tr class="{{ band }}{% if r.reset_flag == 'RESET' %} reset{% endif %}{% if conf == 'Low' %} low-conf{% endif %}"
         data-tier="{{ r.tier }}" data-reset="{% if r.reset_flag == 'RESET' %}1{% else %}0{% endif %}" data-anomaly="{% if conf == 'Low' %}1{% else %}0{% endif %}">
-      <td><a href="/bond/{{ r.ric }}">{{ r.issuer }}</a></td>
+      <td><a href="{% if STATIC_SITE %}{{ ROOT|default('') }}bond/{{ r.safe_ric }}/{% else %}/bond/{{ r.ric }}{% endif %}">{{ r.issuer }}</a></td>
       <td>{{ r.underlying }}</td>
       <td><span class="rtg {{ 'ig' if r.tier=='ig' else 'sub' if r.tier=='sub' else 'nr' }}">{{ r.rating }}</span></td>
       <td class="num">{{ r.spread_bp }}</td>
@@ -186,7 +186,15 @@
 <script>
 async function addWatch(ev, ric) {
   ev.stopPropagation();
+  ev.preventDefault();
+  {% if STATIC_SITE %}
+  // Static site: client-side watchlist in localStorage
+  const key = 'jpcb_watchlist';
+  const cur = JSON.parse(localStorage.getItem(key) || '[]');
+  if (!cur.includes(ric)) { cur.push(ric); localStorage.setItem(key, JSON.stringify(cur)); }
+  {% else %}
   await fetch('/api/watchlist/' + encodeURIComponent(ric), {method:'POST'});
+  {% endif %}
   ev.target.textContent = '✓'; ev.target.disabled = true;
 }
 
