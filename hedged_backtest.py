@@ -102,8 +102,13 @@ def compute_real_entry_delta(panel_grp: pd.DataFrame, entry_idx: int,
 # ---------------------------------------------------------------------------
 @dataclass
 class HedgeParams:
-    cost_bond_bp:    float = 25.0     # one-way half-spread on bond
-    cost_equity_bp:  float = 5.0      # one-way half-spread on equity
+    # When use_bid_ask=True we execute at the dealer's ask (buy) / bid (sell)
+    # and the cost_bond_bp parameter becomes ZERO (the spread is captured
+    # directly in the price differential). Old default 25bp was an estimate;
+    # using real bid/ask removes that approximation entirely.
+    use_bid_ask:     bool  = True
+    cost_bond_bp:    float = 0.0      # superseded by bid/ask when use_bid_ask=True
+    cost_equity_bp:  float = 5.0      # equity half-spread (no real bid/ask in panel)
     financing_rate:  float = 0.010    # JPY cash rate (decimal, annualised)
     notional_jpy:    float = 100_000_000  # ¥100M face per position
     rehedge_freq:    int   = 5        # rehedge every N business days
@@ -133,7 +138,11 @@ def simulate_trade(panel_grp: pd.DataFrame, entry_idx: int,
 
     bond_face = params.notional_jpy
     bond_units = bond_face / 100.0  # bond price quoted as % of par
-    entry_bond_px = float(entry["mkt_px"])
+    # Realistic execution: BUY at ask, SELL at bid. Falls back to mid if no quote.
+    if params.use_bid_ask and "ask_px" in grp.columns and pd.notna(entry.get("ask_px")):
+        entry_bond_px = float(entry["ask_px"])
+    else:
+        entry_bond_px = float(entry["mkt_px"])
     entry_spot = float(entry["spot"])
 
     # Real per-trade delta from the pricer, with parity-proxy fallback.
@@ -199,7 +208,11 @@ def simulate_trade(panel_grp: pd.DataFrame, entry_idx: int,
         return None
 
     final = grp.iloc[exit_idx]
-    final_bond = float(final["mkt_px"])
+    # Realistic execution: SELL at bid
+    if params.use_bid_ask and "bid_px" in grp.columns and pd.notna(final.get("bid_px")):
+        final_bond = float(final["bid_px"])
+    else:
+        final_bond = float(final["mkt_px"])
     final_spot = float(final["spot"])
 
     bond_pnl = (final_bond - entry_bond_px) * bond_units

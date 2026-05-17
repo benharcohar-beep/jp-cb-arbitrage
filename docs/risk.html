@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Risk</title>
-  <link rel="stylesheet" href="static/app.css?v=blue2">
+  <link rel="stylesheet" href="static/app.css?v=blue3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
@@ -82,17 +82,17 @@
 
 <div class="section-head"><h2>Backtest review · how the limits would have behaved</h2></div>
 <section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
-  <div class="kpi"><span class="lab">Trades reviewed</span><span class="val">38</span></div>
-  <div class="kpi alert"><span class="lab">Accepted as-is</span><span class="val">35</span></div>
-  <div class="kpi"><span class="lab">Resized down</span><span class="val">3</span></div>
+  <div class="kpi"><span class="lab">Trades reviewed</span><span class="val">77</span></div>
+  <div class="kpi alert"><span class="lab">Accepted as-is</span><span class="val">68</span></div>
+  <div class="kpi"><span class="lab">Resized down</span><span class="val">9</span></div>
   <div class="kpi"><span class="lab">Rejected</span><span class="val">0</span></div>
-  <div class="kpi"><span class="lab">Avg 1d 95% VaR</span><span class="val">0.12%</span></div>
-  <div class="kpi"><span class="lab">Peak 1d 95% VaR</span><span class="val">0.13%</span></div>
+  <div class="kpi"><span class="lab">Avg 1d 95% VaR</span><span class="val">0.74%</span></div>
+  <div class="kpi"><span class="lab">Peak 1d 95% VaR</span><span class="val">0.98%</span></div>
 </section>
 
 <div class="callout">
   <span class="label">What this means</span>
-  Out of 38 historical trades, the risk framework would have accepted 35 as-is, resized 3 (all from concentration breaches in our biggest winners), and rejected 0. The 1-day 95% VaR averaged 0.12% of NAV — well inside the 2% soft limit — meaning the strategy was never close to breaching risk budgets. <strong>Interpretation: the strategy is small-vol enough at 5-slot sizing that risk limits rarely bite.</strong> Tighter limits would only matter at higher concentration.
+  Out of 77 historical trades, the risk framework would have accepted 68 as-is, resized 9 (all from concentration breaches in our biggest winners), and rejected 0. The 1-day 95% VaR averaged 0.74% of NAV — well inside the 2% soft limit — meaning the strategy was never close to breaching risk budgets. <strong>Interpretation: the strategy is small-vol enough at 5-slot sizing that risk limits rarely bite.</strong> Tighter limits would only matter at higher concentration.
 </div>
 
 
@@ -116,25 +116,15 @@
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     <tr class="rich-mild">
-      <td>2025-06-20</td>
-      <td>Rohm</td>
-      <td class="num">+9.1</td>
-      <td class="num">30,000,000</td>
-      <td class="num">7,500,000</td>
+      <td>2023-06-16</td>
+      <td>Mercari</td>
+      <td class="num">+19.3</td>
+      <td class="num">150,000,000</td>
+      <td class="num">37,500,000</td>
       <td class="num">5.0%</td>
       <td><strong>RESIZED</strong></td>
-      <td style="font-size:11px;">issuer_pct_cap (40.0% &gt; 25.0%)</td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=150M + 150M &gt; 200M); issuer_pct_cap (26.7% &gt; 25.0%)</td>
     </tr>
     
     
@@ -161,16 +151,163 @@
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <tr class="rich-mild">
-      <td>2025-11-12</td>
-      <td>Rohm</td>
-      <td class="num">+5.1</td>
-      <td class="num">30,000,000</td>
-      <td class="num">7,500,000</td>
+      <td>2024-08-02</td>
+      <td>Daifuku</td>
+      <td class="num">+6.5</td>
+      <td class="num">148,812,994</td>
+      <td class="num">37,203,248</td>
       <td class="num">5.0%</td>
       <td><strong>RESIZED</strong></td>
-      <td style="font-size:11px;">issuer_pct_cap (40.0% &gt; 25.0%)</td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=149M + 149M &gt; 200M); issuer_pct_cap (26.9% &gt; 25.0%)</td>
     </tr>
+    
+    
+    
+    <tr class="rich-mild">
+      <td>2024-08-05</td>
+      <td>Nagoya Railroad</td>
+      <td class="num">+5.2</td>
+      <td class="num">148,812,994</td>
+      <td class="num">37,264,406</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=149M + 149M &gt; 200M); issuer_pct_cap (26.9% &gt; 25.0%)</td>
+    </tr>
+    
+    
+    
+    
+    
+    <tr class="rich-mild">
+      <td>2024-08-05</td>
+      <td>Kobe Steel</td>
+      <td class="num">+8.4</td>
+      <td class="num">148,812,994</td>
+      <td class="num">37,203,248</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=149M + 149M &gt; 200M); issuer_pct_cap (26.9% &gt; 25.0%)</td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <tr class="rich-mild">
+      <td>2024-11-01</td>
+      <td>Daifuku</td>
+      <td class="num">+7.1</td>
+      <td class="num">149,627,509</td>
+      <td class="num">37,406,877</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=150M + 150M &gt; 200M); issuer_pct_cap (26.7% &gt; 25.0%)</td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    
+    <tr class="rich-mild">
+      <td>2024-11-04</td>
+      <td>Kobe Steel</td>
+      <td class="num">+5.2</td>
+      <td class="num">149,627,509</td>
+      <td class="num">37,406,877</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=150M + 150M &gt; 200M); issuer_pct_cap (26.7% &gt; 25.0%)</td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <tr class="rich-mild">
+      <td>2025-04-07</td>
+      <td>Daifuku</td>
+      <td class="num">+6.3</td>
+      <td class="num">145,966,746</td>
+      <td class="num">36,491,686</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=146M + 146M &gt; 200M); issuer_pct_cap (27.4% &gt; 25.0%)</td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -193,12 +330,12 @@
     <tr class="rich-mild">
       <td>2026-03-06</td>
       <td>Rohm</td>
-      <td class="num">+13.0</td>
-      <td class="num">30,014,067</td>
-      <td class="num">7,503,517</td>
+      <td class="num">+5.3</td>
+      <td class="num">144,964,969</td>
+      <td class="num">36,241,242</td>
       <td class="num">5.0%</td>
       <td><strong>RESIZED</strong></td>
-      <td style="font-size:11px;">issuer_pct_cap (40.0% &gt; 25.0%)</td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=145M + 145M &gt; 200M); issuer_pct_cap (27.6% &gt; 25.0%)</td>
     </tr>
     
     
@@ -217,9 +354,16 @@
     
     
     
-    
-    
-    
+    <tr class="rich-mild">
+      <td>2026-04-22</td>
+      <td>Daifuku</td>
+      <td class="num">+5.0</td>
+      <td class="num">144,964,969</td>
+      <td class="num">36,241,242</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_notional_cap (cur=145M + 145M &gt; 200M); issuer_pct_cap (27.6% &gt; 25.0%)</td>
+    </tr>
     
     
   </tbody>

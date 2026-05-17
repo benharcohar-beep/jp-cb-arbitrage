@@ -42,15 +42,18 @@ If Refinitiv Workspace isn't running, the agent auto-launches it via macOS
 | 10–15% | **70%** | **+881** | +448 |
 | 15–25% | 50% | +164 | -15 |
 
-**Paper trading simulation ($1M starting equity, 5 concurrent positions):**
+**Paper trading simulation ($5M starting equity, 5 concurrent positions, 3-year backtest with bid/ask execution):**
 
 | Metric | Result |
 |---|---|
-| Ending equity | $1,200,406 |
-| CAGR | +23.8% |
-| Max drawdown | -1.4% |
-| Sharpe | 1.49 |
-| Trades taken | 21 / 38 |
+| Ending equity | $5,867,673 |
+| CAGR | +5.65% |
+| Max drawdown | -3.89% |
+| Sharpe | 0.49 |
+| Trades taken | 46 / 77 |
+| Days simulated | 1,064 (~3 years) |
+
+> **Honest note:** an earlier 13-month version of this backtest showed CAGR +24% / Sharpe 1.49, but that number was flattered by (a) one extraordinary 4-month window in Q1 2026, (b) trading at the dealer indicative mid instead of realistic bid/ask. The numbers above use 3 years of data and execute at the ask on entry / bid on exit. They are what an actual JP CB arb desk would realize. The headline drop is the honest "what changed" story.
 
 **Sizing sensitivity (same trades, different concentration):**
 

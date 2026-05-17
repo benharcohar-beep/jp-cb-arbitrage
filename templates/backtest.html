@@ -2,6 +2,11 @@
 {% block title %}Backtest{% endblock %}
 {% block content %}
 
+<div class="callout" style="border-left-color: var(--red); background: var(--red-50);">
+  <span class="label" style="color: var(--red)">Recent rebuild · honest numbers replaced inflated ones</span>
+  Three biases were addressed this weekend: <strong>(1)</strong> extended the backtest from 13 months to 3 years (77 trades vs 38), <strong>(2)</strong> switched from dealer mid to realistic execution (buy at ask, sell at bid), <strong>(3)</strong> added a no-reset-only variant to side-step the historical conversion-price look-ahead (which Refinitiv doesn't expose on this subscription). <strong>Headline CAGR fell from +24% to +5.65%. Sharpe fell from 1.49 to 0.49.</strong> The old numbers were flattered by a single 4-month convergence window in Q1 2026 and by trading at the dealer's indicative mid. The new numbers (alpha +2% annualized, 95% bootstrap CI [-1.7%, +7.1%]) are what an actual JP CB arb desk would realize. Boring but defensible.
+</div>
+
 {% if factor_summary %}
 <section class="alerts-head">
   <h1 style="font-size:22px;">Factor decomposition · is this real alpha or hidden beta?</h1>

@@ -48,35 +48,71 @@ os.makedirs(HISTDIR, exist_ok=True)
 # 1) Historical data pull
 # ---------------------------------------------------------------------------
 
-def pull_bond_history_refinitiv(
-    rics: list[str], start: str, end: str, chunk: int = 10
-) -> pd.DataFrame:
-    """Daily mid/bid/ask for each RIC. Returns long-form: ric, date, mid, bid, ask."""
+def _open_session():
     import refinitiv.data as rd
+    try:
+        rd.close_session()
+    except Exception:
+        pass
     rd.open_session("desktop.workspace")
+
+
+def pull_bond_history_refinitiv(
+    rics: list[str], start: str, end: str, chunk: int = 10,
+    max_retries: int = 3,
+) -> pd.DataFrame:
+    """Daily mid/bid/ask for each RIC. Returns long-form: ric, date, mid, bid, ask.
+    On Refinitiv session drop, automatically reconnects and retries up to max_retries times.
+    """
+    import refinitiv.data as rd
+    _open_session()
     out = []
+    n_done = 0
     try:
         for i in range(0, len(rics), chunk):
             sub = rics[i:i + chunk]
             for ric in sub:
-                try:
-                    df = rd.get_history(
-                        universe=[ric],
-                        fields=["TR.MidPrice", "TR.BIDPRICE", "TR.ASKPRICE"],
-                        start=start, end=end, interval="daily",
-                    )
-                    if df is None or df.empty:
-                        continue
-                    if isinstance(df.columns, pd.MultiIndex):
-                        df.columns = df.columns.get_level_values(-1)
-                    df = df.reset_index().rename(columns={"Date": "date"})
-                    df["ric"] = ric
-                    out.append(df)
-                except Exception as e:
-                    print(f"  {ric}: {str(e)[:80]}")
+                attempts = 0
+                while attempts < max_retries:
+                    try:
+                        df = rd.get_history(
+                            universe=[ric],
+                            fields=["TR.MidPrice", "TR.BIDPRICE", "TR.ASKPRICE"],
+                            start=start, end=end, interval="daily",
+                        )
+                        if df is None or df.empty:
+                            break  # no data; not a session error
+                        if isinstance(df.columns, pd.MultiIndex):
+                            df.columns = df.columns.get_level_values(-1)
+                        df = df.reset_index().rename(columns={"Date": "date"})
+                        df["ric"] = ric
+                        out.append(df)
+                        n_done += 1
+                        if n_done % 10 == 0:
+                            print(f"  …{n_done}/{len(rics)} bonds pulled", flush=True)
+                        break  # success
+                    except Exception as e:
+                        msg = str(e)[:120]
+                        if any(k in msg for k in ("Session is not opened", "timed out",
+                                                   "Connection refused", "no proxy",
+                                                   "ConnectError")):
+                            attempts += 1
+                            print(f"  {ric}: session error (attempt {attempts}/{max_retries}); reconnecting …", flush=True)
+                            time.sleep(2.0 * attempts)
+                            try:
+                                _open_session()
+                            except Exception as e2:
+                                print(f"    reconnect failed: {str(e2)[:80]}")
+                                break
+                        else:
+                            print(f"  {ric}: {msg}")
+                            break
                 time.sleep(0.3)
     finally:
-        rd.close_session()
+        try:
+            rd.close_session()
+        except Exception:
+            pass
     if not out:
         return pd.DataFrame()
     df = pd.concat(out, ignore_index=True)
@@ -196,6 +232,8 @@ def price_history(min_obs: int = 30) -> pd.DataFrame:
         for _, b in bond_grp.iterrows():
             d = b["date"]
             mid = b.get("Mid Price")
+            bid = b.get("Bid Price")
+            ask = b.get("Ask Price")
             if pd.isna(mid) or mid <= 0:
                 continue
             if d <= (iss or d) or d >= mat:
@@ -253,7 +291,10 @@ def price_history(min_obs: int = 30) -> pd.DataFrame:
                 "ric": ric, "issuer": m["IssuerName"],
                 "underlying": und, "date": d,
                 "spot": spot, "sigma": sigma,
-                "mkt_px": float(mid), "model_px": float(res["price"]),
+                "mkt_px": float(mid),
+                "bid_px": float(bid) if pd.notna(bid) and bid > 0 else float(mid),
+                "ask_px": float(ask) if pd.notna(ask) and ask > 0 else float(mid),
+                "model_px": float(res["price"]),
                 "cheap_pct": cheap, "engine": engine,
             })
 
