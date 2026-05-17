@@ -95,6 +95,16 @@ header {
   padding-left: 12px; margin-left: 4px;
   border-left: 1px solid var(--line);
 }
+.freshness {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--muted); font-size: 11px;
+  padding-left: 12px; margin-left: 4px;
+  border-left: 1px solid var(--line);
+}
+.freshness .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--profit-500); box-shadow: 0 0 6px var(--profit-500);
+}
 nav { display: flex; align-items: center; gap: 2px; }
 nav a {
   color: var(--ink-soft); font-size: 13px; font-weight: 500;

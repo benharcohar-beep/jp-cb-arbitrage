@@ -40,6 +40,26 @@ templates = Jinja2Templates(directory=os.path.join(PROJ, "templates"))
 templates.env.globals["DEMO_MODE"] = DEMO_MODE
 
 
+def _latest_label() -> str:
+    import re
+    snaps = sorted(glob.glob(os.path.join(SNAPDIR, "screen_*.csv")))
+    if not snaps:
+        return ""
+    base = os.path.basename(snaps[-1])
+    m = re.match(r"screen_(\d{8})_(\d{4})\.csv", base)
+    if not m:
+        return ""
+    d, t = m.group(1), m.group(2)
+    return f"{d[:4]}-{d[4:6]}-{d[6:]} {t[:2]}:{t[2:]}"
+
+
+# Recompute on each request so it reflects the freshest snapshot after manual refresh
+@app.middleware("http")
+async def freshness_middleware(request, call_next):
+    templates.env.globals["LAST_UPDATED"] = _latest_label()
+    return await call_next(request)
+
+
 # --- helpers ---------------------------------------------------------------
 
 def list_snapshots() -> list[str]:
@@ -597,25 +617,29 @@ def remove_watchlist(ric: str):
 
 @app.post("/api/run")
 def api_run():
-    """Trigger refresh + screen synchronously. Returns log + new snapshot path."""
+    """
+    Trigger full manual refresh (data pull + price + regenerate + push).
+    Disabled in demo mode for security.
+    """
     if DEMO_MODE:
         return JSONResponse(
             {"error": "Disabled in demo mode. Clone the repo and run locally for live data."},
             status_code=403,
         )
-    out = []
-    for script in ("refresh.py", "run.py"):
-        try:
-            r = subprocess.run(
-                [sys.executable, os.path.join(PROJ, script)],
-                cwd=PROJ, capture_output=True, text=True, timeout=600,
-            )
-            out.append({"script": script, "rc": r.returncode,
-                        "stdout": r.stdout[-2000:], "stderr": r.stderr[-1000:]})
-        except subprocess.TimeoutExpired:
-            out.append({"script": script, "rc": -1, "error": "timeout"})
-            break
-    return JSONResponse({"runs": out, "latest": os.path.basename(list_snapshots()[-1])})
+    # Single-script entry — refreshes, prices, paper-updates, regenerates, and pushes
+    try:
+        r = subprocess.run(
+            [sys.executable, os.path.join(PROJ, "manual_refresh.py")],
+            cwd=PROJ, capture_output=True, text=True, timeout=900,
+        )
+        return JSONResponse({
+            "rc": r.returncode,
+            "stdout": r.stdout[-4000:],
+            "stderr": r.stderr[-1500:],
+            "latest": os.path.basename(list_snapshots()[-1]) if list_snapshots() else None,
+        })
+    except subprocess.TimeoutExpired:
+        return JSONResponse({"error": "timeout (>15 min)"}, status_code=504)
 
 
 if __name__ == "__main__":

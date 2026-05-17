@@ -185,6 +185,18 @@ python3 run.py        # price universe + save snapshot
 python3 server.py     # dashboard at http://127.0.0.1:8765/
 ```
 
+### One-shot manual refresh
+
+When the scheduled 8 AM run was missed (Mac asleep) or you want fresher data before a demo:
+
+```bash
+python3 manual_refresh.py
+```
+
+Does the full chain in one command: pull data → price universe → update $5M paper portfolio →
+regenerate static site → git commit + push. The public dashboard refreshes within ~60 seconds.
+Same script is wired to the **Run now** button on the local server.
+
 ## Limitations
 
 - Credit spread is rating-based when CDS unavailable.

@@ -75,6 +75,26 @@ def setup_docs():
     shutil.copytree(os.path.join(PROJ, "static"), os.path.join(DOCS, "static"))
 
 
+def latest_snapshot_label() -> str:
+    """Human-readable timestamp from the latest snapshot, for the header badge."""
+    import re
+    from datetime import datetime
+    # Prefer the most recent timestamped screen_YYYYMMDD_HHMM.csv if any
+    candidates = sorted(glob.glob(os.path.join(SNAPDIR, "screen_*.csv")))
+    if candidates:
+        base = os.path.basename(candidates[-1])
+        m = re.match(r"screen_(\d{8})_(\d{4})\.csv", base)
+        if m:
+            d, t = m.group(1), m.group(2)
+            return f"{d[:4]}-{d[4:6]}-{d[6:]} {t[:2]}:{t[2:]}"
+    # Fall back to demo_screen.csv mtime
+    p = latest_snapshot_path()
+    if p and os.path.exists(p):
+        ts = datetime.fromtimestamp(os.path.getmtime(p))
+        return ts.strftime("%Y-%m-%d %H:%M")
+    return ""
+
+
 def setup_jinja() -> Environment:
     env = Environment(
         loader=FileSystemLoader(os.path.join(PROJ, "templates")),
@@ -83,6 +103,7 @@ def setup_jinja() -> Environment:
     # Mark this as static-site mode so templates can hide server-only widgets
     env.globals["DEMO_MODE"] = True
     env.globals["STATIC_SITE"] = True
+    env.globals["LAST_UPDATED"] = latest_snapshot_label()
     return env
 
 
