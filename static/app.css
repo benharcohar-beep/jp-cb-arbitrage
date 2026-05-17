@@ -1,31 +1,50 @@
 /* ============================================================
-   JP CB Arbitrage Desk — green/white theme
+   JP CB Arbitrage Desk — blue/white theme
+   Brand: dark blue primary, light blue accent
+   Semantic: green = profit/cheap, red = loss/rich, amber = warning/reset
    ============================================================ */
 :root {
-  --bg: #fafbf9;
+  --bg: #f8fafc;
   --panel: #ffffff;
-  --panel-muted: #f3f6f2;
-  --line: #e3eae0;
-  --line-strong: #c9d6c4;
+  --panel-muted: #f1f5f9;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
 
-  --ink: #0f1d12;
-  --ink-soft: #2c3d2f;
-  --muted: #6f8073;
+  --ink: #0f172a;
+  --ink-soft: #334155;
+  --muted: #64748b;
 
-  --green-50:  #ecfdf5;
-  --green-100: #d1fae5;
-  --green-500: #10b981;
-  --green-600: #059669;
-  --green-700: #047857;
-  --green-800: #065f46;
+  /* Brand blues */
+  --blue-50:  #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-300: #93c5fd;
+  --blue-500: #3b82f6;    /* light blue — secondary accent */
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;    /* dark blue — primary brand */
+  --blue-800: #1e3a8a;    /* deepest */
+
+  /* Alias the old green-* tokens to blue so brand-styled elements all swap */
+  --green-50:  #eff6ff;
+  --green-100: #dbeafe;
+  --green-500: #3b82f6;
+  --green-600: #2563eb;
+  --green-700: #1d4ed8;
+  --green-800: #1e3a8a;
+
+  /* Semantic P&L colors (kept) */
+  --profit-50:  #ecfdf5;
+  --profit-100: #d1fae5;
+  --profit-500: #10b981;
+  --profit-700: #047857;
+  --profit-800: #065f46;
 
   --red:    #b91c1c;
   --red-50: #fef2f2;
   --amber:  #b45309;
   --amber-50: #fffbeb;
 
-  --shadow-sm: 0 1px 2px rgba(15, 29, 18, 0.04);
-  --shadow:    0 1px 3px rgba(15, 29, 18, 0.06), 0 1px 2px rgba(15, 29, 18, 0.04);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow:    0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
 
   --radius: 8px;
   --radius-lg: 12px;
@@ -423,12 +442,34 @@ table.screen {
 .screen a:hover { color: var(--green-700); }
 
 .cheap-cell { font-weight: 600; }
-.cheap-strong .cheap-cell { color: var(--green-700); font-weight: 700; }
-.cheap-mild   .cheap-cell { color: var(--green-600); }
+.cheap-strong .cheap-cell { color: var(--profit-700); font-weight: 700; }
+.cheap-mild   .cheap-cell { color: var(--profit-500); }
+.cheap-strong { background: rgba(16, 185, 129, 0.04); }
+.cheap-mild   { /* no bg */ }
 .rich-mild    .cheap-cell { color: var(--red); }
 .rich-strong  .cheap-cell { color: var(--red); font-weight: 700; }
+.rich-strong { background: rgba(220, 38, 38, 0.03); }
 tr.reset { box-shadow: inset 3px 0 0 var(--amber); }
 tr.low-conf { opacity: 0.55; }
+
+/* BUY action stays profit-green; brand stays blue */
+.action-buy { background: var(--profit-700); color: white; }
+
+/* IG rating pill stays profit-green (semantic "safer") */
+.rtg.ig { background: var(--profit-100); color: var(--profit-800); border-color: var(--profit-100); }
+
+/* KPI alert + cheap KPI stays profit-green */
+.summary .kpi.alert .val { color: var(--profit-700); }
+.kpi.cheap { border-left: 3px solid var(--profit-500); }
+.kpi.cheap .val { color: var(--profit-700); }
+.alert-card { border-left: 3px solid var(--profit-500); }
+.alert-card:hover { border-left-color: var(--profit-700); }
+.alert-card .cheap-big { color: var(--profit-700); }
+.play-rank { background: var(--blue-700); }
+.play-cheap { color: var(--profit-700); }
+.play-main .play-title strong { color: var(--blue-700); }
+.play-main .play-detail strong { background: var(--blue-50); }
+.play-thesis strong { color: var(--blue-700); }
 
 button.small {
   background: var(--panel-muted); color: var(--muted);
