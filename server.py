@@ -352,6 +352,19 @@ def backtest_view(request: Request):
     if os.path.exists(p):
         try: regime_summary = pd.read_csv(p).to_dict("records")
         except Exception: pass
+    # Factor decomposition
+    factor_decomp, factor_summary = [], {}
+    p = os.path.join(histdir, f"{prefix}factor_decomp.csv")
+    if os.path.exists(p):
+        try: factor_decomp = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+    p = os.path.join(histdir, f"{prefix}factor_summary.csv")
+    if os.path.exists(p):
+        try:
+            c = pd.read_csv(p, header=None, names=["k","v"])
+            factor_summary = dict(zip(c["k"], c["v"]))
+        except Exception: pass
+
     # Ensemble
     ensemble = []
     p = os.path.join(histdir, f"{prefix}ensemble_summary.csv")
@@ -435,7 +448,9 @@ def backtest_view(request: Request):
          "concentration": concentration,
          "regime_summary": regime_summary,
          "ql_sanity": ql_sanity,
-         "ensemble": ensemble},
+         "ensemble": ensemble,
+         "factor_decomp": factor_decomp,
+         "factor_summary": factor_summary},
     )
 
 

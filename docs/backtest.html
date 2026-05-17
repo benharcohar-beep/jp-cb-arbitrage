@@ -40,6 +40,92 @@
 
 
 <section class="alerts-head">
+  <h1 style="font-size:22px;">Factor decomposition · is this real alpha or hidden beta?</h1>
+  <p>Daily strategy returns regressed against four standard factors: Nikkei 225, USD/JPY, VIX, US 10Y yield. If the strategy is "long Japan + long vol in disguise," this regression will reveal it. If the residual alpha (intercept) is large and the factor betas are small/insignificant, the strategy has genuine alpha — or at least alpha that's orthogonal to these four factors.</p>
+</section>
+
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+  <div class="kpi"><span class="lab">Observations</span><span class="val">167</span></div>
+  <div class="kpi"><span class="lab">R² (variance explained)</span><span class="val">1.4%</span></div>
+  <div class="kpi"><span class="lab">F-stat p-value</span><span class="val">0.687</span></div>
+  <div class="kpi alert"><span class="lab">Alpha (annualized)</span><span class="val">+25.6%</span></div>
+</section>
+
+<div class="callout">
+  <span class="label">The honest read</span>
+  R² of <strong>1.4%</strong> means these four factors explain almost none of the strategy's daily return variance. The F-test p-value of <strong>0.69</strong> says the factors as a group are <strong>not statistically significant</strong>. The strategy's daily returns are essentially uncorrelated with broad Japan equity (Nikkei), FX (USD/JPY), global vol regime (VIX), or global rates (US 10y). The implied annualized alpha is <strong>+25.6%</strong>. <strong>But:</strong> with only 167 daily observations the alpha's standalone p-value is also not significant. The honest claim is "uncorrelated with broad factors, sample too small to prove alpha is real."
+</div>
+
+<table class="screen" style="margin-bottom:24px;">
+  <thead>
+    <tr>
+      <th>Factor</th>
+      <th class="num">Coefficient</th>
+      <th class="num">Std error</th>
+      <th class="num">t-stat</th>
+      <th class="num">p-value</th>
+      <th>Significant?</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr class="">
+      <td><strong>Alpha (intercept)</strong></td>
+      <td class="num">+0.0009</td>
+      <td class="num">0.0007</td>
+      <td class="num">+1.37</td>
+      <td class="num">0.173</td>
+      <td><span style="color:var(--muted)">No</span></td>
+    </tr>
+    
+    <tr class="">
+      <td><strong>nikkei</strong></td>
+      <td class="num">+0.0006</td>
+      <td class="num">0.0480</td>
+      <td class="num">+0.01</td>
+      <td class="num">0.989</td>
+      <td><span style="color:var(--muted)">No</span></td>
+    </tr>
+    
+    <tr class="">
+      <td><strong>usdjpy</strong></td>
+      <td class="num">-0.0052</td>
+      <td class="num">0.1310</td>
+      <td class="num">-0.04</td>
+      <td class="num">0.969</td>
+      <td><span style="color:var(--muted)">No</span></td>
+    </tr>
+    
+    <tr class="">
+      <td><strong>vix</strong></td>
+      <td class="num">+0.0004</td>
+      <td class="num">0.0005</td>
+      <td class="num">+0.91</td>
+      <td class="num">0.364</td>
+      <td><span style="color:var(--muted)">No</span></td>
+    </tr>
+    
+    <tr class="">
+      <td><strong>us10y</strong></td>
+      <td class="num">+0.0174</td>
+      <td class="num">0.0177</td>
+      <td class="num">+0.98</td>
+      <td class="num">0.328</td>
+      <td><span style="color:var(--muted)">No</span></td>
+    </tr>
+    
+  </tbody>
+</table>
+
+<div class="callout">
+  <span class="label">What an interviewer would push on</span>
+  Four legitimate critiques of this regression: <strong>(1)</strong> the residuals are highly non-normal (skew 8.3, kurtosis 73), so OLS p-values are unreliable — newey-west or bootstrap standard errors would be more honest. <strong>(2)</strong> I'm missing factors that probably matter — JP credit spread, listed equity IV, small-cap factor. <strong>(3)</strong> 167 observations is small; a 3-5 year backtest would let me make stronger statistical claims. <strong>(4)</strong> The strategy is concentrated in 5 issuers — the "alpha" might be issuer-specific Q1 outperformance, not a repeatable signal. <em>All true. Acknowledging these is the right move.</em>
+</div>
+
+
+
+
+<section class="alerts-head">
   <h1 style="font-size:22px;">Walk-forward validation · out-of-sample stability</h1>
   <p>Split the historical panel 70/30 by date. Train on the first 70%, test on the last 30%. If the signal works on train but breaks on test, it's overfit.</p>
 </section>

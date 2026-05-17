@@ -2,6 +2,56 @@
 {% block title %}Backtest{% endblock %}
 {% block content %}
 
+{% if factor_summary %}
+<section class="alerts-head">
+  <h1 style="font-size:22px;">Factor decomposition · is this real alpha or hidden beta?</h1>
+  <p>Daily strategy returns regressed against four standard factors: Nikkei 225, USD/JPY, VIX, US 10Y yield. If the strategy is "long Japan + long vol in disguise," this regression will reveal it. If the residual alpha (intercept) is large and the factor betas are small/insignificant, the strategy has genuine alpha — or at least alpha that's orthogonal to these four factors.</p>
+</section>
+
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+  <div class="kpi"><span class="lab">Observations</span><span class="val">{{ "{:.0f}".format(factor_summary.n_observations) }}</span></div>
+  <div class="kpi"><span class="lab">R² (variance explained)</span><span class="val">{{ "{:.1%}".format(factor_summary.r_squared) }}</span></div>
+  <div class="kpi"><span class="lab">F-stat p-value</span><span class="val">{{ "{:.3f}".format(factor_summary.f_pvalue) }}</span></div>
+  <div class="kpi alert"><span class="lab">Alpha (annualized)</span><span class="val">{{ "{:+.1f}".format(factor_summary.alpha_annual_pct) }}%</span></div>
+</section>
+
+<div class="callout">
+  <span class="label">The honest read</span>
+  R² of <strong>{{ "{:.1%}".format(factor_summary.r_squared) }}</strong> means these four factors explain almost none of the strategy's daily return variance. The F-test p-value of <strong>{{ "{:.2f}".format(factor_summary.f_pvalue) }}</strong> says the factors as a group are <strong>not statistically significant</strong>. The strategy's daily returns are essentially uncorrelated with broad Japan equity (Nikkei), FX (USD/JPY), global vol regime (VIX), or global rates (US 10y). The implied annualized alpha is <strong>{{ "{:+.1f}".format(factor_summary.alpha_annual_pct) }}%</strong>. <strong>But:</strong> with only {{ "{:.0f}".format(factor_summary.n_observations) }} daily observations the alpha's standalone p-value is also not significant. The honest claim is "uncorrelated with broad factors, sample too small to prove alpha is real."
+</div>
+
+<table class="screen" style="margin-bottom:24px;">
+  <thead>
+    <tr>
+      <th>Factor</th>
+      <th class="num">Coefficient</th>
+      <th class="num">Std error</th>
+      <th class="num">t-stat</th>
+      <th class="num">p-value</th>
+      <th>Significant?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in factor_decomp %}
+    <tr class="{% if f.p_value < 0.05 %}cheap-strong{% endif %}">
+      <td><strong>{{ f.factor if f.factor != 'const' else 'Alpha (intercept)' }}</strong></td>
+      <td class="num">{{ "{:+.4f}".format(f.coefficient) }}</td>
+      <td class="num">{{ "{:.4f}".format(f.std_error) }}</td>
+      <td class="num">{{ "{:+.2f}".format(f.t_stat) }}</td>
+      <td class="num">{{ "{:.3f}".format(f.p_value) }}</td>
+      <td>{% if f.p_value < 0.05 %}<strong style="color:var(--profit-700)">Yes (p&lt;0.05)</strong>{% elif f.p_value < 0.10 %}<span style="color:var(--amber)">Marginal (p&lt;0.10)</span>{% else %}<span style="color:var(--muted)">No</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="callout">
+  <span class="label">What an interviewer would push on</span>
+  Four legitimate critiques of this regression: <strong>(1)</strong> the residuals are highly non-normal (skew 8.3, kurtosis 73), so OLS p-values are unreliable — newey-west or bootstrap standard errors would be more honest. <strong>(2)</strong> I'm missing factors that probably matter — JP credit spread, listed equity IV, small-cap factor. <strong>(3)</strong> 167 observations is small; a 3-5 year backtest would let me make stronger statistical claims. <strong>(4)</strong> The strategy is concentrated in 5 issuers — the "alpha" might be issuer-specific Q1 outperformance, not a repeatable signal. <em>All true. Acknowledging these is the right move.</em>
+</div>
+
+{% endif %}
+
 {% if walk_forward %}
 <section class="alerts-head">
   <h1 style="font-size:22px;">Walk-forward validation · out-of-sample stability</h1>

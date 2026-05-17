@@ -254,6 +254,19 @@ def render_backtest(env):
         try: regime_summary = pd.read_csv(p).to_dict("records")
         except Exception: pass
 
+    # Factor decomposition
+    factor_decomp, factor_summary = [], {}
+    p = hist_path("factor_decomp")
+    if os.path.exists(p):
+        try: factor_decomp = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+    p = hist_path("factor_summary")
+    if os.path.exists(p):
+        try:
+            c = pd.read_csv(p, header=None, names=["k","v"])
+            factor_summary = dict(zip(c["k"], c["v"]))
+        except Exception: pass
+
     # Ensemble
     ensemble = []
     p = hist_path("ensemble_summary")
@@ -343,6 +356,8 @@ def render_backtest(env):
         regime_summary=regime_summary,
         ql_sanity=ql_sanity,
         ensemble=ensemble,
+        factor_decomp=factor_decomp,
+        factor_summary=factor_summary,
         ROOT="",
     )
     write(os.path.join(DOCS, "backtest.html"), html)
