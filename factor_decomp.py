@@ -121,27 +121,72 @@ def run():
         print("  Too few observations for a meaningful regression.")
         return
 
-    # OLS regression
+    # OLS regression (vanilla)
     X = df[list(FACTORS.keys())]
     X = sm.add_constant(X)
     y = df["strategy"]
     model = sm.OLS(y, X).fit()
-    print("\n--- OLS regression: strategy ~ factors ---")
-    print(model.summary())
 
-    # Parse results
-    results = []
-    for name in ["const"] + list(FACTORS.keys()):
+    # Newey-West HAC standard errors (corrects for autocorrelation + heteroskedasticity)
+    # Use ceil(4*(N/100)^(2/9)) lags per Newey-West's own recommendation
+    n_lags = max(1, int(np.ceil(4 * (len(df) / 100) ** (2/9))))
+    model_hac = sm.OLS(y, X).fit(cov_type="HAC", cov_kwds={"maxlags": n_lags})
+
+    print(f"\n--- OLS regression (HAC, Newey-West, {n_lags} lags) ---")
+    print(model_hac.summary())
+
+    # Bootstrap: resample (X, y) pairs 1000 times, refit, percentile CI on alpha
+    rng = np.random.default_rng(42)
+    n_boot = 1000
+    boot_alphas = []
+    boot_betas = {f: [] for f in FACTORS.keys()}
+    for _ in range(n_boot):
+        idx = rng.integers(0, len(df), size=len(df))
+        Xb = X.iloc[idx].reset_index(drop=True)
+        yb = y.iloc[idx].reset_index(drop=True)
         try:
-            results.append({
-                "factor":     name,
-                "coefficient": float(model.params[name]),
-                "std_error":  float(model.bse[name]),
-                "t_stat":     float(model.tvalues[name]),
-                "p_value":    float(model.pvalues[name]),
-            })
+            mb = sm.OLS(yb, Xb).fit()
+            boot_alphas.append(float(mb.params["const"]))
+            for f in FACTORS.keys():
+                boot_betas[f].append(float(mb.params[f]))
         except Exception:
             continue
+
+    alpha_ci_low  = float(np.percentile(boot_alphas,  2.5)) if boot_alphas else 0
+    alpha_ci_high = float(np.percentile(boot_alphas, 97.5)) if boot_alphas else 0
+    # 2-sided bootstrap p-value for H0: alpha = 0
+    boot_p_alpha = float(2 * min(np.mean(np.array(boot_alphas) <= 0),
+                                  np.mean(np.array(boot_alphas) >= 0))) if boot_alphas else 1.0
+
+    print(f"\n--- Bootstrap (1000 resamples) ---")
+    print(f"  alpha 95% CI: [{alpha_ci_low:.5f}, {alpha_ci_high:.5f}]  bootstrap p={boot_p_alpha:.3f}")
+
+    # Build per-factor result with OLS, HAC, and bootstrap stats
+    results = []
+    for name in ["const"] + list(FACTORS.keys()):
+        coef = float(model.params[name])
+        ols_se = float(model.bse[name])
+        ols_p  = float(model.pvalues[name])
+        hac_se = float(model_hac.bse[name])
+        hac_p  = float(model_hac.pvalues[name])
+        if name == "const":
+            boot_ci_l, boot_ci_h, boot_p = alpha_ci_low, alpha_ci_high, boot_p_alpha
+        else:
+            arr = np.array(boot_betas.get(name, [0]))
+            boot_ci_l = float(np.percentile(arr, 2.5)) if len(arr) else 0
+            boot_ci_h = float(np.percentile(arr, 97.5)) if len(arr) else 0
+            boot_p    = float(2 * min(np.mean(arr <= 0), np.mean(arr >= 0))) if len(arr) else 1.0
+        results.append({
+            "factor":      name,
+            "coefficient": coef,
+            "ols_se":      ols_se,
+            "ols_p":       ols_p,
+            "hac_se":      hac_se,
+            "hac_p":       hac_p,
+            "boot_ci_low":  boot_ci_l,
+            "boot_ci_high": boot_ci_h,
+            "boot_p":       boot_p,
+        })
     res_df = pd.DataFrame(results)
 
     # Annualize alpha (constant) — daily * 252
@@ -154,8 +199,14 @@ def run():
         "adj_r_squared":   float(model.rsquared_adj),
         "alpha_daily":     alpha_daily,
         "alpha_annual_pct": alpha_annual_pct,
+        "alpha_ols_p":     float(model.pvalues.get("const", 1.0)),
+        "alpha_hac_p":     float(model_hac.pvalues.get("const", 1.0)),
+        "alpha_boot_p":    boot_p_alpha,
+        "alpha_boot_ci_low_annual_pct":  (np.exp(alpha_ci_low * 252) - 1) * 100,
+        "alpha_boot_ci_high_annual_pct": (np.exp(alpha_ci_high * 252) - 1) * 100,
         "f_statistic":     float(model.fvalue),
         "f_pvalue":        float(model.f_pvalue),
+        "hac_lags":        int(n_lags),
     }
     pd.Series(summary).to_csv(os.path.join(HISTDIR, "factor_summary.csv"), header=False)
     res_df.to_csv(os.path.join(HISTDIR, "factor_decomp.csv"), index=False)

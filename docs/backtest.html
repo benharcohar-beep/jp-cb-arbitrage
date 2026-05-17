@@ -23,6 +23,7 @@
       <a href="portfolio.html">$5M Portfolio</a>
       <a href="watchlist.html">Watchlist</a>
       <a href="backtest.html">Backtest</a>
+      <a href="simulator.html">Simulator</a>
       <a href="risk.html">Risk</a>
       <a href="alerts.html">Alerts log</a>
       <a href="how-it-works.html">How it works</a>
@@ -56,66 +57,84 @@
   R² of <strong>1.4%</strong> means these four factors explain almost none of the strategy's daily return variance. The F-test p-value of <strong>0.69</strong> says the factors as a group are <strong>not statistically significant</strong>. The strategy's daily returns are essentially uncorrelated with broad Japan equity (Nikkei), FX (USD/JPY), global vol regime (VIX), or global rates (US 10y). The implied annualized alpha is <strong>+25.6%</strong>. <strong>But:</strong> with only 167 daily observations the alpha's standalone p-value is also not significant. The honest claim is "uncorrelated with broad factors, sample too small to prove alpha is real."
 </div>
 
-<table class="screen" style="margin-bottom:24px;">
+<table class="screen" style="margin-bottom:18px;">
   <thead>
     <tr>
       <th>Factor</th>
       <th class="num">Coefficient</th>
-      <th class="num">Std error</th>
-      <th class="num">t-stat</th>
-      <th class="num">p-value</th>
+      <th class="num">OLS p</th>
+      <th class="num" title="Newey-West HAC: heteroskedasticity- and autocorrelation-consistent standard errors">HAC p</th>
+      <th class="num" title="2-sided bootstrap p-value, 1000 resamples">Boot p</th>
+      <th class="num">95% bootstrap CI</th>
       <th>Significant?</th>
     </tr>
   </thead>
   <tbody>
     
+    
     <tr class="">
       <td><strong>Alpha (intercept)</strong></td>
       <td class="num">+0.0009</td>
-      <td class="num">0.0007</td>
-      <td class="num">+1.37</td>
       <td class="num">0.173</td>
+      <td class="num">0.198</td>
+      <td class="num">0.172</td>
+      <td class="num" style="font-size:11px;">[-0.0001, +0.0025]</td>
       <td><span style="color:var(--muted)">No</span></td>
     </tr>
+    
     
     <tr class="">
       <td><strong>nikkei</strong></td>
       <td class="num">+0.0006</td>
-      <td class="num">0.0480</td>
-      <td class="num">+0.01</td>
       <td class="num">0.989</td>
+      <td class="num">0.985</td>
+      <td class="num">0.984</td>
+      <td class="num" style="font-size:11px;">[-0.0706, +0.0811]</td>
       <td><span style="color:var(--muted)">No</span></td>
     </tr>
+    
     
     <tr class="">
       <td><strong>usdjpy</strong></td>
       <td class="num">-0.0052</td>
-      <td class="num">0.1310</td>
-      <td class="num">-0.04</td>
       <td class="num">0.969</td>
+      <td class="num">0.928</td>
+      <td class="num">0.998</td>
+      <td class="num" style="font-size:11px;">[-0.1485, +0.1130]</td>
       <td><span style="color:var(--muted)">No</span></td>
     </tr>
+    
     
     <tr class="">
       <td><strong>vix</strong></td>
       <td class="num">+0.0004</td>
-      <td class="num">0.0005</td>
-      <td class="num">+0.91</td>
       <td class="num">0.364</td>
+      <td class="num">0.307</td>
+      <td class="num">0.344</td>
+      <td class="num" style="font-size:11px;">[-0.0001, +0.0016]</td>
       <td><span style="color:var(--muted)">No</span></td>
     </tr>
+    
     
     <tr class="">
       <td><strong>us10y</strong></td>
       <td class="num">+0.0174</td>
-      <td class="num">0.0177</td>
-      <td class="num">+0.98</td>
       <td class="num">0.328</td>
+      <td class="num">0.380</td>
+      <td class="num">0.446</td>
+      <td class="num" style="font-size:11px;">[-0.0106, +0.0634]</td>
       <td><span style="color:var(--muted)">No</span></td>
     </tr>
     
   </tbody>
 </table>
+
+
+<div class="callout">
+  <span class="label">The bootstrap result — most defensible number</span>
+  Point estimate: <strong>+25.6% annualized alpha</strong>. 95% bootstrap confidence interval: <strong>[-3.3%, +86.2%]</strong>. With 1000 resamples, the true alpha could be anywhere between losing 3.3% and gaining 86.2% per year. <strong>That's how much uncertainty 167 daily observations actually leave you with.</strong> A confident statistical claim needs 3-5x more data.
+</div>
+
 
 <div class="callout">
   <span class="label">What an interviewer would push on</span>

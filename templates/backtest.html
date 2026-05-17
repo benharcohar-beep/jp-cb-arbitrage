@@ -20,30 +20,40 @@
   R² of <strong>{{ "{:.1%}".format(factor_summary.r_squared) }}</strong> means these four factors explain almost none of the strategy's daily return variance. The F-test p-value of <strong>{{ "{:.2f}".format(factor_summary.f_pvalue) }}</strong> says the factors as a group are <strong>not statistically significant</strong>. The strategy's daily returns are essentially uncorrelated with broad Japan equity (Nikkei), FX (USD/JPY), global vol regime (VIX), or global rates (US 10y). The implied annualized alpha is <strong>{{ "{:+.1f}".format(factor_summary.alpha_annual_pct) }}%</strong>. <strong>But:</strong> with only {{ "{:.0f}".format(factor_summary.n_observations) }} daily observations the alpha's standalone p-value is also not significant. The honest claim is "uncorrelated with broad factors, sample too small to prove alpha is real."
 </div>
 
-<table class="screen" style="margin-bottom:24px;">
+<table class="screen" style="margin-bottom:18px;">
   <thead>
     <tr>
       <th>Factor</th>
       <th class="num">Coefficient</th>
-      <th class="num">Std error</th>
-      <th class="num">t-stat</th>
-      <th class="num">p-value</th>
+      <th class="num">OLS p</th>
+      <th class="num" title="Newey-West HAC: heteroskedasticity- and autocorrelation-consistent standard errors">HAC p</th>
+      <th class="num" title="2-sided bootstrap p-value, 1000 resamples">Boot p</th>
+      <th class="num">95% bootstrap CI</th>
       <th>Significant?</th>
     </tr>
   </thead>
   <tbody>
     {% for f in factor_decomp %}
-    <tr class="{% if f.p_value < 0.05 %}cheap-strong{% endif %}">
-      <td><strong>{{ f.factor if f.factor != 'const' else 'Alpha (intercept)' }}</strong></td>
+    {% set min_p = [f.ols_p, f.hac_p, f.boot_p]|min %}
+    <tr class="{% if min_p < 0.05 %}cheap-strong{% endif %}">
+      <td><strong>{{ 'Alpha (intercept)' if f.factor == 'const' else f.factor }}</strong></td>
       <td class="num">{{ "{:+.4f}".format(f.coefficient) }}</td>
-      <td class="num">{{ "{:.4f}".format(f.std_error) }}</td>
-      <td class="num">{{ "{:+.2f}".format(f.t_stat) }}</td>
-      <td class="num">{{ "{:.3f}".format(f.p_value) }}</td>
-      <td>{% if f.p_value < 0.05 %}<strong style="color:var(--profit-700)">Yes (p&lt;0.05)</strong>{% elif f.p_value < 0.10 %}<span style="color:var(--amber)">Marginal (p&lt;0.10)</span>{% else %}<span style="color:var(--muted)">No</span>{% endif %}</td>
+      <td class="num">{{ "{:.3f}".format(f.ols_p) }}</td>
+      <td class="num">{{ "{:.3f}".format(f.hac_p) }}</td>
+      <td class="num">{{ "{:.3f}".format(f.boot_p) }}</td>
+      <td class="num" style="font-size:11px;">[{{ "{:+.4f}".format(f.boot_ci_low) }}, {{ "{:+.4f}".format(f.boot_ci_high) }}]</td>
+      <td>{% if min_p < 0.05 %}<strong style="color:var(--profit-700)">Yes (p&lt;0.05)</strong>{% elif min_p < 0.10 %}<span style="color:var(--amber)">Marginal</span>{% else %}<span style="color:var(--muted)">No</span>{% endif %}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+
+{% if factor_summary.alpha_boot_ci_low_annual_pct is defined %}
+<div class="callout">
+  <span class="label">The bootstrap result — most defensible number</span>
+  Point estimate: <strong>{{ "{:+.1f}".format(factor_summary.alpha_annual_pct) }}% annualized alpha</strong>. 95% bootstrap confidence interval: <strong>[{{ "{:+.1f}".format(factor_summary.alpha_boot_ci_low_annual_pct) }}%, {{ "{:+.1f}".format(factor_summary.alpha_boot_ci_high_annual_pct) }}%]</strong>. With 1000 resamples, the true alpha could be anywhere between losing {{ "{:.1f}".format(-factor_summary.alpha_boot_ci_low_annual_pct) }}% and gaining {{ "{:.1f}".format(factor_summary.alpha_boot_ci_high_annual_pct) }}% per year. <strong>That's how much uncertainty 167 daily observations actually leave you with.</strong> A confident statistical claim needs 3-5x more data.
+</div>
+{% endif %}
 
 <div class="callout">
   <span class="label">What an interviewer would push on</span>

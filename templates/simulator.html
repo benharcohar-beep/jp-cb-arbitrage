@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% block title %}Live constraint simulator{% endblock %}
+{% block content %}
+
+<section class="welcome">
+  <h1>Live constraint simulator</h1>
+  <p class="lead">
+    Drag the sliders to see how the paper portfolio's performance changes under different sizing, cost,
+    and exit-horizon assumptions. The simulation re-runs in your browser on every slider move — same
+    trade data, different rules.
+  </p>
+</section>
+
+<section style="display:grid; grid-template-columns: 320px 1fr; gap:22px; margin-bottom:18px;">
+  <!-- LEFT: Sliders -->
+  <div style="background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; box-shadow:var(--shadow-sm);">
+    <h3 style="margin:0 0 12px; font-size:12px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:0.6px;">Strategy parameters</h3>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>Starting capital</label>
+        <span class="slider-val" id="capital-val">$5.0M</span>
+      </div>
+      <input type="range" id="capital" min="1" max="50" step="1" value="5" class="slider">
+      <div class="slider-help">How much real money is in the account. Higher = catches more concurrent signals.</div>
+    </div>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>Concurrent positions (slots)</label>
+        <span class="slider-val" id="slots-val">5</span>
+      </div>
+      <input type="range" id="slots" min="1" max="10" step="1" value="5" class="slider">
+      <div class="slider-help">Max open trades at once. Fewer slots = bigger bets = higher CAGR but deeper drawdowns.</div>
+    </div>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>Round-trip transaction cost</label>
+        <span class="slider-val" id="cost-val">60bp</span>
+      </div>
+      <input type="range" id="cost" min="10" max="200" step="5" value="60" class="slider">
+      <div class="slider-help">Bond + equity bid-ask cost per trade. Realistic on JP CBs: 50-150bp.</div>
+    </div>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>Max exit horizon</label>
+        <span class="slider-val" id="horizon-val">60d</span>
+      </div>
+      <input type="range" id="horizon" min="10" max="120" step="5" value="60" class="slider">
+      <div class="slider-help">Force exit if held this long. Shorter = more turnover but cuts off late convergence.</div>
+    </div>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>JPY financing rate</label>
+        <span class="slider-val" id="fin-val">1.0%</span>
+      </div>
+      <input type="range" id="fin" min="0" max="500" step="10" value="100" class="slider">
+      <div class="slider-help">Annualized rate paid on the long bond / earned on short proceeds.</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Live KPIs -->
+  <div>
+    <div class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); margin-bottom:14px;">
+      <div class="kpi"><span class="lab">Starting</span><span class="val" id="kpi-start">$5.0M</span></div>
+      <div class="kpi alert"><span class="lab">Ending equity</span><span class="val" id="kpi-end">—</span></div>
+      <div class="kpi alert"><span class="lab">Total P&L</span><span class="val" id="kpi-pnl">—</span></div>
+      <div class="kpi"><span class="lab">CAGR</span><span class="val" id="kpi-cagr">—</span></div>
+      <div class="kpi"><span class="lab">Max DD</span><span class="val" id="kpi-dd" style="color:var(--red);">—</span></div>
+      <div class="kpi"><span class="lab">Sharpe</span><span class="val" id="kpi-sharpe">—</span></div>
+      <div class="kpi"><span class="lab">Trades taken</span><span class="val" id="kpi-trades">—</span></div>
+      <div class="kpi"><span class="lab">Win rate</span><span class="val" id="kpi-winrate">—</span></div>
+    </div>
+
+    <div class="chart-block">
+      <h3>Equity curve</h3>
+      <canvas id="sim-chart" height="120"></canvas>
+    </div>
+
+    <div class="chart-block">
+      <h3>Drawdown</h3>
+      <canvas id="sim-dd" height="60"></canvas>
+    </div>
+  </div>
+</section>
+
+<div class="callout">
+  <span class="label">What to try</span>
+  Slide <strong>concurrent positions</strong> from 5 down to 1 — watch CAGR rise from ~24% to ~50% as concentration increases. Slide <strong>transaction cost</strong> from 60 up to 150bp — see the strategy's edge shrink dramatically (CB arb is highly sensitive to execution costs). Slide <strong>exit horizon</strong> below 30 days — too short and you cut off late convergence; too long and you bleed theta.
+</div>
+
+<style>
+.slider-block { margin-bottom: 18px; }
+.slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.slider-row label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.slider-val { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--blue-700); }
+.slider { width: 100%; appearance: none; height: 4px; background: var(--line); border-radius: 2px; outline: none; }
+.slider::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--blue-700); cursor: pointer; border: 2px solid white; box-shadow: var(--shadow-sm); }
+.slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--blue-700); cursor: pointer; border: 2px solid white; }
+.slider-help { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+</style>
+
+<script>
+const TRADES = {{ trades_json|safe }};
+const USD_JPY = 150;
+const SIM_BASELINE_COST_BP = 30;  // backtest used 25bp bond + 5bp equity half-spread = 30bp round-trip
+
+// Pre-parse dates
+TRADES.forEach(t => {
+  t._entry = new Date(t.entry_date + 'T00:00:00');
+  t._exit  = new Date(t.exit_date  + 'T00:00:00');
+});
+
+function simulate(startUsd, slots, costBp, horizonDays, finRate) {
+  const startJpy = startUsd * USD_JPY;
+  let cash = startJpy;
+  const openPositions = [];
+  const history = [];
+  let nTaken = 0, nWins = 0;
+
+  // Build events with cost/horizon-adjusted P&L
+  const trades = TRADES.map(t => {
+    // Truncate days held to horizon (linear scaling of P&L)
+    const heldEff = Math.min(t.days_held, horizonDays);
+    const scaleByHorizon = heldEff / t.days_held;
+    // Apply user's cost: subtract (newCost - baselineCost) of par per ¥100M
+    const baselineCost = SIM_BASELINE_COST_BP / 10000 * 100_000_000;
+    const userCost     = costBp / 10000 * 100_000_000;
+    const grossAt100M  = t.gross_pnl_jpy ?? (t.net_pnl_jpy + (t.transaction_cost_jpy || 0));
+    const carryAt100M  = (t.financing_carry_jpy || 0);
+    // Re-scale financing carry to user rate (baseline was 1%)
+    const carryScaled  = carryAt100M * (finRate / 100);
+    let netAt100M = grossAt100M * scaleByHorizon - userCost + carryScaled;
+    // Exit date shifts if horizon kicks in
+    const exitDateEff = new Date(t._entry.getTime() + heldEff * 86400000);
+    return {
+      ...t,
+      _exit_eff: exitDateEff,
+      _days_eff: heldEff,
+      _net_at_100M: netAt100M,
+    };
+  });
+
+  // Event timeline (exits before entries on same date)
+  const events = [];
+  trades.forEach((t, i) => {
+    events.push({ date: t._entry, type: 'entry', idx: i });
+    events.push({ date: t._exit_eff, type: 'exit',  idx: i });
+  });
+  events.sort((a, b) => (a.date - b.date) || (a.type === 'exit' ? -1 : 1));
+
+  for (const ev of events) {
+    if (ev.type === 'exit') {
+      const opIdx = openPositions.findIndex(op => op.tradeIdx === ev.idx);
+      if (opIdx >= 0) {
+        const op = openPositions[opIdx];
+        const t  = trades[ev.idx];
+        const realized = t._net_at_100M * (op.notionalJpy / 100_000_000);
+        cash += op.notionalJpy + realized;
+        if (realized > 0) nWins += 1;
+        openPositions.splice(opIdx, 1);
+      }
+    } else {
+      if (openPositions.length >= slots) continue;
+      const slotsOpen = slots - openPositions.length;
+      const notional = cash / slotsOpen;
+      if (notional < 10_000_000) continue;  // min ¥10M
+      cash -= notional;
+      openPositions.push({
+        tradeIdx: ev.idx,
+        notionalJpy: notional,
+      });
+      nTaken += 1;
+    }
+    const deployed = openPositions.reduce((s, op) => s + op.notionalJpy, 0);
+    const equityJpy = cash + deployed;
+    history.push({
+      date: ev.date.toISOString().slice(0, 10),
+      equityUsd: equityJpy / USD_JPY,
+      equityJpy: equityJpy,
+      cash: cash,
+      deployed: deployed,
+    });
+  }
+
+  if (history.length === 0) return null;
+
+  // Drawdown
+  let peak = history[0].equityUsd;
+  history.forEach(h => {
+    if (h.equityUsd > peak) peak = h.equityUsd;
+    h.drawdownPct = (h.equityUsd / peak - 1) * 100;
+  });
+
+  // Sharpe (daily returns)
+  const dailyReturns = [];
+  for (let i = 1; i < history.length; i++) {
+    const r = (history[i].equityUsd / history[i-1].equityUsd) - 1;
+    if (Number.isFinite(r)) dailyReturns.push(r);
+  }
+  const mean = dailyReturns.reduce((a,b)=>a+b, 0) / Math.max(1, dailyReturns.length);
+  const variance = dailyReturns.reduce((a,b) => a + Math.pow(b-mean, 2), 0) / Math.max(1, dailyReturns.length - 1);
+  const std = Math.sqrt(variance);
+  const sharpe = std > 0 ? (mean / std) * Math.sqrt(252) : 0;
+
+  const finalEquity = history[history.length-1].equityUsd;
+  const days = Math.max(1, (new Date(history[history.length-1].date) - new Date(history[0].date)) / 86400000);
+  const years = days / 365.25;
+  const totalRet = (finalEquity / startUsd - 1) * 100;
+  const cagr = years > 0 ? (Math.pow(finalEquity / startUsd, 1/years) - 1) * 100 : 0;
+  const maxDd = Math.min(...history.map(h => h.drawdownPct));
+
+  return {
+    history, finalEquity, totalRet, cagr, maxDd, sharpe,
+    nTaken, nAvailable: trades.length,
+    winRate: nTaken > 0 ? (nWins / nTaken) * 100 : 0,
+  };
+}
+
+function fmtUsd(v) {
+  if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'k';
+  return '$' + Math.round(v).toLocaleString();
+}
+function fmtSignedUsd(v) { return (v >= 0 ? '+' : '') + fmtUsd(v).replace('$', v >= 0 ? '$' : '-$').replace('-$-', '-$'); }
+
+let chart, ddChart;
+
+function render() {
+  const startUsd = parseFloat(document.getElementById('capital').value) * 1_000_000;
+  const slots = parseInt(document.getElementById('slots').value);
+  const costBp = parseInt(document.getElementById('cost').value);
+  const horizon = parseInt(document.getElementById('horizon').value);
+  const finRate = parseInt(document.getElementById('fin').value) / 100;  // bp -> %
+
+  document.getElementById('capital-val').textContent = '$' + (startUsd/1e6).toFixed(1) + 'M';
+  document.getElementById('slots-val').textContent = slots;
+  document.getElementById('cost-val').textContent = costBp + 'bp';
+  document.getElementById('horizon-val').textContent = horizon + 'd';
+  document.getElementById('fin-val').textContent = finRate.toFixed(1) + '%';
+
+  const r = simulate(startUsd, slots, costBp, horizon, finRate);
+  if (!r) return;
+
+  document.getElementById('kpi-start').textContent = fmtUsd(startUsd);
+  document.getElementById('kpi-end').textContent = fmtUsd(r.finalEquity);
+  const pnl = r.finalEquity - startUsd;
+  const pnlEl = document.getElementById('kpi-pnl');
+  pnlEl.textContent = (pnl >= 0 ? '+' : '') + fmtUsd(pnl).replace('$-', '-$');
+  pnlEl.style.color = pnl >= 0 ? 'var(--profit-700)' : 'var(--red)';
+  document.getElementById('kpi-cagr').textContent = (r.cagr >= 0 ? '+' : '') + r.cagr.toFixed(1) + '%';
+  document.getElementById('kpi-dd').textContent = r.maxDd.toFixed(2) + '%';
+  document.getElementById('kpi-sharpe').textContent = r.sharpe.toFixed(2);
+  document.getElementById('kpi-trades').textContent = r.nTaken + ' / ' + r.nAvailable;
+  document.getElementById('kpi-winrate').textContent = r.winRate.toFixed(0) + '%';
+
+  const labels = r.history.map(h => h.date);
+  const equity = r.history.map(h => h.equityUsd);
+  const dd = r.history.map(h => h.drawdownPct);
+
+  if (!chart) {
+    chart = new Chart(document.getElementById('sim-chart'), {
+      type: 'line',
+      data: { labels, datasets: [
+        { label: 'Equity', data: equity, borderColor: '#1d4ed8',
+          backgroundColor: 'rgba(59,130,246,0.10)', fill: true, pointRadius: 0, borderWidth: 2, tension: 0.05 },
+        { label: 'Starting', data: equity.map(()=>startUsd), borderColor: 'rgba(100,116,139,0.4)',
+          borderDash: [5,5], pointRadius: 0, borderWidth: 1, fill: false },
+      ]},
+      options: {
+        responsive: true, animation: false,
+        plugins: { legend: { labels: { color: '#0f172a', font: { size: 11 } } },
+                   tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + (ctx.parsed.y || 0).toLocaleString(undefined, {maximumFractionDigits:0}) } } },
+        scales: {
+          x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#e2e8f0' } },
+          y: { ticks: { color: '#64748b', callback: v => '$' + (v/1e6).toFixed(2) + 'M' }, grid: { color: '#e2e8f0' } }
+        }
+      }
+    });
+    ddChart = new Chart(document.getElementById('sim-dd'), {
+      type: 'line',
+      data: { labels, datasets: [{
+        label: 'Drawdown', data: dd, borderColor: '#b91c1c',
+        backgroundColor: 'rgba(185,28,28,0.15)', fill: true, pointRadius: 0, borderWidth: 1.5, tension: 0.05
+      }]},
+      options: { responsive: true, animation: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#e2e8f0' } },
+          y: { ticks: { color: '#64748b', callback: v => v.toFixed(1) + '%' }, grid: { color: '#e2e8f0' }, max: 0 }
+        }
+      }
+    });
+  } else {
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = equity;
+    chart.data.datasets[1].data = equity.map(() => startUsd);
+    chart.update('none');
+    ddChart.data.labels = labels;
+    ddChart.data.datasets[0].data = dd;
+    ddChart.update('none');
+  }
+}
+
+['capital','slots','cost','horizon','fin'].forEach(id => {
+  document.getElementById(id).addEventListener('input', render);
+});
+render();
+</script>
+
+{% endblock %}

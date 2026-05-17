@@ -373,6 +373,34 @@ def render_glossary(env):
     write(os.path.join(DOCS, "glossary.html"), html)
 
 
+def render_simulator(env):
+    """Export trades as JSON + render simulator page with client-side sliders."""
+    import json as _json
+    trades_path = hist_path("hedged_trades")
+    trades_json = "[]"
+    if os.path.exists(trades_path):
+        df = pd.read_csv(trades_path)
+        # Keep only the fields the JS sim needs
+        keep_cols = ["entry_date", "exit_date", "days_held", "issuer", "ric",
+                     "entry_cheap", "net_pnl_jpy", "gross_pnl_jpy",
+                     "transaction_cost_jpy", "financing_carry_jpy", "delta_used"]
+        keep_cols = [c for c in keep_cols if c in df.columns]
+        df = df[keep_cols].copy()
+        df["entry_date"] = pd.to_datetime(df["entry_date"]).dt.strftime("%Y-%m-%d")
+        df["exit_date"]  = pd.to_datetime(df["exit_date"]).dt.strftime("%Y-%m-%d")
+        trades_json = df.to_json(orient="records")
+        # Also write to docs/api/ for the page to fetch
+        api_dir = os.path.join(DOCS, "api")
+        os.makedirs(api_dir, exist_ok=True)
+        with open(os.path.join(api_dir, "trades.json"), "w") as f:
+            f.write(trades_json)
+
+    html = env.get_template("simulator.html").render(
+        trades_json=trades_json, ROOT="",
+    )
+    write(os.path.join(DOCS, "simulator.html"), html)
+
+
 def render_portfolio(env):
     import json as _json
     portfolio_kpis, portfolio_curve = {}, []
@@ -507,6 +535,8 @@ def main():
     print(f"  ✓ how-it-works.html")
     render_glossary(env)
     print(f"  ✓ glossary.html")
+    render_simulator(env)
+    print(f"  ✓ simulator.html")
     render_risk(env)
     print(f"  ✓ risk.html")
     render_portfolio(env)

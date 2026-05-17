@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live constraint simulator</title>
+  <link rel="stylesheet" href="static/app.css?v=blue2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">JP</span>
+      <span class="title">CB Arbitrage Desk</span>
+      <span class="src">Refinitiv · LSEG Eikon</span>
+    </div>
+    <nav>
+      
+      
+      <a href="index.html">Universe</a>
+      <a href="portfolio.html">$5M Portfolio</a>
+      <a href="watchlist.html">Watchlist</a>
+      <a href="backtest.html">Backtest</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="risk.html">Risk</a>
+      <a href="alerts.html">Alerts log</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="glossary.html">Glossary</a>
+      
+    </nav>
+  </header>
+  
+  <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+  </div>
+  
+  <main>
+    
+
+<section class="welcome">
+  <h1>Live constraint simulator</h1>
+  <p class="lead">
+    Drag the sliders to see how the paper portfolio's performance changes under different sizing, cost,
+    and exit-horizon assumptions. The simulation re-runs in your browser on every slider move — same
+    trade data, different rules.
+  </p>
+</section>
+
+<section style="display:grid; grid-template-columns: 320px 1fr; gap:22px; margin-bottom:18px;">
+  <!-- LEFT: Sliders -->
+  <div style="background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; box-shadow:var(--shadow-sm);">
+    <h3 style="margin:0 0 12px; font-size:12px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:0.6px;">Strategy parameters</h3>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>Starting capital</label>
+        <span class="slider-val" id="capital-val">$5.0M</span>
+      </div>
+      <input type="range" id="capital" min="1" max="50" step="1" value="5" class="slider">
+      <div class="slider-help">How much real money is in the account. Higher = catches more concurrent signals.</div>
+    </div>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>Concurrent positions (slots)</label>
+        <span class="slider-val" id="slots-val">5</span>
+      </div>
+      <input type="range" id="slots" min="1" max="10" step="1" value="5" class="slider">
+      <div class="slider-help">Max open trades at once. Fewer slots = bigger bets = higher CAGR but deeper drawdowns.</div>
+    </div>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>Round-trip transaction cost</label>
+        <span class="slider-val" id="cost-val">60bp</span>
+      </div>
+      <input type="range" id="cost" min="10" max="200" step="5" value="60" class="slider">
+      <div class="slider-help">Bond + equity bid-ask cost per trade. Realistic on JP CBs: 50-150bp.</div>
+    </div>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>Max exit horizon</label>
+        <span class="slider-val" id="horizon-val">60d</span>
+      </div>
+      <input type="range" id="horizon" min="10" max="120" step="5" value="60" class="slider">
+      <div class="slider-help">Force exit if held this long. Shorter = more turnover but cuts off late convergence.</div>
+    </div>
+
+    <div class="slider-block">
+      <div class="slider-row">
+        <label>JPY financing rate</label>
+        <span class="slider-val" id="fin-val">1.0%</span>
+      </div>
+      <input type="range" id="fin" min="0" max="500" step="10" value="100" class="slider">
+      <div class="slider-help">Annualized rate paid on the long bond / earned on short proceeds.</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Live KPIs -->
+  <div>
+    <div class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); margin-bottom:14px;">
+      <div class="kpi"><span class="lab">Starting</span><span class="val" id="kpi-start">$5.0M</span></div>
+      <div class="kpi alert"><span class="lab">Ending equity</span><span class="val" id="kpi-end">—</span></div>
+      <div class="kpi alert"><span class="lab">Total P&L</span><span class="val" id="kpi-pnl">—</span></div>
+      <div class="kpi"><span class="lab">CAGR</span><span class="val" id="kpi-cagr">—</span></div>
+      <div class="kpi"><span class="lab">Max DD</span><span class="val" id="kpi-dd" style="color:var(--red);">—</span></div>
+      <div class="kpi"><span class="lab">Sharpe</span><span class="val" id="kpi-sharpe">—</span></div>
+      <div class="kpi"><span class="lab">Trades taken</span><span class="val" id="kpi-trades">—</span></div>
+      <div class="kpi"><span class="lab">Win rate</span><span class="val" id="kpi-winrate">—</span></div>
+    </div>
+
+    <div class="chart-block">
+      <h3>Equity curve</h3>
+      <canvas id="sim-chart" height="120"></canvas>
+    </div>
+
+    <div class="chart-block">
+      <h3>Drawdown</h3>
+      <canvas id="sim-dd" height="60"></canvas>
+    </div>
+  </div>
+</section>
+
+<div class="callout">
+  <span class="label">What to try</span>
+  Slide <strong>concurrent positions</strong> from 5 down to 1 — watch CAGR rise from ~24% to ~50% as concentration increases. Slide <strong>transaction cost</strong> from 60 up to 150bp — see the strategy's edge shrink dramatically (CB arb is highly sensitive to execution costs). Slide <strong>exit horizon</strong> below 30 days — too short and you cut off late convergence; too long and you bleed theta.
+</div>
+
+<style>
+.slider-block { margin-bottom: 18px; }
+.slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.slider-row label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.slider-val { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--blue-700); }
+.slider { width: 100%; appearance: none; height: 4px; background: var(--line); border-radius: 2px; outline: none; }
+.slider::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--blue-700); cursor: pointer; border: 2px solid white; box-shadow: var(--shadow-sm); }
+.slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--blue-700); cursor: pointer; border: 2px solid white; }
+.slider-help { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+</style>
+
+<script>
+const TRADES = [{"entry_date":"2026-04-03","exit_date":"2026-04-29","days_held":18,"issuer":"ANA","ric":"JP241370844=","entry_cheap":5.0208904482,"net_pnl_jpy":-6428999.9925829871,"gross_pnl_jpy":-5856742.9039534424,"transaction_cost_jpy":502559.8582896586,"financing_carry_jpy":-69697.230339886,"delta_used":0.0251426953},{"entry_date":"2026-03-24","exit_date":"2026-04-29","days_held":26,"issuer":"Park24","ric":"JP258410505=","entry_cheap":5.9827024665,"net_pnl_jpy":-2721396.2300844342,"gross_pnl_jpy":-2118025.5723167299,"transaction_cost_jpy":502314.5475325169,"financing_carry_jpy":-101056.1102351873,"delta_used":0.021257873},{"entry_date":"2026-04-23","exit_date":"2026-04-29","days_held":4,"issuer":"Tokyu","ric":"JP263516745=","entry_cheap":5.5665712086,"net_pnl_jpy":-874521.7826921705,"gross_pnl_jpy":-357239.7859200906,"transaction_cost_jpy":501673.4068377515,"financing_carry_jpy":-15608.5899343283,"delta_used":0.0168228694},{"entry_date":"2025-06-20","exit_date":"2025-07-08","days_held":12,"issuer":"Money Forward","ric":"JP266263856=","entry_cheap":6.6968873835,"net_pnl_jpy":1002148.3746734684,"gross_pnl_jpy":1550484.1980195281,"transaction_cost_jpy":501300.445009159,"financing_carry_jpy":-47035.3783369003,"delta_used":0.0120128505},{"entry_date":"2025-10-02","exit_date":"2025-10-29","days_held":19,"issuer":"Money Forward","ric":"JP266263856=","entry_cheap":5.4907519513,"net_pnl_jpy":-5221359.2279517706,"gross_pnl_jpy":-4645795.6332629742,"transaction_cost_jpy":500622.2975996757,"financing_carry_jpy":-74941.2970891206,"delta_used":0.0062957759},{"entry_date":"2026-01-15","exit_date":"2026-04-09","days_held":60,"issuer":"Money Forward","ric":"JP266263856=","entry_cheap":7.6799709308,"net_pnl_jpy":-5353542.5284754001,"gross_pnl_jpy":-4615735.6976571558,"transaction_cost_jpy":500564.6973284755,"financing_carry_jpy":-237242.1334897686,"delta_used":0.005251091},{"entry_date":"2025-06-20","exit_date":"2025-07-08","days_held":12,"issuer":"Daifuku","ric":"JP267637369=","entry_cheap":7.8718191017,"net_pnl_jpy":-51495.3381791996,"gross_pnl_jpy":497257.8580461701,"transaction_cost_jpy":502093.0495319388,"financing_carry_jpy":-46660.146693431,"delta_used":0.019896982},{"entry_date":"2025-10-10","exit_date":"2025-11-07","days_held":20,"issuer":"Daifuku","ric":"JP267637369=","entry_cheap":5.1840195893,"net_pnl_jpy":4453749.9197926307,"gross_pnl_jpy":5033758.7605630606,"transaction_cost_jpy":502484.8981302903,"financing_carry_jpy":-77523.94264014,"delta_used":0.0226582411},{"entry_date":"2026-04-01","exit_date":"2026-04-29","days_held":20,"issuer":"Daifuku","ric":"JP267637369=","entry_cheap":12.4230286301,"net_pnl_jpy":33387905.80825435,"gross_pnl_jpy":33968098.79854808,"transaction_cost_jpy":502955.6282846946,"financing_carry_jpy":-77237.3620090377,"delta_used":0.0250949773},{"entry_date":"2025-06-20","exit_date":"2025-07-10","days_held":14,"issuer":"Taiyo Yuden","ric":"JP270026966=","entry_cheap":12.9310902864,"net_pnl_jpy":1032858.7229570434,"gross_pnl_jpy":1589183.5491743516,"transaction_cost_jpy":501662.0815267397,"financing_carry_jpy":-54662.7446905684,"delta_used":0.0149891245},{"entry_date":"2025-10-27","exit_date":"2026-01-19","days_held":60,"issuer":"Taiyo Yuden","ric":"JP270026966=","entry_cheap":6.3948913939,"net_pnl_jpy":-6421578.3599077584,"gross_pnl_jpy":-5684861.7240120824,"transaction_cost_jpy":501877.0556870432,"financing_carry_jpy":-234839.580208633,"delta_used":0.0156550976},{"entry_date":"2026-01-26","exit_date":"2026-04-20","days_held":60,"issuer":"Taiyo Yuden","ric":"JP270026966=","entry_cheap":13.0376155397,"net_pnl_jpy":40175328.3348717541,"gross_pnl_jpy":40911592.0038658157,"transaction_cost_jpy":502755.2018562583,"financing_carry_jpy":-233508.4671378032,"delta_used":0.0152829531},{"entry_date":"2026-04-27","exit_date":"2026-04-29","days_held":2,"issuer":"Taiyo Yuden","ric":"JP270026966=","entry_cheap":20.6578411761,"net_pnl_jpy":352269.3731695627,"gross_pnl_jpy":862028.9231092009,"transaction_cost_jpy":501980.2007965035,"financing_carry_jpy":-7779.3491431346,"delta_used":0.0197371526},{"entry_date":"2025-06-20","exit_date":"2025-07-08","days_held":12,"issuer":"Kobe Steel","ric":"JP272792062=","entry_cheap":6.7049129275,"net_pnl_jpy":1222569.0246662928,"gross_pnl_jpy":1771313.2360258426,"transaction_cost_jpy":502058.5726517996,"financing_carry_jpy":-46685.6387077503,"delta_used":0.0190696199},{"entry_date":"2026-03-13","exit_date":"2026-04-29","days_held":33,"issuer":"Kobe Steel","ric":"JP272792062=","entry_cheap":5.2987085175,"net_pnl_jpy":-3593308.6317127184,"gross_pnl_jpy":-2962709.5592977502,"transaction_cost_jpy":502739.5781266335,"financing_carry_jpy":-127859.4942883347,"delta_used":0.0246657157},{"entry_date":"2026-02-16","exit_date":"2026-04-29","days_held":52,"issuer":"Obara Group","ric":"JP279390296=","entry_cheap":8.690994977,"net_pnl_jpy":22027559.4805863835,"gross_pnl_jpy":22731360.9537614435,"transaction_cost_jpy":503415.9147891058,"financing_carry_jpy":-200385.558385954,"delta_used":0.0240618559},{"entry_date":"2025-06-20","exit_date":"2025-07-14","days_held":16,"issuer":"Rohm","ric":"JP279962168=","entry_cheap":9.090457743,"net_pnl_jpy":2054242.5404060937,"gross_pnl_jpy":2618591.2636929066,"transaction_cost_jpy":502151.4935860359,"financing_carry_jpy":-62197.229700777,"delta_used":0.0186796256},{"entry_date":"2025-11-12","exit_date":"2026-02-04","days_held":60,"issuer":"Rohm","ric":"JP279962168=","entry_cheap":5.1058522503,"net_pnl_jpy":8248974.1228438569,"gross_pnl_jpy":8985201.5038694367,"transaction_cost_jpy":502495.0961978703,"financing_carry_jpy":-233732.2848277104,"delta_used":0.0168172863},{"entry_date":"2026-03-06","exit_date":"2026-04-29","days_held":38,"issuer":"Rohm","ric":"JP279962168=","entry_cheap":10.6900069774,"net_pnl_jpy":6055534.2922470355,"gross_pnl_jpy":6705417.5183546534,"transaction_cost_jpy":502861.7335675626,"financing_carry_jpy":-147021.4925400546,"delta_used":0.0235001031},{"entry_date":"2025-06-20","exit_date":"2025-08-22","days_held":45,"issuer":"Rohm","ric":"JP279962206=","entry_cheap":13.5623737989,"net_pnl_jpy":5661886.3854971062,"gross_pnl_jpy":6338980.5593669023,"transaction_cost_jpy":502914.5817504818,"financing_carry_jpy":-174179.5921193146,"delta_used":0.021549387},{"entry_date":"2025-11-07","exit_date":"2026-01-30","days_held":60,"issuer":"Rohm","ric":"JP279962206=","entry_cheap":6.5233092609,"net_pnl_jpy":11458726.4999167565,"gross_pnl_jpy":12194395.5186646506,"transaction_cost_jpy":503239.3941869902,"financing_carry_jpy":-232429.624560905,"delta_used":0.0217094835},{"entry_date":"2026-03-06","exit_date":"2026-04-29","days_held":38,"issuer":"Rohm","ric":"JP279962206=","entry_cheap":13.0190987434,"net_pnl_jpy":5682751.7978674723,"gross_pnl_jpy":6332533.2150257286,"transaction_cost_jpy":503181.7491518657,"financing_carry_jpy":-146599.6680063905,"delta_used":0.0261280204},{"entry_date":"2026-03-26","exit_date":"2026-03-31","days_held":3,"issuer":"Nikkon Holdings","ric":"JP294960325=","entry_cheap":8.4788184665,"net_pnl_jpy":17203030.2642845996,"gross_pnl_jpy":17718616.4517687634,"transaction_cost_jpy":504235.6014213931,"financing_carry_jpy":-11350.5860627691,"delta_used":0.0450815965},{"entry_date":"2026-04-07","exit_date":"2026-04-29","days_held":16,"issuer":"Nikkon Holdings","ric":"JP294960325=","entry_cheap":9.8619250876,"net_pnl_jpy":17707270.5976779759,"gross_pnl_jpy":18272714.9439583719,"transaction_cost_jpy":504912.4558286826,"financing_carry_jpy":-60531.8904517137,"delta_used":0.0438388771},{"entry_date":"2025-06-20","exit_date":"2025-09-12","days_held":60,"issuer":"Rohto Pharm","ric":"JP301652887=","entry_cheap":17.6883696643,"net_pnl_jpy":8196840.1742300773,"gross_pnl_jpy":8932248.6449144725,"transaction_cost_jpy":503349.4544123966,"financing_carry_jpy":-232059.0162719982,"delta_used":0.0229273486},{"entry_date":"2025-09-19","exit_date":"2025-11-06","days_held":34,"issuer":"Rohto Pharm","ric":"JP301652887=","entry_cheap":9.6480618631,"net_pnl_jpy":-1954686.9047116695,"gross_pnl_jpy":-1320257.3709337709,"transaction_cost_jpy":502721.3513046048,"financing_carry_jpy":-131708.1824732937,"delta_used":0.0241965576},{"entry_date":"2026-03-04","exit_date":"2026-04-29","days_held":40,"issuer":"Rohto Pharm","ric":"JP301652887=","entry_cheap":8.3772426226,"net_pnl_jpy":1568104.7487380097,"gross_pnl_jpy":2225735.2493798733,"transaction_cost_jpy":503110.7273428029,"financing_carry_jpy":-154519.7732990607,"delta_used":0.0250143307},{"entry_date":"2025-06-20","exit_date":"2025-07-03","days_held":9,"issuer":"Sinko","ric":"JP302522383=","entry_cheap":6.800014458,"net_pnl_jpy":-480039.1904777336,"gross_pnl_jpy":58407.9835162645,"transaction_cost_jpy":504203.3133549293,"financing_carry_jpy":-34243.8606390688,"delta_used":0.0412978801},{"entry_date":"2025-11-21","exit_date":"2026-01-16","days_held":37,"issuer":"Sinko","ric":"JP302522383=","entry_cheap":5.2059950612,"net_pnl_jpy":-1255027.0845033647,"gross_pnl_jpy":-609632.9515127399,"transaction_cost_jpy":505648.3181808448,"financing_carry_jpy":-139745.8148097801,"delta_used":0.0449130717},{"entry_date":"2026-03-17","exit_date":"2026-04-29","days_held":31,"issuer":"Mizuno","ric":"JP329568903=","entry_cheap":7.4213148085,"net_pnl_jpy":-1355354.4244574527,"gross_pnl_jpy":-732444.080126605,"transaction_cost_jpy":501241.8818319532,"financing_carry_jpy":-121668.4624988944,"delta_used":0.0108687104},{"entry_date":"2026-04-21","exit_date":"2026-04-29","days_held":6,"issuer":"Advantest","ric":"JP330437685=","entry_cheap":11.5892067841,"net_pnl_jpy":4455601.8138470789,"gross_pnl_jpy":4979590.0352197764,"transaction_cost_jpy":500233.8641797734,"financing_carry_jpy":-23754.3571929244,"delta_used":0.0021770629},{"entry_date":"2025-06-20","exit_date":"2025-09-17","days_held":60,"issuer":"Renaissance","ric":"JP900012378=","entry_cheap":14.2596258213,"net_pnl_jpy":-2231184.2356462697,"gross_pnl_jpy":-1501344.7998582835,"transaction_cost_jpy":509856.4638673579,"financing_carry_jpy":-219982.9719206284,"delta_used":0.0681015411},{"entry_date":"2025-10-01","exit_date":"2025-12-29","days_held":60,"issuer":"Renaissance","ric":"JP900012378=","entry_cheap":24.4103342645,"net_pnl_jpy":-506138.1363683481,"gross_pnl_jpy":221389.234078202,"transaction_cost_jpy":513713.1379273701,"financing_carry_jpy":-213814.23251918,"delta_used":0.107614419},{"entry_date":"2026-01-08","exit_date":"2026-01-16","days_held":5,"issuer":"Renaissance","ric":"JP900012378=","entry_cheap":18.5254712976,"net_pnl_jpy":-787924.3689608763,"gross_pnl_jpy":-260949.6321997948,"transaction_cost_jpy":508829.8831795605,"financing_carry_jpy":-18144.8535815209,"delta_used":0.0848086305},{"entry_date":"2025-06-20","exit_date":"2025-08-08","days_held":34,"issuer":"Hokuto Corp","ric":"JP900021379=","entry_cheap":8.2203464024,"net_pnl_jpy":-828236.8177311926,"gross_pnl_jpy":-194157.068830692,"transaction_cost_jpy":505343.5429394712,"financing_carry_jpy":-128736.2059610293,"delta_used":0.0455890884},{"entry_date":"2025-09-16","exit_date":"2025-12-15","days_held":60,"issuer":"Hokuto Corp","ric":"JP900021379=","entry_cheap":6.5464145064,"net_pnl_jpy":-976574.211376051,"gross_pnl_jpy":-243475.3963946737,"transaction_cost_jpy":506539.5734432666,"financing_carry_jpy":-226559.2415381107,"delta_used":0.0495735988},{"entry_date":"2025-12-22","exit_date":"2026-01-16","days_held":15,"issuer":"Hokuto Corp","ric":"JP900021379=","entry_cheap":12.4650314783,"net_pnl_jpy":-562286.4203864626,"gross_pnl_jpy":-0.0,"transaction_cost_jpy":506177.6713968605,"financing_carry_jpy":-56108.7489896021,"delta_used":0.057484509},{"entry_date":"2025-06-20","exit_date":"2025-08-07","days_held":33,"issuer":"SRS Holdings","ric":"JP901018163=","entry_cheap":14.8300372436,"net_pnl_jpy":-980407.8778114819,"gross_pnl_jpy":-350416.1322482799,"transaction_cost_jpy":507001.7523424859,"financing_carry_jpy":-122989.9932207164,"delta_used":0.0591327223}];
+const USD_JPY = 150;
+const SIM_BASELINE_COST_BP = 30;  // backtest used 25bp bond + 5bp equity half-spread = 30bp round-trip
+
+// Pre-parse dates
+TRADES.forEach(t => {
+  t._entry = new Date(t.entry_date + 'T00:00:00');
+  t._exit  = new Date(t.exit_date  + 'T00:00:00');
+});
+
+function simulate(startUsd, slots, costBp, horizonDays, finRate) {
+  const startJpy = startUsd * USD_JPY;
+  let cash = startJpy;
+  const openPositions = [];
+  const history = [];
+  let nTaken = 0, nWins = 0;
+
+  // Build events with cost/horizon-adjusted P&L
+  const trades = TRADES.map(t => {
+    // Truncate days held to horizon (linear scaling of P&L)
+    const heldEff = Math.min(t.days_held, horizonDays);
+    const scaleByHorizon = heldEff / t.days_held;
+    // Apply user's cost: subtract (newCost - baselineCost) of par per ¥100M
+    const baselineCost = SIM_BASELINE_COST_BP / 10000 * 100_000_000;
+    const userCost     = costBp / 10000 * 100_000_000;
+    const grossAt100M  = t.gross_pnl_jpy ?? (t.net_pnl_jpy + (t.transaction_cost_jpy || 0));
+    const carryAt100M  = (t.financing_carry_jpy || 0);
+    // Re-scale financing carry to user rate (baseline was 1%)
+    const carryScaled  = carryAt100M * (finRate / 100);
+    let netAt100M = grossAt100M * scaleByHorizon - userCost + carryScaled;
+    // Exit date shifts if horizon kicks in
+    const exitDateEff = new Date(t._entry.getTime() + heldEff * 86400000);
+    return {
+      ...t,
+      _exit_eff: exitDateEff,
+      _days_eff: heldEff,
+      _net_at_100M: netAt100M,
+    };
+  });
+
+  // Event timeline (exits before entries on same date)
+  const events = [];
+  trades.forEach((t, i) => {
+    events.push({ date: t._entry, type: 'entry', idx: i });
+    events.push({ date: t._exit_eff, type: 'exit',  idx: i });
+  });
+  events.sort((a, b) => (a.date - b.date) || (a.type === 'exit' ? -1 : 1));
+
+  for (const ev of events) {
+    if (ev.type === 'exit') {
+      const opIdx = openPositions.findIndex(op => op.tradeIdx === ev.idx);
+      if (opIdx >= 0) {
+        const op = openPositions[opIdx];
+        const t  = trades[ev.idx];
+        const realized = t._net_at_100M * (op.notionalJpy / 100_000_000);
+        cash += op.notionalJpy + realized;
+        if (realized > 0) nWins += 1;
+        openPositions.splice(opIdx, 1);
+      }
+    } else {
+      if (openPositions.length >= slots) continue;
+      const slotsOpen = slots - openPositions.length;
+      const notional = cash / slotsOpen;
+      if (notional < 10_000_000) continue;  // min ¥10M
+      cash -= notional;
+      openPositions.push({
+        tradeIdx: ev.idx,
+        notionalJpy: notional,
+      });
+      nTaken += 1;
+    }
+    const deployed = openPositions.reduce((s, op) => s + op.notionalJpy, 0);
+    const equityJpy = cash + deployed;
+    history.push({
+      date: ev.date.toISOString().slice(0, 10),
+      equityUsd: equityJpy / USD_JPY,
+      equityJpy: equityJpy,
+      cash: cash,
+      deployed: deployed,
+    });
+  }
+
+  if (history.length === 0) return null;
+
+  // Drawdown
+  let peak = history[0].equityUsd;
+  history.forEach(h => {
+    if (h.equityUsd > peak) peak = h.equityUsd;
+    h.drawdownPct = (h.equityUsd / peak - 1) * 100;
+  });
+
+  // Sharpe (daily returns)
+  const dailyReturns = [];
+  for (let i = 1; i < history.length; i++) {
+    const r = (history[i].equityUsd / history[i-1].equityUsd) - 1;
+    if (Number.isFinite(r)) dailyReturns.push(r);
+  }
+  const mean = dailyReturns.reduce((a,b)=>a+b, 0) / Math.max(1, dailyReturns.length);
+  const variance = dailyReturns.reduce((a,b) => a + Math.pow(b-mean, 2), 0) / Math.max(1, dailyReturns.length - 1);
+  const std = Math.sqrt(variance);
+  const sharpe = std > 0 ? (mean / std) * Math.sqrt(252) : 0;
+
+  const finalEquity = history[history.length-1].equityUsd;
+  const days = Math.max(1, (new Date(history[history.length-1].date) - new Date(history[0].date)) / 86400000);
+  const years = days / 365.25;
+  const totalRet = (finalEquity / startUsd - 1) * 100;
+  const cagr = years > 0 ? (Math.pow(finalEquity / startUsd, 1/years) - 1) * 100 : 0;
+  const maxDd = Math.min(...history.map(h => h.drawdownPct));
+
+  return {
+    history, finalEquity, totalRet, cagr, maxDd, sharpe,
+    nTaken, nAvailable: trades.length,
+    winRate: nTaken > 0 ? (nWins / nTaken) * 100 : 0,
+  };
+}
+
+function fmtUsd(v) {
+  if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'k';
+  return '$' + Math.round(v).toLocaleString();
+}
+function fmtSignedUsd(v) { return (v >= 0 ? '+' : '') + fmtUsd(v).replace('$', v >= 0 ? '$' : '-$').replace('-$-', '-$'); }
+
+let chart, ddChart;
+
+function render() {
+  const startUsd = parseFloat(document.getElementById('capital').value) * 1_000_000;
+  const slots = parseInt(document.getElementById('slots').value);
+  const costBp = parseInt(document.getElementById('cost').value);
+  const horizon = parseInt(document.getElementById('horizon').value);
+  const finRate = parseInt(document.getElementById('fin').value) / 100;  // bp -> %
+
+  document.getElementById('capital-val').textContent = '$' + (startUsd/1e6).toFixed(1) + 'M';
+  document.getElementById('slots-val').textContent = slots;
+  document.getElementById('cost-val').textContent = costBp + 'bp';
+  document.getElementById('horizon-val').textContent = horizon + 'd';
+  document.getElementById('fin-val').textContent = finRate.toFixed(1) + '%';
+
+  const r = simulate(startUsd, slots, costBp, horizon, finRate);
+  if (!r) return;
+
+  document.getElementById('kpi-start').textContent = fmtUsd(startUsd);
+  document.getElementById('kpi-end').textContent = fmtUsd(r.finalEquity);
+  const pnl = r.finalEquity - startUsd;
+  const pnlEl = document.getElementById('kpi-pnl');
+  pnlEl.textContent = (pnl >= 0 ? '+' : '') + fmtUsd(pnl).replace('$-', '-$');
+  pnlEl.style.color = pnl >= 0 ? 'var(--profit-700)' : 'var(--red)';
+  document.getElementById('kpi-cagr').textContent = (r.cagr >= 0 ? '+' : '') + r.cagr.toFixed(1) + '%';
+  document.getElementById('kpi-dd').textContent = r.maxDd.toFixed(2) + '%';
+  document.getElementById('kpi-sharpe').textContent = r.sharpe.toFixed(2);
+  document.getElementById('kpi-trades').textContent = r.nTaken + ' / ' + r.nAvailable;
+  document.getElementById('kpi-winrate').textContent = r.winRate.toFixed(0) + '%';
+
+  const labels = r.history.map(h => h.date);
+  const equity = r.history.map(h => h.equityUsd);
+  const dd = r.history.map(h => h.drawdownPct);
+
+  if (!chart) {
+    chart = new Chart(document.getElementById('sim-chart'), {
+      type: 'line',
+      data: { labels, datasets: [
+        { label: 'Equity', data: equity, borderColor: '#1d4ed8',
+          backgroundColor: 'rgba(59,130,246,0.10)', fill: true, pointRadius: 0, borderWidth: 2, tension: 0.05 },
+        { label: 'Starting', data: equity.map(()=>startUsd), borderColor: 'rgba(100,116,139,0.4)',
+          borderDash: [5,5], pointRadius: 0, borderWidth: 1, fill: false },
+      ]},
+      options: {
+        responsive: true, animation: false,
+        plugins: { legend: { labels: { color: '#0f172a', font: { size: 11 } } },
+                   tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + (ctx.parsed.y || 0).toLocaleString(undefined, {maximumFractionDigits:0}) } } },
+        scales: {
+          x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#e2e8f0' } },
+          y: { ticks: { color: '#64748b', callback: v => '$' + (v/1e6).toFixed(2) + 'M' }, grid: { color: '#e2e8f0' } }
+        }
+      }
+    });
+    ddChart = new Chart(document.getElementById('sim-dd'), {
+      type: 'line',
+      data: { labels, datasets: [{
+        label: 'Drawdown', data: dd, borderColor: '#b91c1c',
+        backgroundColor: 'rgba(185,28,28,0.15)', fill: true, pointRadius: 0, borderWidth: 1.5, tension: 0.05
+      }]},
+      options: { responsive: true, animation: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#e2e8f0' } },
+          y: { ticks: { color: '#64748b', callback: v => v.toFixed(1) + '%' }, grid: { color: '#e2e8f0' }, max: 0 }
+        }
+      }
+    });
+  } else {
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = equity;
+    chart.data.datasets[1].data = equity.map(() => startUsd);
+    chart.update('none');
+    ddChart.data.labels = labels;
+    ddChart.data.datasets[0].data = dd;
+    ddChart.update('none');
+  }
+}
+
+['capital','slots','cost','horizon','fin'].forEach(id => {
+  document.getElementById(id).addEventListener('input', render);
+});
+render();
+</script>
+
+
+  </main>
+  <footer>
+    <span>Phase 2 build · pricer: Tsiveriotis-Fernandes binomial tree + MC for resets</span>
+  </footer>
+  <script>
+    async function runScreen() {
+      const btn = document.getElementById('run-now');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const r = await fetch('/api/run', {method:'POST'});
+        const j = await r.json();
+        location.reload();
+      } catch(e) { alert('Run failed: '+e); btn.disabled=false; btn.textContent='Run now'; }
+    }
+  </script>
+</body>
+</html>

@@ -175,6 +175,30 @@ def glossary_view(request: Request):
     return templates.TemplateResponse("glossary.html", {"request": request})
 
 
+@app.get("/simulator", response_class=HTMLResponse)
+def simulator_view(request: Request):
+    histdir = os.path.join(PROJ, "history")
+    prefix = "demo_" if DEMO_MODE else ""
+    trades_json = "[]"
+    p = os.path.join(histdir, f"{prefix}hedged_trades.csv")
+    if os.path.exists(p):
+        try:
+            df = pd.read_csv(p)
+            keep = [c for c in ["entry_date","exit_date","days_held","issuer","ric",
+                                "entry_cheap","net_pnl_jpy","gross_pnl_jpy",
+                                "transaction_cost_jpy","financing_carry_jpy","delta_used"]
+                    if c in df.columns]
+            df = df[keep].copy()
+            df["entry_date"] = pd.to_datetime(df["entry_date"]).dt.strftime("%Y-%m-%d")
+            df["exit_date"]  = pd.to_datetime(df["exit_date"]).dt.strftime("%Y-%m-%d")
+            trades_json = df.to_json(orient="records")
+        except Exception:
+            pass
+    return templates.TemplateResponse(
+        "simulator.html", {"request": request, "trades_json": trades_json},
+    )
+
+
 @app.get("/portfolio", response_class=HTMLResponse)
 def portfolio_view(request: Request):
     histdir = os.path.join(PROJ, "history")
