@@ -423,6 +423,11 @@ def render_glossary(env):
     write(os.path.join(DOCS, "glossary.html"), html)
 
 
+def render_limitations(env):
+    html = env.get_template("limitations.html").render(ROOT="")
+    write(os.path.join(DOCS, "limitations.html"), html)
+
+
 def render_simulator(env):
     """Export trades as JSON + render simulator page with client-side sliders."""
     import json as _json
@@ -585,6 +590,8 @@ def main():
     print(f"  ✓ how-it-works.html")
     render_glossary(env)
     print(f"  ✓ glossary.html")
+    render_limitations(env)
+    print(f"  ✓ limitations.html")
     render_simulator(env)
     print(f"  ✓ simulator.html")
     render_risk(env)

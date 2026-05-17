@@ -4,7 +4,31 @@ Autonomous AI agentic workflow that prices the Japanese convertible-bond
 universe daily, validates against real Refinitiv data, and surfaces
 high-confidence mispricings.
 
-**Live demo (cached snapshot):** _add Render URL here after deploy_
+**Live demo:** [benharcohar-beep.github.io/jp-cb-arbitrage](https://benharcohar-beep.github.io/jp-cb-arbitrage/) — public dashboard, refreshes daily.
+
+## Dashboard at a glance
+
+![Top opportunities + universe table](docs/screenshots/universe.png)
+
+*Today's plays at the top, sortable universe table below, full plain-English explainer at the bottom.*
+
+![$5M paper portfolio equity curve](docs/screenshots/portfolio.png)
+
+*Live-tracked $5M paper account. Walks every signal chronologically, marks to market, plots equity curve and drawdown.*
+
+![Backtest stats + factor decomposition](docs/screenshots/backtest.png)
+
+*Walk-forward validation, vol-regime sensitivity, concentration metrics, factor decomposition with HAC + bootstrap p-values, QuantLib sanity check.*
+
+![Live constraint simulator](docs/screenshots/simulator.png)
+
+*Five sliders (capital, slots, transaction cost, exit horizon, financing rate) re-run the simulation in-browser. KPIs and equity curve update instantly.*
+
+![Bond detail page](docs/screenshots/bond_detail.png)
+
+*Per-bond drill-down. Greeks, hedge calculator, historical price path, action recommendation, full investment memo.*
+
+---
 
 ## What it does
 
@@ -226,13 +250,30 @@ bash scripts/setup_autorefresh.sh --uninstall
 sudo pmset repeat cancel
 ```
 
+## Tests
+
+Pricer boundary-case unit tests covering deep ITM/OTM behavior, tree convergence, monotonicity in credit spread and vol, near-maturity terminal payoff, and implied-vol round-trip:
+
+```bash
+python3 -m unittest discover tests -v
+# Ran 10 tests in 0.16s — OK
+```
+
+QuantLib sanity check (cross-validation against `BinomialConvertibleEngine` on 5 plain-vanilla bonds) reports mean absolute difference 0.46% — see `/backtest` dashboard page.
+
 ## Limitations
 
-- Credit spread is rating-based when CDS unavailable.
-- Reset detection is heuristic (issue-size + coupon + rating), not parsed from prospectuses.
-- Many JP CBs are illiquid; dealer mids can be stale for days.
-- Backtest doesn't model the full equity hedge rebalancing — fixed-entry-delta proxy.
-- This is a screening tool, not a trading system. Always Δ-hedge and watch issuer-level news.
+A full honest-limitations catalogue lives on the dashboard at
+[`/limitations`](https://benharcohar-beep.github.io/jp-cb-arbitrage/limitations.html) —
+every data, backtest, operational, and model gap an interviewer (or sceptical PM)
+would push on, listed in one place. Top items:
+
+- **Data**: universe survivorship bias; no historical conversion price; dealer mid is indicative; credit spread is rating-based; stock-borrow assumed free + permanent.
+- **Backtest**: 3-year window with no stress regime; 77 trades is statistically thin (bootstrap 95% CI on alpha [-1.7%, +7.1%]); P&L concentrated in top 5 issuers.
+- **Operational**: no execution layer, no corporate-action handling, no total-book vega cap enforcement.
+- **Model**: constant vol (no surface), constant credit spread, European reset only in MC.
+
+This is a screening + research tool, not a trading system. Always Δ-hedge and watch issuer-level news.
 
 ## License
 

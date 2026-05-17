@@ -219,6 +219,11 @@ def glossary_view(request: Request):
     return templates.TemplateResponse("glossary.html", {"request": request})
 
 
+@app.get("/limitations", response_class=HTMLResponse)
+def limitations_view(request: Request):
+    return templates.TemplateResponse("limitations.html", {"request": request})
+
+
 @app.get("/simulator", response_class=HTMLResponse)
 def simulator_view(request: Request):
     histdir = os.path.join(PROJ, "history")

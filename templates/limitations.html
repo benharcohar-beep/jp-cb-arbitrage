@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Limitations{% endblock %}
+{% block content %}
+
+<section class="welcome">
+  <h1>Honest limitations</h1>
+  <p class="lead">
+    Every gap in the methodology, data, and execution that an interviewer (or a sceptical PM)
+    would push on. Listed in one place so you can pre-empt the conversation.
+    The point isn't that the project is broken — it's that knowing where the cracks are
+    matters more than papering over them.
+  </p>
+</section>
+
+<div class="section-head"><h2>Data limitations</h2></div>
+<section class="primer-body" style="margin-bottom:18px;">
+  <div class="primer-card">
+    <h4>Universe survivorship bias</h4>
+    <p>The universe is sourced from currently-outstanding bonds. Bonds that defaulted, were called early, or had material corporate-action shocks during the backtest period are absent. <strong>Real historical performance was messier than what we see.</strong></p>
+  </div>
+  <div class="primer-card">
+    <h4>No historical conversion-price data</h4>
+    <p>Refinitiv subscription doesn't expose historical conversion prices (only the current snapshot). For reset-clause bonds whose conversion price has changed during the backtest, today's price is applied retroactively — making them look artificially cheap in the past. <strong>Mitigation:</strong> a separate "no-reset bonds only" backtest is run alongside the main one.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Dealer mid is indicative, not transacted</h4>
+    <p>Refinitiv <code>TR.MidPrice</code> is what dealers SAY they'd quote, not what trades actually happen at. The bid/ask version of the backtest models execution at the dealer's quoted bid (sell) / ask (buy), but even these can be soft. <strong>Real slippage probably 30-100bp more than modeled.</strong></p>
+  </div>
+  <div class="primer-card">
+    <h4>Credit spread is rating-based</h4>
+    <p>Issuer-specific CDS isn't pulled per-trade; instead a rating-spread lookup table is used. Some issuers have CDS that's wider or tighter than their rating implies. The signal you see is sensitive to this — a 100bp mismark on credit spread can flip cheap-to-rich.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Stock borrow assumed free + permanent</h4>
+    <p>To delta-hedge you short the underlying. On the unrated small-caps that top the cheap list, borrow may be unavailable at any price, cost 5-10% annualized, or get recalled at the worst time. <strong>Borrow costs alone would erase the alpha on some signals.</strong></p>
+  </div>
+  <div class="primer-card">
+    <h4>No transaction costs above 60bp simulated</h4>
+    <p>Modeled costs assume tight-spread dealer quotes. In a vol spike, dealer spreads widen 2-3×. The strategy was never tested through such an environment in the backtest window.</p>
+  </div>
+</section>
+
+<div class="section-head"><h2>Backtest limitations</h2></div>
+<section class="primer-body" style="margin-bottom:18px;">
+  <div class="primer-card">
+    <h4>3 years is still short</h4>
+    <p>The backtest covers May 2023 → May 2026. Doesn't include a global vol crisis (2008, 2020) or a JP-specific event (1990 crash, 2011 earthquake). Sharpe in a stress regime is unknown.</p>
+  </div>
+  <div class="primer-card">
+    <h4>77 trades is statistically thin</h4>
+    <p>Bootstrap 95% CI on alpha is <strong>[-1.7%, +7.1%]</strong> annualized. The true expected return is somewhere in that range — we can't yet claim the signal is statistically real with 5% confidence.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Top 5 issuers = 113% of P&L</h4>
+    <p>The strategy's edge is concentrated in a handful of names (Rohm, Daifuku, Taiyo Yuden, Nikkon, Obara). The other 12 bonds traded were net flat or negative. <strong>Is the signal robust, or are we lucky in 5 specific issuers?</strong> Can't tell with 3 years.</p>
+  </div>
+  <div class="primer-card">
+    <h4>No walk-forward parameter tuning</h4>
+    <p>The 60-day exit horizon, 5% cheap threshold, and 25% cheap cap were picked from the data, not derived from theory. With more time these would be re-optimized on each rolling window separately to avoid the obvious data-mining bias.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Hedged-trade delta is entry-only</h4>
+    <p>Delta is computed at entry and held fixed through the trade. Real desks rebalance the hedge as delta drifts. The backtest's "5-day rebalance" line item is a cost approximation, not a true rebalanced P&L.</p>
+  </div>
+  <div class="primer-card">
+    <h4>No regime adaptive sizing</h4>
+    <p>Position sizing is uniform (1/N of equity per slot). A real strategy would size up in high-vol regimes (where the backtest shows 62% win rate) and size down in low-vol (40% win rate). Not implemented.</p>
+  </div>
+</section>
+
+<div class="section-head"><h2>Operational limitations</h2></div>
+<section class="primer-body" style="margin-bottom:18px;">
+  <div class="primer-card">
+    <h4>No execution layer</h4>
+    <p>This is a screening tool. There's no FIX connectivity, no order-management system, no broker integration. A real desk would wire this into an existing OMS.</p>
+  </div>
+  <div class="primer-card">
+    <h4>No counterparty / funding limits</h4>
+    <p>Backtest assumes unlimited repo availability and stock-borrow lines. In practice prime brokerage is gated by relationship and capital. Capacity is in part a counterparty problem.</p>
+  </div>
+  <div class="primer-card">
+    <h4>No corporate-action handling</h4>
+    <p>Splits, special dividends, mergers, tender offers — all ignored. In real trading these create one-off events that hit the bond and stock differently and require manual handling.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Refinitiv Workspace must be running</h4>
+    <p>The live data pull depends on a logged-in Refinitiv Workspace on a specific machine. If Workspace closes, the daily agent falls back to free sources (equity prices via yfinance, JGB curve via MoF) — which means equities stay fresh but bond prices don't update.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Total book vega cap not enforced</h4>
+    <p>The risk-limits page defines a vega cap but the simulator doesn't yet enforce it on a trade-by-trade basis. Would require per-trade vega tracking and a running sum. Listed in the roadmap.</p>
+  </div>
+  <div class="primer-card">
+    <h4>No stress tests</h4>
+    <p>Parallel rate shifts, equity crashes, vol spikes — none implemented. A real desk runs these nightly. The risk framework defines limits but doesn't simulate scenarios where they'd bind.</p>
+  </div>
+</section>
+
+<div class="section-head"><h2>Model limitations</h2></div>
+<section class="primer-body" style="margin-bottom:18px;">
+  <div class="primer-card">
+    <h4>Constant volatility (no vol surface)</h4>
+    <p>The TF tree uses a single vol number (60-day realized) for the entire option's life. Real CB pricing should use a term structure of implied vols. The Goldman-Sachs CB model handles this better.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Constant credit spread</h4>
+    <p>Spread is held fixed through the option's life. No credit-spread vol, no spread-equity correlation, no jump-to-default modeling.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Continuous dividend yield</h4>
+    <p>Dividends are modeled as a continuous yield, not discrete payments. For short-dated bonds with high payouts this introduces small pricing error.</p>
+  </div>
+  <div class="primer-card">
+    <h4>European reset only in MC</h4>
+    <p>The Monte Carlo reset pricer assumes the reset trigger fires at fixed dates with fixed terms (80% trigger / 70% floor). Real prospectus terms vary and can be path-dependent in more complex ways. Reset bonds are flagged but the MC handles the common case only.</p>
+  </div>
+  <div class="primer-card">
+    <h4>QuantLib sanity check ±1%, not zero</h4>
+    <p>Our pricer matches QuantLib's binomial CB engine within 0.5-1% on plain-vanilla bonds. The residual reflects different conventions for how the credit spread is applied to the conversion leg's discount factor. Not a bug, but real desks would converge to a single convention.</p>
+  </div>
+  <div class="primer-card">
+    <h4>No model uncertainty quantification</h4>
+    <p>The cheap% number has no error bars. In reality the model price has uncertainty from vol input, spread input, etc. A proper version would propagate input uncertainty through to a cheap%-with-CI.</p>
+  </div>
+</section>
+
+<div class="section-head"><h2>What to ask me about these</h2></div>
+<section class="hedge-suggestion" style="border-left: 4px solid var(--blue-700);">
+  <p style="margin:0; font-size:13.5px; line-height:1.65;">
+    If you read all of this and want to push back, the most fertile questions are:
+    <strong>(1)</strong> "How would you fix the historical conversion-price problem if you had Bloomberg instead of Refinitiv?" — answer: pull issuer SEDOL or ISIN with date-parameterised TR.IRConvCurrentPrice equivalent, or parse EDINET prospectuses, or maintain a reset-event log manually.
+    <strong>(2)</strong> "If borrow costs 5% annualized on the cheap small-caps, does the strategy still work?" — answer: probably not on those names; the alpha would compress to IG-rated names where borrow is free, dramatically shrinking the universe.
+    <strong>(3)</strong> "What's the one thing you'd change before sizing this up to $10M?" — answer: extend the backtest to a stress regime, even if synthetic (e.g., 2008 stocks/vol re-anchored to today's JP names) before deploying.
+  </p>
+</section>
+
+{% endblock %}
