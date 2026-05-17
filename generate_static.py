@@ -358,6 +358,50 @@ def render_glossary(env):
     write(os.path.join(DOCS, "glossary.html"), html)
 
 
+def render_portfolio(env):
+    import json as _json
+    portfolio_kpis, portfolio_curve = {}, []
+    open_positions, recent_trades = [], []
+
+    p = hist_path("paper_5m_kpis")
+    if os.path.exists(p):
+        try:
+            pk = pd.read_csv(p, header=None, names=["k","v"])
+            portfolio_kpis = dict(zip(pk["k"], pk["v"]))
+        except Exception:
+            pass
+    p = hist_path("paper_5m_equity")
+    if os.path.exists(p):
+        try:
+            pe = pd.read_csv(p)
+            pe["date"] = pd.to_datetime(pe["date"]).dt.strftime("%Y-%m-%d")
+            portfolio_curve = [
+                {"date": r["date"],
+                 "equity_usd": float(r["equity_usd"]) if pd.notna(r["equity_usd"]) else None,
+                 "drawdown_pct": float(r["drawdown_pct"]) if pd.notna(r["drawdown_pct"]) else None}
+                for _, r in pe.iterrows()
+            ]
+        except Exception:
+            pass
+    p = hist_path("paper_5m_open_positions")
+    if os.path.exists(p):
+        try: open_positions = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+    p = hist_path("paper_5m_recent_trades")
+    if os.path.exists(p):
+        try: recent_trades = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+
+    html = env.get_template("portfolio.html").render(
+        portfolio_kpis=portfolio_kpis,
+        portfolio_curve_json=_json.dumps(portfolio_curve),
+        open_positions=open_positions,
+        recent_trades=recent_trades,
+        ROOT="",
+    )
+    write(os.path.join(DOCS, "portfolio.html"), html)
+
+
 def render_risk(env):
     risk_limits, risk_kpis, risk_breaches = {}, {}, []
     for name, target in [("risk_limits", "limits"), ("risk_kpis", "kpis")]:
@@ -450,6 +494,8 @@ def main():
     print(f"  ✓ glossary.html")
     render_risk(env)
     print(f"  ✓ risk.html")
+    render_portfolio(env)
+    print(f"  ✓ portfolio.html")
     n = render_memos(env, df)
     print(f"  ✓ {n} investment memos under memo/")
     render_api_snapshot(df)

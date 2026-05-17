@@ -175,6 +175,59 @@ def glossary_view(request: Request):
     return templates.TemplateResponse("glossary.html", {"request": request})
 
 
+@app.get("/portfolio", response_class=HTMLResponse)
+def portfolio_view(request: Request):
+    histdir = os.path.join(PROJ, "history")
+    prefix = "demo_" if DEMO_MODE else ""
+    portfolio_kpis, portfolio_curve = {}, []
+    open_positions, recent_trades = [], []
+
+    p = os.path.join(histdir, f"{prefix}paper_5m_kpis.csv")
+    if os.path.exists(p):
+        try:
+            pk = pd.read_csv(p, header=None, names=["k","v"])
+            portfolio_kpis = dict(zip(pk["k"], pk["v"]))
+        except Exception:
+            pass
+
+    p = os.path.join(histdir, f"{prefix}paper_5m_equity.csv")
+    if os.path.exists(p):
+        try:
+            pe = pd.read_csv(p)
+            pe["date"] = pd.to_datetime(pe["date"]).dt.strftime("%Y-%m-%d")
+            portfolio_curve = [
+                {"date": r["date"],
+                 "equity_usd": _clean(r["equity_usd"]),
+                 "drawdown_pct": _clean(r["drawdown_pct"])}
+                for _, r in pe.iterrows()
+            ]
+        except Exception:
+            pass
+
+    p = os.path.join(histdir, f"{prefix}paper_5m_open_positions.csv")
+    if os.path.exists(p):
+        try:
+            open_positions = pd.read_csv(p).to_dict("records")
+        except Exception:
+            pass
+
+    p = os.path.join(histdir, f"{prefix}paper_5m_recent_trades.csv")
+    if os.path.exists(p):
+        try:
+            recent_trades = pd.read_csv(p).to_dict("records")
+        except Exception:
+            pass
+
+    return templates.TemplateResponse(
+        "portfolio.html",
+        {"request": request,
+         "portfolio_kpis": portfolio_kpis,
+         "portfolio_curve_json": json.dumps(portfolio_curve),
+         "open_positions": open_positions,
+         "recent_trades": recent_trades},
+    )
+
+
 @app.get("/risk", response_class=HTMLResponse)
 def risk_view(request: Request):
     histdir = os.path.join(PROJ, "history")

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}JP CB Arb Dashboard{% endblock %}</title>
-  <link rel="stylesheet" href="{% if STATIC_SITE %}{{ ROOT|default('') }}{% endif %}static/app.css?v=blue1">
+  <link rel="stylesheet" href="{% if STATIC_SITE %}{{ ROOT|default('') }}{% endif %}static/app.css?v=blue2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
@@ -20,6 +20,7 @@
       {% if STATIC_SITE %}
       {% set R = ROOT|default('') %}
       <a href="{{ R }}index.html">Universe</a>
+      <a href="{{ R }}portfolio.html">$5M Portfolio</a>
       <a href="{{ R }}watchlist.html">Watchlist</a>
       <a href="{{ R }}backtest.html">Backtest</a>
       <a href="{{ R }}risk.html">Risk</a>
@@ -28,6 +29,7 @@
       <a href="{{ R }}glossary.html">Glossary</a>
       {% else %}
       <a href="/">Universe</a>
+      <a href="/portfolio">$5M Portfolio</a>
       <a href="/watchlist">Watchlist</a>
       <a href="/backtest">Backtest</a>
       <a href="/risk">Risk</a>

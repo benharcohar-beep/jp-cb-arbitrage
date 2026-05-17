@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Paper portfolio · $5M{% endblock %}
+{% block content %}
+
+<section class="welcome">
+  <h1>$5,000,000 paper trading portfolio</h1>
+  <p class="lead">
+    Live track of what the agent's signals would have done with a real
+    <strong>$5 million</strong> starting account, 5 concurrent positions, 25bp bond +
+    5bp equity transaction costs, 1% JPY financing. Re-runs every weekday
+    morning — as the live agent generates new signals, this curve extends.
+  </p>
+</section>
+
+{% if portfolio_kpis %}
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+  <div class="kpi"><span class="lab">Starting capital</span><span class="val">${{ "{:,.0f}".format(portfolio_kpis.starting_usd) }}</span></div>
+  <div class="kpi alert"><span class="lab">Current equity</span><span class="val">${{ "{:,.0f}".format(portfolio_kpis.final_equity_usd) }}</span></div>
+  <div class="kpi alert">
+    <span class="lab">Total P&L</span>
+    <span class="val" style="color: {% if portfolio_kpis.final_equity_usd >= portfolio_kpis.starting_usd %}var(--profit-700){% else %}var(--red){% endif %};">
+      {% if portfolio_kpis.final_equity_usd >= portfolio_kpis.starting_usd %}+{% endif %}${{ "{:,.0f}".format(portfolio_kpis.final_equity_usd - portfolio_kpis.starting_usd) }}
+    </span>
+  </div>
+  <div class="kpi"><span class="lab">Total return</span><span class="val">{{ "{:+,.1f}".format(portfolio_kpis.total_return_pct) }}%</span></div>
+  <div class="kpi"><span class="lab">CAGR</span><span class="val">{{ "{:+,.1f}".format(portfolio_kpis.cagr_pct) }}%</span></div>
+  <div class="kpi"><span class="lab">Max drawdown</span><span class="val" style="color:var(--red);">{{ "{:+,.2f}".format(portfolio_kpis.max_drawdown_pct) }}%</span></div>
+  <div class="kpi"><span class="lab">Sharpe</span><span class="val">{{ "{:.2f}".format(portfolio_kpis.sharpe) }}</span></div>
+  <div class="kpi"><span class="lab">Days running</span><span class="val">{{ "{:.0f}".format(portfolio_kpis.days_simulated) }}</span></div>
+</section>
+
+<div class="callout">
+  <span class="label">How to read this</span>
+  This is a <strong>live paper account</strong>. Every weekday morning the agent: (1) pulls fresh Refinitiv data, (2) reprices the universe, (3) takes any new BUY signals as new positions (up to 5 concurrent), (4) marks open positions to market, (5) closes anything that hit the exit rule (60d held or cheap% &lt; 1%), and (6) regenerates this page. Watch the equity curve extend rightward over the coming weeks as the strategy plays out in real time.
+</div>
+{% endif %}
+
+{% if portfolio_curve_json and portfolio_curve_json != '[]' %}
+<section class="chart-block">
+  <h3>Equity curve · $5M paper account</h3>
+  <canvas id="portfolio-equity" height="110"></canvas>
+</section>
+
+<section class="chart-block">
+  <h3>Drawdown</h3>
+  <canvas id="portfolio-dd" height="60"></canvas>
+</section>
+{% endif %}
+
+{% if open_positions %}
+<div class="section-head"><h2>Open positions</h2><span class="sub">{{ open_positions|length }} active · marked at last snapshot</span></div>
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>RIC</th>
+      <th>Entry</th><th>Days held</th>
+      <th class="num">Entry cheap%</th><th class="num">Δ used</th>
+      <th class="num">Entry bond</th><th class="num">Notional ¥</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in open_positions %}
+    <tr>
+      <td><strong>{{ p.issuer }}</strong></td>
+      <td><code>{{ p.ric }}</code></td>
+      <td>{{ p.entry_date[:10] }}</td>
+      <td>{{ "{:.0f}".format(p.days_held) }}</td>
+      <td class="num">{{ "{:+.1f}".format(p.entry_cheap) }}</td>
+      <td class="num">{{ "{:.3f}".format(p.delta_used) }}</td>
+      <td class="num">{{ "{:.2f}".format(p.entry_bond) }}</td>
+      <td class="num">100,000,000</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="section-head"><h2>Open positions</h2></div>
+<section class="hedge-suggestion">
+  <p class="muted">No open positions at the latest mark. The agent will open new ones on the next BUY signal — check back tomorrow morning.</p>
+</section>
+{% endif %}
+
+{% if recent_trades %}
+<div class="section-head"><h2>Recent closed trades</h2><span class="sub">last {{ recent_trades|length }}</span></div>
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>Entry</th><th>Exit</th><th>Days</th>
+      <th class="num">Entry cheap%</th><th class="num">Exit cheap%</th>
+      <th class="num">Δ used</th>
+      <th class="num">Net bp</th>
+      <th class="num">Net P&L (¥)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in recent_trades %}
+    <tr class="{% if t.net_pnl_jpy > 0 %}cheap-mild{% else %}rich-mild{% endif %}">
+      <td><strong>{{ t.issuer }}</strong></td>
+      <td>{{ t.entry_date[:10] }}</td>
+      <td>{{ t.exit_date[:10] }}</td>
+      <td>{{ "{:.0f}".format(t.days_held) }}</td>
+      <td class="num">{{ "{:+.1f}".format(t.entry_cheap) }}</td>
+      <td class="num">{{ "{:+.1f}".format(t.exit_cheap) }}</td>
+      <td class="num">{{ "{:.3f}".format(t.delta_used) }}</td>
+      <td class="num">{{ "{:+.0f}".format(t.net_return_bp) }}</td>
+      <td class="num">{{ "{:,.0f}".format(t.net_pnl_jpy) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<script>
+const equityData = {{ portfolio_curve_json|safe }};
+if (equityData && equityData.length > 0) {
+  const labels = equityData.map(p => p.date);
+  const equity = equityData.map(p => p.equity_usd);
+  const dd = equityData.map(p => p.drawdown_pct);
+  const starting = {{ portfolio_kpis.starting_usd|default(5000000) }};
+
+  new Chart(document.getElementById('portfolio-equity'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Equity',
+          data: equity,
+          borderColor: '#1d4ed8',
+          backgroundColor: 'rgba(59,130,246,0.12)',
+          fill: true, pointRadius: 0, borderWidth: 2, tension: 0.05,
+        },
+        {
+          label: 'Starting $5M',
+          data: equity.map(_ => starting),
+          borderColor: 'rgba(100,116,139,0.5)',
+          borderDash: [5,5],
+          pointRadius: 0, borderWidth: 1, fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#0f172a', font: { size: 11 } } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + (ctx.parsed.y || 0).toLocaleString(undefined, {maximumFractionDigits:0}) } }
+      },
+      scales: {
+        x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#e2e8f0' } },
+        y: { ticks: { color: '#64748b', callback: v => '$' + (v/1e6).toFixed(2) + 'M' }, grid: { color: '#e2e8f0' } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('portfolio-dd'), {
+    type: 'line',
+    data: { labels, datasets: [{
+      label: 'Drawdown',
+      data: dd,
+      borderColor: '#b91c1c',
+      backgroundColor: 'rgba(185,28,28,0.15)',
+      fill: true, pointRadius: 0, borderWidth: 1.5, tension: 0.05,
+    }]},
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#e2e8f0' } },
+        y: { ticks: { color: '#64748b', callback: v => v.toFixed(1) + '%' }, grid: { color: '#e2e8f0' }, max: 0 }
+      }
+    }
+  });
+}
+</script>
+
+{% endblock %}

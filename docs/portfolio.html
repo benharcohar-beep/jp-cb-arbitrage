@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Paper portfolio · $5M</title>
+  <link rel="stylesheet" href="static/app.css?v=blue2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">JP</span>
+      <span class="title">CB Arbitrage Desk</span>
+      <span class="src">Refinitiv · LSEG Eikon</span>
+    </div>
+    <nav>
+      
+      
+      <a href="index.html">Universe</a>
+      <a href="portfolio.html">$5M Portfolio</a>
+      <a href="watchlist.html">Watchlist</a>
+      <a href="backtest.html">Backtest</a>
+      <a href="risk.html">Risk</a>
+      <a href="alerts.html">Alerts log</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="glossary.html">Glossary</a>
+      
+    </nav>
+  </header>
+  
+  <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+  </div>
+  
+  <main>
+    
+
+<section class="welcome">
+  <h1>$5,000,000 paper trading portfolio</h1>
+  <p class="lead">
+    Live track of what the agent's signals would have done with a real
+    <strong>$5 million</strong> starting account, 5 concurrent positions, 25bp bond +
+    5bp equity transaction costs, 1% JPY financing. Re-runs every weekday
+    morning — as the live agent generates new signals, this curve extends.
+  </p>
+</section>
+
+
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+  <div class="kpi"><span class="lab">Starting capital</span><span class="val">$5,000,000</span></div>
+  <div class="kpi alert"><span class="lab">Current equity</span><span class="val">$6,002,031</span></div>
+  <div class="kpi alert">
+    <span class="lab">Total P&L</span>
+    <span class="val" style="color: var(--profit-700);">
+      +$1,002,031
+    </span>
+  </div>
+  <div class="kpi"><span class="lab">Total return</span><span class="val">+20.0%</span></div>
+  <div class="kpi"><span class="lab">CAGR</span><span class="val">+23.8%</span></div>
+  <div class="kpi"><span class="lab">Max drawdown</span><span class="val" style="color:var(--red);">-1.44%</span></div>
+  <div class="kpi"><span class="lab">Sharpe</span><span class="val">1.49</span></div>
+  <div class="kpi"><span class="lab">Days running</span><span class="val">313</span></div>
+</section>
+
+<div class="callout">
+  <span class="label">How to read this</span>
+  This is a <strong>live paper account</strong>. Every weekday morning the agent: (1) pulls fresh Refinitiv data, (2) reprices the universe, (3) takes any new BUY signals as new positions (up to 5 concurrent), (4) marks open positions to market, (5) closes anything that hit the exit rule (60d held or cheap% &lt; 1%), and (6) regenerates this page. Watch the equity curve extend rightward over the coming weeks as the strategy plays out in real time.
+</div>
+
+
+
+<section class="chart-block">
+  <h3>Equity curve · $5M paper account</h3>
+  <canvas id="portfolio-equity" height="110"></canvas>
+</section>
+
+<section class="chart-block">
+  <h3>Drawdown</h3>
+  <canvas id="portfolio-dd" height="60"></canvas>
+</section>
+
+
+
+<div class="section-head"><h2>Open positions</h2></div>
+<section class="hedge-suggestion">
+  <p class="muted">No open positions at the latest mark. The agent will open new ones on the next BUY signal — check back tomorrow morning.</p>
+</section>
+
+
+
+<div class="section-head"><h2>Recent closed trades</h2><span class="sub">last 10</span></div>
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>Entry</th><th>Exit</th><th>Days</th>
+      <th class="num">Entry cheap%</th><th class="num">Exit cheap%</th>
+      <th class="num">Δ used</th>
+      <th class="num">Net bp</th>
+      <th class="num">Net P&L (¥)</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr class="rich-mild">
+      <td><strong>ANA</strong></td>
+      <td>2026-04-03</td>
+      <td>2026-04-29</td>
+      <td>18</td>
+      <td class="num">+5.0</td>
+      <td class="num">+5.5</td>
+      <td class="num">0.025</td>
+      <td class="num">-643</td>
+      <td class="num">-6,429,000</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Taiyo Yuden</strong></td>
+      <td>2026-04-27</td>
+      <td>2026-04-29</td>
+      <td>2</td>
+      <td class="num">+20.7</td>
+      <td class="num">+20.4</td>
+      <td class="num">0.020</td>
+      <td class="num">+35</td>
+      <td class="num">352,269</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Advantest</strong></td>
+      <td>2026-04-21</td>
+      <td>2026-04-29</td>
+      <td>6</td>
+      <td class="num">+11.6</td>
+      <td class="num">+12.2</td>
+      <td class="num">0.002</td>
+      <td class="num">+446</td>
+      <td class="num">4,455,602</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Rohto Pharm</strong></td>
+      <td>2026-03-04</td>
+      <td>2026-04-29</td>
+      <td>40</td>
+      <td class="num">+8.4</td>
+      <td class="num">+3.9</td>
+      <td class="num">0.025</td>
+      <td class="num">+157</td>
+      <td class="num">1,568,105</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Nikkon Holdings</strong></td>
+      <td>2026-04-07</td>
+      <td>2026-04-29</td>
+      <td>16</td>
+      <td class="num">+9.9</td>
+      <td class="num">+10.1</td>
+      <td class="num">0.044</td>
+      <td class="num">+1771</td>
+      <td class="num">17,707,271</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Rohm</strong></td>
+      <td>2026-03-06</td>
+      <td>2026-04-29</td>
+      <td>38</td>
+      <td class="num">+13.0</td>
+      <td class="num">+18.3</td>
+      <td class="num">0.026</td>
+      <td class="num">+568</td>
+      <td class="num">5,682,752</td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Park24</strong></td>
+      <td>2026-03-24</td>
+      <td>2026-04-29</td>
+      <td>26</td>
+      <td class="num">+6.0</td>
+      <td class="num">+6.5</td>
+      <td class="num">0.021</td>
+      <td class="num">-272</td>
+      <td class="num">-2,721,396</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Rohm</strong></td>
+      <td>2026-03-06</td>
+      <td>2026-04-29</td>
+      <td>38</td>
+      <td class="num">+10.7</td>
+      <td class="num">+14.2</td>
+      <td class="num">0.024</td>
+      <td class="num">+606</td>
+      <td class="num">6,055,534</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Obara Group</strong></td>
+      <td>2026-02-16</td>
+      <td>2026-04-29</td>
+      <td>52</td>
+      <td class="num">+8.7</td>
+      <td class="num">+14.6</td>
+      <td class="num">0.024</td>
+      <td class="num">+2203</td>
+      <td class="num">22,027,559</td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Mizuno</strong></td>
+      <td>2026-03-17</td>
+      <td>2026-04-29</td>
+      <td>31</td>
+      <td class="num">+7.4</td>
+      <td class="num">+8.9</td>
+      <td class="num">0.011</td>
+      <td class="num">-136</td>
+      <td class="num">-1,355,354</td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+<script>
+const equityData = [{"date": "2025-06-20", "equity_usd": 5000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 5000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 5000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 5000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 5000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 4995199.608095223, "drawdown_pct": -0.0960078380955353}, {"date": "2025-07-08", "equity_usd": 5005221.0918419575, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 5005221.0918419575, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 5005221.0918419575, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 5005221.0918419575, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 5005221.0918419575, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 4995417.013063842, "drawdown_pct": -0.195877037162151}, {"date": "2025-08-08", "equity_usd": 4987134.64488653, "drawdown_pct": -0.3613516091208635}, {"date": "2025-08-22", "equity_usd": 5043753.508741501, "drawdown_pct": 0.0}, {"date": "2025-09-12", "equity_usd": 5043753.508741501, "drawdown_pct": 0.0}, {"date": "2025-09-16", "equity_usd": 5043753.508741501, "drawdown_pct": 0.0}, {"date": "2025-09-17", "equity_usd": 5043753.508741501, "drawdown_pct": 0.0}, {"date": "2025-09-19", "equity_usd": 5043753.508741501, "drawdown_pct": 0.0}, {"date": "2025-10-01", "equity_usd": 5043753.508741501, "drawdown_pct": 0.0}, {"date": "2025-10-02", "equity_usd": 5043753.5087415, "drawdown_pct": -2.220446049250313e-14}, {"date": "2025-10-10", "equity_usd": 5043753.5087415, "drawdown_pct": -2.220446049250313e-14}, {"date": "2025-10-29", "equity_usd": 4991083.010888737, "drawdown_pct": -1.044271845590372}, {"date": "2025-11-06", "equity_usd": 4971365.093020476, "drawdown_pct": -1.4352092265326966}, {"date": "2025-11-07", "equity_usd": 5016292.326590499, "drawdown_pct": -0.544459242574169}, {"date": "2025-11-07", "equity_usd": 5016292.326590499, "drawdown_pct": -0.544459242574169}, {"date": "2025-11-12", "equity_usd": 5016292.326590499, "drawdown_pct": -0.544459242574169}, {"date": "2025-11-21", "equity_usd": 5016292.326590499, "drawdown_pct": -0.544459242574169}, {"date": "2025-12-15", "equity_usd": 5006441.12738015, "drawdown_pct": -0.739774084849365}, {"date": "2025-12-22", "equity_usd": 5006441.12738015, "drawdown_pct": -0.739774084849365}, {"date": "2025-12-29", "equity_usd": 5001335.455377718, "drawdown_pct": -0.8410017121230462}, {"date": "2026-01-08", "equity_usd": 5001335.455377718, "drawdown_pct": -0.8410017121230462}, {"date": "2026-01-16", "equity_usd": 4988790.242613567, "drawdown_pct": -1.089729425370911}, {"date": "2026-01-16", "equity_usd": 4983173.566357487, "drawdown_pct": -1.2010884806131106}, {"date": "2026-01-16", "equity_usd": 4975265.6025902545, "drawdown_pct": -1.3578757572618838}, {"date": "2026-01-19", "equity_usd": 4975265.6025902545, "drawdown_pct": -1.3578757572618838}, {"date": "2026-01-26", "equity_usd": 4975265.6025902545, "drawdown_pct": -1.3578757572618838}, {"date": "2026-01-30", "equity_usd": 5089806.68598414, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 5172263.1817322085, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 5172263.1817322085, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 5172263.1817322085, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 5172263.181732209, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 5172263.181732209, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 5172263.181732209, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 5172263.181732209, "drawdown_pct": 0.0}, {"date": "2026-04-20", "equity_usd": 5570812.034538775, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 5570812.034538775, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5801013.208939317, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5817400.841670972, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5880684.797704622, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5940072.953657568, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5940072.953657568, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5940072.953657568, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5940072.953657568, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5940072.953657568, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5940072.953657568, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 5940072.953657568, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 6002031.337769224, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 6002031.337769224, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 6002031.337769224, "drawdown_pct": 0.0}];
+if (equityData && equityData.length > 0) {
+  const labels = equityData.map(p => p.date);
+  const equity = equityData.map(p => p.equity_usd);
+  const dd = equityData.map(p => p.drawdown_pct);
+  const starting = 5000000.0;
+
+  new Chart(document.getElementById('portfolio-equity'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Equity',
+          data: equity,
+          borderColor: '#1d4ed8',
+          backgroundColor: 'rgba(59,130,246,0.12)',
+          fill: true, pointRadius: 0, borderWidth: 2, tension: 0.05,
+        },
+        {
+          label: 'Starting $5M',
+          data: equity.map(_ => starting),
+          borderColor: 'rgba(100,116,139,0.5)',
+          borderDash: [5,5],
+          pointRadius: 0, borderWidth: 1, fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#0f172a', font: { size: 11 } } },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + (ctx.parsed.y || 0).toLocaleString(undefined, {maximumFractionDigits:0}) } }
+      },
+      scales: {
+        x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#e2e8f0' } },
+        y: { ticks: { color: '#64748b', callback: v => '$' + (v/1e6).toFixed(2) + 'M' }, grid: { color: '#e2e8f0' } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('portfolio-dd'), {
+    type: 'line',
+    data: { labels, datasets: [{
+      label: 'Drawdown',
+      data: dd,
+      borderColor: '#b91c1c',
+      backgroundColor: 'rgba(185,28,28,0.15)',
+      fill: true, pointRadius: 0, borderWidth: 1.5, tension: 0.05,
+    }]},
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#e2e8f0' } },
+        y: { ticks: { color: '#64748b', callback: v => v.toFixed(1) + '%' }, grid: { color: '#e2e8f0' }, max: 0 }
+      }
+    }
+  });
+}
+</script>
+
+
+  </main>
+  <footer>
+    <span>Phase 2 build · pricer: Tsiveriotis-Fernandes binomial tree + MC for resets</span>
+  </footer>
+  <script>
+    async function runScreen() {
+      const btn = document.getElementById('run-now');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const r = await fetch('/api/run', {method:'POST'});
+        const j = await r.json();
+        location.reload();
+      } catch(e) { alert('Run failed: '+e); btn.disabled=false; btn.textContent='Run now'; }
+    }
+  </script>
+</body>
+</html>
