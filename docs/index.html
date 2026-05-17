@@ -24,6 +24,7 @@
       <a href="backtest.html">Backtest</a>
       <a href="alerts.html">Alerts log</a>
       <a href="how-it-works.html">How it works</a>
+      <a href="glossary.html">Glossary</a>
       
     </nav>
   </header>
@@ -69,18 +70,22 @@
 </section>
 
 <section class="summary">
-  <div class="kpi timestamp"><span class="lab">Snapshot</span><span class="val">demo_screen</span></div>
-  <div class="kpi"><span class="lab">Bonds priced</span><span class="val">18</span></div>
-  <div class="kpi"><span class="lab">Rated</span><span class="val">16</span></div>
-  <div class="kpi"><span class="lab">MC priced</span><span class="val">2</span></div>
-  <div class="kpi alert"><span class="lab">Buy signals</span><span class="val">2</span></div>
-  <div class="kpi"><span class="lab">Median spread</span><span class="val">90bp</span></div>
+  <div class="kpi timestamp" title="When this snapshot was taken. The agent runs every weekday at 08:04."><span class="lab">Snapshot</span><span class="val">demo_screen</span></div>
+  <div class="kpi" title="Number of bonds the system successfully priced today. Bonds with no live quote get dropped."><span class="lab">Bonds priced</span><span class="val">18</span></div>
+  <div class="kpi" title="How many of those bonds have a credit rating (the rest use a default spread)."><span class="lab">Rated</span><span class="val">16</span></div>
+  <div class="kpi" title="Bonds priced with Monte Carlo because they have reset clauses (the binomial tree can't handle those properly)."><span class="lab">MC priced</span><span class="val">2</span></div>
+  <div class="kpi alert" title="Bonds the model says are at least 5% cheap to fair value."><span class="lab">Buy signals</span><span class="val">2</span></div>
+  <div class="kpi" title="Median credit spread across all bonds, in basis points. 100bp = 1%."><span class="lab">Median spread</span><span class="val">90bp</span></div>
 </section>
 
 
 <div class="section-head">
   <h2>Today's plays</h2>
   <span class="sub">Ranked by cheap-to-model · click any row to drill into the bond</span>
+</div>
+<div class="callout">
+  <span class="label">How to read this</span>
+  Each row is a bond the model thinks is mispriced. <strong>Cheap%</strong> is how far below model fair the market is trading. <strong>BUY</strong> = high-confidence signal. <strong>WATCH</strong> = signal but with a reset clause that needs human review. The "thesis" line tells you in plain English what the trade is — buy this bond, short this many shares of the underlying.
 </div>
 <section class="hero-list">
   
@@ -95,10 +100,11 @@
         <span class="engine engine-tree">Tree</span>
         
       </div>
-      <div class="play-detail">
-        Buy bond at <strong>131.50</strong>, model fair <strong>149.48</strong>.
-        Hedge with short <strong>25,836</strong> shares of 6963.T per ¥100M face.
-        HV60 62% · spread 70bp · matures 2031-04-24.
+      <div class="play-thesis">
+        <strong>The thesis:</strong> the bond trades at 131.50, but our model says fair value is 149.48 — a <strong>+13.7% gap</strong>. Buy ¥100M face of the bond and short <strong>25,836 shares</strong> of 6963.T to neutralize stock direction. If the gap closes over the next 60 days (78% historical hit rate for this signal strength), you collect the convergence.
+      </div>
+      <div class="play-detail" style="margin-top:6px;">
+        Maturity 2031-04-24 · Realized vol (HV60) 62% · Credit spread 70bp
       </div>
     </div>
     <div class="play-numbers">
@@ -123,10 +129,11 @@
         <span class="engine engine-tree">Tree</span>
         
       </div>
-      <div class="play-detail">
-        Buy bond at <strong>121.45</strong>, model fair <strong>131.72</strong>.
-        Hedge with short <strong>2,163</strong> shares of 6857.T per ¥100M face.
-        HV60 74% · spread 70bp · matures 2031-03-28.
+      <div class="play-thesis">
+        <strong>The thesis:</strong> the bond trades at 121.45, but our model says fair value is 131.72 — a <strong>+8.5% gap</strong>. Buy ¥100M face of the bond and short <strong>2,163 shares</strong> of 6857.T to neutralize stock direction. If the gap closes over the next 60 days (78% historical hit rate for this signal strength), you collect the convergence.
+      </div>
+      <div class="play-detail" style="margin-top:6px;">
+        Maturity 2031-03-28 · Realized vol (HV60) 74% · Credit spread 70bp
       </div>
     </div>
     <div class="play-numbers">
@@ -149,6 +156,10 @@
   <h2>Full universe</h2>
   <span class="sub">click column to sort · ⊕ to add to watchlist · row colour by cheap%</span>
 </div>
+<div class="callout">
+  <span class="label">How to read this table</span>
+  Every bond the model could price today. Green-tinted rows are <strong>cheap to model</strong> (potential buys); red-tinted are rich. Hover any column header to see what it means. The <strong>Rtg</strong> column shows the issuer's credit rating (greener = safer). <strong>Engine</strong> = whether the bond used the binomial tree (default) or the Monte Carlo pricer (used for bonds with reset clauses). <strong>Conf</strong> = the system's confidence in the signal — Low means we suspect a data anomaly like a stale conversion price.
+</div>
 
 <div class="tabs" id="universe-tabs">
   <button class="tab active" data-filter="all">All <span class="tab-count">18</span></button>
@@ -162,13 +173,22 @@
 <table class="screen" id="universe-table">
   <thead>
     <tr>
-      <th>Issuer</th><th>Equity</th><th>Rtg</th><th>Spd</th>
-      <th>Engine</th><th>Maturity</th>
-      <th class="num">Mkt</th><th class="num">Model</th>
-      <th class="num">Cheap%</th><th class="num">Prem%</th>
-      <th class="num">HV60</th><th class="num">IV</th>
-      <th class="num">Δ</th><th class="num">Vega</th>
-      <th>Conf</th><th></th>
+      <th title="The company that issued the bond">Issuer</th>
+      <th title="TSE ticker for the underlying equity that this bond converts into">Equity</th>
+      <th title="Credit rating of the issuer. Investment Grade (BBB-) and above are shown in green; sub-investment grade in amber.">Rtg</th>
+      <th title="Credit spread over the JGB risk-free rate, in basis points. 100bp = 1%.">Spd</th>
+      <th title="Which pricer was used. Tree = binomial tree. MC = Monte Carlo (for bonds with reset clauses).">Engine</th>
+      <th title="When the bond matures (you get back par value plus any final coupon)">Maturity</th>
+      <th class="num" title="Current market price as % of par. 100 = trading at par.">Mkt</th>
+      <th class="num" title="Our model's fair value, % of par. Compare to Mkt.">Model</th>
+      <th class="num" title="(Model − Mkt) / Mkt × 100. Positive = bond is cheap vs model.">Cheap%</th>
+      <th class="num" title="How much above conversion value the bond trades. Premium = (Bond − Parity) / Parity.">Prem%</th>
+      <th class="num" title="60-day realized volatility of the underlying stock, annualized.">HV60</th>
+      <th class="num" title="Implied volatility — the vol number that would make our model match the market price.">IV</th>
+      <th class="num" title="Delta — bond price change per ¥1 stock move. Also the hedge ratio.">Δ</th>
+      <th class="num" title="Vega — bond price change per 1 percentage point change in volatility.">Vega</th>
+      <th title="Confidence in the signal. Low = likely data anomaly (e.g. stale conversion price after stock split).">Conf</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>

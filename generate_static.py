@@ -240,6 +240,11 @@ def render_methodology(env):
     write(os.path.join(DOCS, "how-it-works.html"), html)
 
 
+def render_glossary(env):
+    html = env.get_template("glossary.html").render(ROOT="")
+    write(os.path.join(DOCS, "glossary.html"), html)
+
+
 def render_api_snapshot(df: pd.DataFrame):
     """Expose the universe as JSON for the watchlist page's client JS."""
     df = df.copy()
@@ -273,6 +278,8 @@ def main():
     print(f"  ✓ backtest.html")
     render_methodology(env)
     print(f"  ✓ how-it-works.html")
+    render_glossary(env)
+    print(f"  ✓ glossary.html")
     render_api_snapshot(df)
     print(f"  ✓ api/snapshot.json")
 

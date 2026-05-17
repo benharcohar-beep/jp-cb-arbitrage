@@ -3,10 +3,15 @@
 {% block content %}
 
 <section class="alerts-head">
-  <h1>Backtest · model signal evaluation</h1>
+  <h1>Backtest · does the signal actually work?</h1>
   <p>Walks the pricer forward day-by-day on real historical CB + equity data, then asks:
     when the model said a bond was cheap, how did the bond move next?</p>
 </section>
+
+<div class="callout">
+  <span class="label">How to read this page</span>
+  We re-ran the entire pricing pipeline on every historical day for 13 months and recorded the model's cheap signals. Then we asked: out of all those "cheap" calls, what fraction of the time did the bond actually go up? That's the <strong>hit rate</strong>. <strong>Avg fwd return</strong> = average bond return over that horizon. The signal works best in the <strong>5-15% cheap range over a 60-day window</strong> (71-78% hit rate). The 25%+ "screaming cheap" bucket is data noise (0% hit rate) — that's how we discovered the stale conversion-price anomalies and built the auto-filter.
+</div>
 
 {% if not panel_stats %}
 <section class="empty">

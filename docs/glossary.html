@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glossary</title>
+  <link rel="stylesheet" href="static/app.css?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">JP</span>
+      <span class="title">CB Arbitrage Desk</span>
+      <span class="src">Refinitiv · LSEG Eikon</span>
+    </div>
+    <nav>
+      
+      
+      <a href="index.html">Universe</a>
+      <a href="watchlist.html">Watchlist</a>
+      <a href="backtest.html">Backtest</a>
+      <a href="alerts.html">Alerts log</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="glossary.html">Glossary</a>
+      
+    </nav>
+  </header>
+  
+  <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+  </div>
+  
+  <main>
+    
+
+<section class="welcome">
+  <h1>Glossary · every term explained</h1>
+  <p class="lead">
+    Plain-English definitions of every label, abbreviation, and Greek used on this dashboard.
+    Hover any underlined term anywhere on the site to see a short version of these definitions.
+  </p>
+</section>
+
+<div class="section-head"><h2>The trade</h2></div>
+<div class="glossary-grid">
+  <div class="glossary-card">
+    <h3>Convertible bond</h3>
+    <span class="pron">"CB"</span>
+    <p>A bond that can be exchanged for the issuer's stock at a fixed price. Has two values bundled together: the bond's debt value + the embedded equity option's value.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Conversion price</h3>
+    <span class="pron">in JPY per share</span>
+    <p>The price at which the bond converts to stock. Example: conversion price ¥9,346 means each ¥100 of bond face becomes 100/9,346 = 0.0107 shares.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Parity</h3>
+    <p>What the bond is worth if you converted it to stock right now. <strong>Parity = stock price × conversion ratio.</strong> If parity > bond price, you can convert and profit immediately (rare).</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Premium</h3>
+    <p>How much extra you're paying for the bond above its conversion value. Example: bond price 131, parity 119 → premium 10%. High premium = bond is more like debt; low premium = bond is more like equity.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Cheap% (cheap to model)</h3>
+    <p>Our model's view: <strong>(model fair value − market price) / market price</strong>. Positive = market is too low vs the model's fair value (potential buy). Negative = market is too high (potential short or just avoid).</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Δ-hedge (delta hedge)</h3>
+    <p>To isolate the bond's pricing edge from general stock direction, you short Δ × shares of the underlying stock. This way you profit if the bond moves to fair value <em>regardless</em> of where the stock goes.</p>
+  </div>
+</div>
+
+<div class="section-head"><h2>The pricing inputs</h2></div>
+<div class="glossary-grid">
+  <div class="glossary-card">
+    <h3>Mkt</h3>
+    <span class="pron">market price, % of par</span>
+    <p>What you'd pay (or receive) for the bond right now. Quoted as % of par. 100 = at par. 130 = trading 30% above issue price.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Model</h3>
+    <span class="pron">model fair value, % of par</span>
+    <p>What our pricer thinks the bond should be worth, given the stock price, vol, credit spread, and yield curve. Same units as Mkt.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>HV60</h3>
+    <span class="pron">historical volatility, 60-day</span>
+    <p>How wildly the underlying stock has moved over the last 60 trading days, expressed as annualized standard deviation of log returns. 40% means the stock typically moves ±40% over a year.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>IV</h3>
+    <span class="pron">implied volatility</span>
+    <p>What volatility number would make the pricing model output equal to the bond's market price. If IV is much lower than HV60, the market is underpricing future volatility → bond looks cheap to model.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>IV-HV</h3>
+    <p>Implied vol minus realized vol. Negative means the bond market is paying for less vol than the stock has actually been showing — the option is on sale.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Spread (Spd)</h3>
+    <span class="pron">credit spread, basis points</span>
+    <p>How much extra yield this issuer pays over the risk-free JGB yield. AAA = ~25bp. BBB = ~190bp. Unrated junk = 400-700bp. Used in the model to discount the bond's cash flows.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Rtg</h3>
+    <span class="pron">issuer credit rating</span>
+    <p>S&P/Moody's-equivalent letter grade for the issuer. AAA is best, D is default. Investment Grade = BBB- and above. Below = high yield / junk.</p>
+  </div>
+</div>
+
+<div class="section-head"><h2>The Greeks (sensitivities)</h2></div>
+<div class="glossary-grid">
+  <div class="glossary-card">
+    <h3>Δ (delta)</h3>
+    <p>How much the bond's price moves for a ¥1 move in the underlying stock. Δ=0.05 means if stock rises ¥100, bond rises ¥5. Used as the hedge ratio: short Δ × shares per ¥1 of bond face.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Γ (gamma)</h3>
+    <p>How fast delta itself changes. High gamma = the hedge ratio drifts quickly, so you need to rebalance the equity short more often.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Vega</h3>
+    <p>How much the bond moves for a 1 percentage-point change in volatility. Vega of 0.5 means if vol rises from 30% to 31%, the bond gains 0.5 (% of par).</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Theta (θ)</h3>
+    <span class="pron">time decay</span>
+    <p>How much the bond loses per day as time passes (the embedded option decays). Negative theta = you're paying rent to hold the position.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Rho (ρ)</h3>
+    <p>How much the bond moves for a 1bp change in the risk-free rate. Usually small for short-tenor CBs.</p>
+  </div>
+</div>
+
+<div class="section-head"><h2>The agentic workflow</h2></div>
+<div class="glossary-grid">
+  <div class="glossary-card">
+    <h3>Tsiveriotis-Fernandes</h3>
+    <p>The 1998 model the pricer uses. Splits the bond's value into an equity-driven component (discounted at the risk-free rate, since converting eliminates default risk) and a debt-driven component (discounted at risk-free + credit spread, since default risk applies). The standard CB pricing approach.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Binomial tree</h3>
+    <p>Discrete grid simulating the stock price over time. At each node, the model decides "convert / put / hold" optimally. With 250+ time steps it converges to the continuous Black-Scholes-style solution.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Monte Carlo (MC)</h3>
+    <p>Used here when a bond has a path-dependent reset feature. Simulates thousands of stock paths, applying the reset rule along the way, then averages the payoffs. Slower than the tree but handles features the tree can't.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Reset / refixing clause</h3>
+    <p>Common in Japanese small-cap CBs. If the stock falls below a trigger (e.g. 80% of conversion price) on a specified date, the conversion price drops (e.g. to max(stock, 70% of original)). Bondholders get more shares per ¥100 face — protects against equity decay.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Soft call (130% trigger)</h3>
+    <p>The issuer can call (redeem) the bond if the stock trades above 130% of the conversion price for 20+ days. Forces the bondholder to convert or take cash — caps upside for the bondholder.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>JGB</h3>
+    <span class="pron">Japanese Government Bond</span>
+    <p>The risk-free rate used in pricing. We pull 2y, 5y, 7y, 10y, 20y, 30y yields directly from Refinitiv and interpolate to match each CB's maturity.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>BUY / WATCH / AVOID</h3>
+    <p><strong>BUY</strong> = cheap ≥ 5%, high confidence, no data flags.<br>
+    <strong>WATCH</strong> = cheap ≥ 5% but has reset clause (model uses MC pricer; needs human review).<br>
+    <strong>AVOID</strong> = rich vs model (model price < market price).</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Hit rate</h3>
+    <p>Out of all the times the model flagged a bond as cheap, the % where the bond actually went up over the next N days. 71% hit rate at 60d in the 5-10% bucket means: of bonds the model called cheap by 5-10%, 71% had a positive return 60 days later.</p>
+  </div>
+  <div class="glossary-card">
+    <h3>Anomaly / stale conv price</h3>
+    <p>When a stock split happens but the dealer's quoted conversion price hasn't been updated, the bond looks artificially "cheap" by 30-50%. Backtest showed these have 0% hit rate — the system auto-suppresses them.</p>
+  </div>
+</div>
+
+
+  </main>
+  <footer>
+    <span>Phase 2 build · pricer: Tsiveriotis-Fernandes binomial tree + MC for resets</span>
+  </footer>
+  <script>
+    async function runScreen() {
+      const btn = document.getElementById('run-now');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const r = await fetch('/api/run', {method:'POST'});
+        const j = await r.json();
+        location.reload();
+      } catch(e) { alert('Run failed: '+e); btn.disabled=false; btn.textContent='Run now'; }
+    }
+  </script>
+</body>
+</html>

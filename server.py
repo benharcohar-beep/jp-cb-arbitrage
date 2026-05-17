@@ -170,6 +170,11 @@ def methodology_view(request: Request):
     return templates.TemplateResponse("methodology.html", {"request": request})
 
 
+@app.get("/glossary", response_class=HTMLResponse)
+def glossary_view(request: Request):
+    return templates.TemplateResponse("glossary.html", {"request": request})
+
+
 @app.get("/backtest", response_class=HTMLResponse)
 def backtest_view(request: Request):
     histdir = os.path.join(PROJ, "history")

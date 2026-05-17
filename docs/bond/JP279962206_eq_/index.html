@@ -24,6 +24,7 @@
       <a href="../../backtest.html">Backtest</a>
       <a href="../../alerts.html">Alerts log</a>
       <a href="../../how-it-works.html">How it works</a>
+      <a href="../../glossary.html">Glossary</a>
       
     </nav>
   </header>
@@ -49,20 +50,25 @@
   </div>
 </section>
 
+<div class="callout">
+  <span class="label">Plain-English summary</span>
+  This bond looks <strong>cheap to model by +13.7%</strong>. The market is paying 131.50 (% of par) while our pricer says fair value is 149.48. To trade it: buy ¥100M face, short delta × shares of 6963.T to neutralize stock direction, hold until the gap closes (typical: 1-3 months). Greeks below show how the bond responds to changes in stock price, vol, time, and interest rates — these drive your hedge ratios.
+</div>
+
 <section class="kpis">
-  <div class="kpi"><span class="lab">Market</span><span class="val">131.50</span></div>
-  <div class="kpi"><span class="lab">Model · Tree</span><span class="val">149.48</span></div>
-  <div class="kpi cheap"><span class="lab">Cheap</span><span class="val">+13.7%</span></div>
+  <div class="kpi" title="Current market price of the bond, quoted as % of par. 100 = at par."><span class="lab">Market</span><span class="val">131.50</span></div>
+  <div class="kpi" title="Our pricer's fair value. Tree = which pricing engine was used."><span class="lab">Model · Tree</span><span class="val">149.48</span></div>
+  <div class="kpi cheap" title="(Model − Market) / Market. Positive = market is too cheap vs model."><span class="lab">Cheap</span><span class="val">+13.7%</span></div>
   
-  <div class="kpi"><span class="lab">Bond floor</span><span class="val">87.89</span></div>
-  <div class="kpi"><span class="lab">Parity</span><span class="val">115.46</span></div>
-  <div class="kpi"><span class="lab">Premium</span><span class="val">14%</span></div>
-  <div class="kpi"><span class="lab">HV60</span><span class="val">62%</span></div>
-  <div class="kpi"><span class="lab">IV</span><span class="val">37%</span></div>
-  <div class="kpi"><span class="lab">Δ</span><span class="val">0.026</span></div>
-  <div class="kpi"><span class="lab">Γ</span><span class="val">0.00000</span></div>
-  <div class="kpi"><span class="lab">Vega</span><span class="val">0.68</span></div>
-  <div class="kpi"><span class="lab">θ /day</span><span class="val">-0.005</span></div>
+  <div class="kpi" title="Bond floor: what this would be worth as a pure debt instrument (ignoring conversion option). The downside protection."><span class="lab">Bond floor</span><span class="val">87.89</span></div>
+  <div class="kpi" title="Parity: value if you converted to stock right now. Stock price × conversion ratio."><span class="lab">Parity</span><span class="val">115.46</span></div>
+  <div class="kpi" title="Premium: how much extra you pay above conversion value. High premium = bond-like; low = equity-like."><span class="lab">Premium</span><span class="val">14%</span></div>
+  <div class="kpi" title="60-day realized volatility of the underlying stock, annualized."><span class="lab">HV60</span><span class="val">62%</span></div>
+  <div class="kpi" title="Implied vol: the σ that would make the model match the market price. Low IV vs HV = market underpricing future vol."><span class="lab">IV</span><span class="val">37%</span></div>
+  <div class="kpi" title="Delta: how much the bond moves per ¥1 stock move. Also your hedge ratio."><span class="lab">Δ Delta</span><span class="val">0.026</span></div>
+  <div class="kpi" title="Gamma: how fast delta changes. Higher = need to rehedge more often."><span class="lab">Γ Gamma</span><span class="val">0.00000</span></div>
+  <div class="kpi" title="Vega: bond price change per 1 percentage-point change in volatility."><span class="lab">Vega</span><span class="val">0.68</span></div>
+  <div class="kpi" title="Theta: bond price change per day from time decay. Negative = costs you to hold."><span class="lab">θ /day</span><span class="val">-0.005</span></div>
 </section>
 
 <section class="hedge-suggestion">
