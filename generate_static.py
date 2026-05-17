@@ -231,6 +231,21 @@ def render_backtest(env):
         except Exception:
             paper_curve = []
 
+    # Attribution
+    attribution, top_trades_list, worst_trades_list = [], [], []
+    p = hist_path("attribution_by_issuer")
+    if os.path.exists(p):
+        try: attribution = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+    p = hist_path("top_trades")
+    if os.path.exists(p):
+        try: top_trades_list = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+    p = hist_path("worst_trades")
+    if os.path.exists(p):
+        try: worst_trades_list = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+
     # Multi-scenario sizing sweep
     paper_scenarios = []
     paper_scenario_curves = {}
@@ -283,6 +298,9 @@ def render_backtest(env):
         paper_curve_json=_json.dumps(paper_curve),
         paper_scenarios=paper_scenarios,
         paper_scenario_curves_json=_json.dumps(paper_scenario_curves),
+        attribution=attribution,
+        top_trades_list=top_trades_list,
+        worst_trades_list=worst_trades_list,
         ROOT="",
     )
     write(os.path.join(DOCS, "backtest.html"), html)

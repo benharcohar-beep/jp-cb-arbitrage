@@ -224,6 +224,26 @@ def backtest_view(request: Request):
         except Exception:
             paper_curve = []
 
+    attr_path = os.path.join(histdir, f"{prefix}attribution_by_issuer.csv")
+    top_path  = os.path.join(histdir, f"{prefix}top_trades.csv")
+    worst_path = os.path.join(histdir, f"{prefix}worst_trades.csv")
+    attribution, top_trades_list, worst_trades_list = [], [], []
+    if os.path.exists(attr_path):
+        try:
+            attribution = pd.read_csv(attr_path).to_dict("records")
+        except Exception:
+            attribution = []
+    if os.path.exists(top_path):
+        try:
+            top_trades_list = pd.read_csv(top_path).to_dict("records")
+        except Exception:
+            top_trades_list = []
+    if os.path.exists(worst_path):
+        try:
+            worst_trades_list = pd.read_csv(worst_path).to_dict("records")
+        except Exception:
+            worst_trades_list = []
+
     paper_scenarios_path = os.path.join(histdir, f"{prefix}paper_scenarios.csv")
     paper_curves_path = os.path.join(histdir, f"{prefix}paper_scenario_curves.csv")
     paper_scenarios, paper_scenario_curves = [], {}
@@ -266,7 +286,10 @@ def backtest_view(request: Request):
          "hedged_buckets": hedged_buckets, "hedged_overall": hedged_overall,
          "paper_kpis": paper_kpis, "paper_curve_json": json.dumps(paper_curve),
          "paper_scenarios": paper_scenarios,
-         "paper_scenario_curves_json": json.dumps(paper_scenario_curves)},
+         "paper_scenario_curves_json": json.dumps(paper_scenario_curves),
+         "attribution": attribution,
+         "top_trades_list": top_trades_list,
+         "worst_trades_list": worst_trades_list},
     )
 
 

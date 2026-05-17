@@ -24,12 +24,78 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
 
 PROJ = os.path.dirname(os.path.abspath(__file__))
 HISTDIR = os.path.join(PROJ, "history")
+
+
+def compute_real_entry_delta(panel_grp: pd.DataFrame, entry_idx: int,
+                              bond_meta: dict) -> float:
+    """
+    Re-price the bond at the entry date using the real Greeks pipeline
+    so we get the actual Δ at entry instead of the 0.05 hardcoded fallback.
+    Falls back to a parity-based proxy if anything goes wrong.
+    """
+    from pricer import ConvertibleBond, MarketData, compute_greeks
+    try:
+        row = panel_grp.iloc[entry_idx]
+        mat = pd.to_datetime(bond_meta.get("MaturityDate")).date()
+        iss = pd.to_datetime(bond_meta.get("IssueDate")).date() if pd.notna(bond_meta.get("IssueDate")) else row["date"]
+        coupon = float(bond_meta.get("Coupon Rate") or 0.0) / 100.0
+        coupon_freq = int(bond_meta.get("Coupon Frequency") or 2) if pd.notna(bond_meta.get("Coupon Frequency")) else 2
+
+        bond = ConvertibleBond(
+            isin=str(bond_meta.get("ISIN") or row["ric"]),
+            issuer=str(bond_meta.get("IssuerName") or row["issuer"]),
+            underlying_ticker=str(bond_meta.get("underlying_ric") or ""),
+            coupon=coupon, coupon_freq=coupon_freq,
+            maturity=mat, issue_date=iss,
+            notional=100.0,
+            conversion_price=float(bond_meta["ConversionPrice"]),
+            currency="JPY",
+            credit_rating=str(bond_meta.get("rating", "NR")),
+        )
+
+        # Approximate rate + spread from today's snapshot (we don't have
+        # historical credit spreads; this is a known limitation).
+        from real_data import load_jgb_curve, rf_for_tenor
+        from credit import spread_for
+        curve = load_jgb_curve()
+        yrs = max((mat - row["date"]).days / 365.0, 0.01)
+        r = rf_for_tenor(curve, yrs)
+        spread = spread_for(bond.credit_rating)
+
+        mkt = MarketData(
+            valuation_date=row["date"],
+            spot=float(row["spot"]),
+            sigma=float(row["sigma"]),
+            r=r, credit_spread=spread,
+            div_yield=0.0,
+        )
+        g = compute_greeks(bond, mkt, n_steps=120)
+        d = float(g.get("delta", 0))
+        if 0 <= d <= 2.0:  # sanity guard
+            return d
+    except Exception:
+        pass
+
+    # Parity proxy fallback: if bond is deep ITM (parity > mkt), delta ≈ 1;
+    # if deep OTM (parity << mkt), delta is small.
+    try:
+        row = panel_grp.iloc[entry_idx]
+        spot = float(row["spot"])
+        cp = float(bond_meta["ConversionPrice"])
+        parity = spot * (100.0 / cp)
+        mkt_px = float(row["mkt_px"])
+        if parity >= mkt_px:
+            return min(0.9, parity / mkt_px * 0.5)
+        return max(0.02, parity / mkt_px * 0.5)
+    except Exception:
+        return 0.10  # less optimistic than the old 0.05 fallback
 
 # ---------------------------------------------------------------------------
 # Parameters
@@ -51,7 +117,7 @@ class HedgeParams:
 # Trade simulation
 # ---------------------------------------------------------------------------
 def simulate_trade(panel_grp: pd.DataFrame, entry_idx: int,
-                   params: HedgeParams) -> dict | None:
+                   params: HedgeParams, bond_meta: dict | None = None) -> dict | None:
     """
     Simulate one trade starting at entry_idx.
     Returns dict with P&L breakdown or None if invalid.
@@ -65,20 +131,19 @@ def simulate_trade(panel_grp: pd.DataFrame, entry_idx: int,
     if cheap_e < params.cheap_entry or cheap_e > params.cheap_max:
         return None
 
-    # Position: long ¥100M face of bond, short delta × shares
     bond_face = params.notional_jpy
     bond_units = bond_face / 100.0  # bond price quoted as % of par
     entry_bond_px = float(entry["mkt_px"])
     entry_spot = float(entry["spot"])
-    entry_delta = grp.iloc[entry_idx].get("delta", None)
-    # delta isn't in panel.csv; derive a proxy from cheap%/spot moves later if missing
-    if pd.isna(entry_delta) or entry_delta is None:
-        # fallback: compute crude delta from parity sensitivity
-        # parity = spot * 100 / conv_price; bond_delta ≈ 0.5 if parity ≈ mkt
-        entry_delta = 0.05  # conservative fallback
 
-    shares_short = (entry_delta * bond_units * 100.0) / entry_spot * bond_face / bond_face
-    # Cleaner: short delta × bond_face_value / spot
+    # Real per-trade delta from the pricer, with parity-proxy fallback.
+    if bond_meta is not None:
+        entry_delta = compute_real_entry_delta(grp, entry_idx, bond_meta)
+    else:
+        # Legacy callers without bond meta — use a parity proxy, not 0.05
+        cp_guess = entry_spot * 100.0 / entry_bond_px  # rough
+        entry_delta = max(0.05, min(0.6, entry_spot / cp_guess))
+
     shares_short = entry_delta * bond_face / entry_spot
 
     # Walk forward
@@ -178,21 +243,32 @@ def run_hedged_backtest(params: HedgeParams = None) -> pd.DataFrame:
     panel = pd.read_csv(os.path.join(HISTDIR, "panel.csv"))
     panel["date"] = pd.to_datetime(panel["date"]).dt.date
 
+    # Load bond meta + equity ratings for delta recomputation
+    bonds_df = pd.read_csv(os.path.join(PROJ, "bonds.csv"))
+    eq_df = pd.read_csv(os.path.join(PROJ, "equities.csv"))
+    eq_df = eq_df.set_index("Instrument")
+    bond_meta_by_ric = {}
+    for _, r in bonds_df.iterrows():
+        rec = r.to_dict()
+        und = rec.get("underlying_ric")
+        rating = ""
+        if und in eq_df.index and pd.notna(eq_df.loc[und].get("Issuer Rating", None)):
+            rating = str(eq_df.loc[und].get("Issuer Rating", ""))
+        rec["rating"] = rating
+        bond_meta_by_ric[str(rec.get("RIC"))] = rec
+
     trades = []
     for ric, grp in panel.groupby("ric"):
         grp = grp.sort_values("date").reset_index(drop=True)
-        # Pseudo-delta from panel (not stored; recompute approx from parity)
-        # Skip — we'll use fallback delta.
+        meta = bond_meta_by_ric.get(str(ric))
         i = 0
         while i < len(grp):
             row = grp.iloc[i]
             cp = row["cheap_pct"]
             if params.cheap_entry <= cp <= params.cheap_max:
-                trade = simulate_trade(grp, i, params)
+                trade = simulate_trade(grp, i, params, bond_meta=meta)
                 if trade is not None:
                     trades.append(trade)
-                    # Skip ahead to exit + cooldown
-                    # find exit_date in grp
                     try:
                         ex_idx = grp[grp["date"] == trade["exit_date"]].index[0]
                         i = int(ex_idx) + 5  # 5-day cooldown
@@ -206,6 +282,44 @@ def run_hedged_backtest(params: HedgeParams = None) -> pd.DataFrame:
         return df
     df.to_csv(os.path.join(HISTDIR, "hedged_trades.csv"), index=False)
     return df
+
+
+def attribution_by_issuer(trades: pd.DataFrame) -> pd.DataFrame:
+    """Group hedged trades by issuer; show P&L contribution + win rate."""
+    if trades.empty:
+        return pd.DataFrame()
+    total_pnl = trades["net_pnl_jpy"].sum()
+    g = trades.groupby("issuer").agg(
+        n_trades=("ric", "size"),
+        total_pnl_jpy=("net_pnl_jpy", "sum"),
+        avg_pnl_jpy=("net_pnl_jpy", "mean"),
+        win_rate_pct=("net_pnl_jpy", lambda s: (s > 0).mean() * 100),
+        avg_cheap_at_entry=("entry_cheap", "mean"),
+        avg_days_held=("days_held", "mean"),
+    ).reset_index()
+    g["contribution_pct"] = g["total_pnl_jpy"] / total_pnl * 100 if total_pnl else 0
+    g = g.sort_values("total_pnl_jpy", ascending=False)
+    return g
+
+
+def top_trades(trades: pd.DataFrame, n: int = 10) -> pd.DataFrame:
+    if trades.empty:
+        return pd.DataFrame()
+    cols = ["issuer", "ric", "entry_date", "exit_date", "days_held",
+            "entry_cheap", "exit_cheap", "delta_used",
+            "entry_bond", "exit_bond", "net_pnl_jpy", "net_return_bp"]
+    cols = [c for c in cols if c in trades.columns]
+    return trades.nlargest(n, "net_pnl_jpy")[cols]
+
+
+def worst_trades(trades: pd.DataFrame, n: int = 5) -> pd.DataFrame:
+    if trades.empty:
+        return pd.DataFrame()
+    cols = ["issuer", "ric", "entry_date", "exit_date", "days_held",
+            "entry_cheap", "exit_cheap", "delta_used",
+            "entry_bond", "exit_bond", "net_pnl_jpy", "net_return_bp"]
+    cols = [c for c in cols if c in trades.columns]
+    return trades.nsmallest(n, "net_pnl_jpy")[cols]
 
 
 def hedged_summary(trades: pd.DataFrame) -> pd.DataFrame:
@@ -384,6 +498,22 @@ def main():
     print(f"  Trades taken:     {kpis['n_trades_taken']} / {kpis['n_trades_available']}")
     print(f"  Days simulated:   {kpis['days_simulated']}")
 
+    # ---------- Attribution ----------
+    print("\n--- P&L attribution by issuer ---")
+    attr = attribution_by_issuer(trades)
+    attr.to_csv(os.path.join(HISTDIR, "attribution_by_issuer.csv"), index=False)
+    print(attr.head(15).to_string(index=False))
+
+    print("\n--- Top 10 trades ---")
+    top = top_trades(trades, 10)
+    top.to_csv(os.path.join(HISTDIR, "top_trades.csv"), index=False)
+    print(top.to_string(index=False))
+
+    print("\n--- Worst 5 trades ---")
+    worst = worst_trades(trades, 5)
+    worst.to_csv(os.path.join(HISTDIR, "worst_trades.csv"), index=False)
+    print(worst.to_string(index=False))
+
     # ---------- Multi-scenario sweep ----------
     print("\n--- Sizing sensitivity: max concurrent positions ---")
     scenarios = []
@@ -418,7 +548,10 @@ def main():
         curves_df.to_csv(os.path.join(HISTDIR, "paper_scenario_curves.csv"), index=False)
         # Copy to demo files for static site
         import shutil
-        for f in ("paper_scenarios.csv", "paper_scenario_curves.csv"):
+        for f in ("paper_scenarios.csv", "paper_scenario_curves.csv",
+                  "paper_equity.csv", "paper_kpis.csv",
+                  "hedged_summary.csv", "hedged_overall.csv",
+                  "attribution_by_issuer.csv", "top_trades.csv", "worst_trades.csv"):
             src = os.path.join(HISTDIR, f)
             dst = os.path.join(HISTDIR, f"demo_{f}")
             if os.path.exists(src):

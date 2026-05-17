@@ -65,8 +65,13 @@
         <span class="engine engine-{{ (r.model_engine or 'tree')|lower }}">{{ r.model_engine or "Tree" }}</span>
         {% if r.reset_flag == 'RESET' %}<span class="reset-tag">RESET {{ "{:.0%}".format(r.reset_prob or 0) }}</span>{% endif %}
       </div>
+      {% set ch = r.cheap_pct or 0 %}
+      {% if ch < 10 %}{% set bucket_hr = 42 %}{% set bucket_name = "5-10%" %}
+      {% elif ch < 15 %}{% set bucket_hr = 70 %}{% set bucket_name = "10-15%" %}
+      {% else %}{% set bucket_hr = 50 %}{% set bucket_name = "15-25%" %}
+      {% endif %}
       <div class="play-thesis">
-        <strong>The thesis:</strong> the bond trades at {{ "{:.2f}".format(r.mkt_px) }}, but our model says fair value is {{ "{:.2f}".format(r.model_px) }} — a <strong>{{ "{:+.1f}%".format(r.cheap_pct) }} gap</strong>. Buy ¥100M face of the bond and short <strong>{{ "{:,.0f}".format((r.delta or 0) * 1_000_000) }} shares</strong> of {{ r.underlying }} to neutralize stock direction. If the gap closes over the next 60 days (78% historical hit rate for this signal strength), you collect the convergence.
+        <strong>The thesis:</strong> the bond trades at {{ "{:.2f}".format(r.mkt_px) }}, but our model says fair value is {{ "{:.2f}".format(r.model_px) }} — a <strong>{{ "{:+.1f}%".format(r.cheap_pct) }} gap</strong>. Buy ¥100M face of the bond and short <strong>{{ "{:,.0f}".format((r.delta or 0) * 1_000_000) }} shares</strong> of {{ r.underlying }} to neutralize stock direction. Historical hedged win rate for the {{ bucket_name }} cheap bucket over 60 days: <strong>{{ bucket_hr }}%</strong> ({{ '78%' if ch >= 10 and ch < 15 else '71%' if ch < 10 else '49%' }} on a pure-bond-return basis, before hedging costs).
       </div>
       <div class="play-detail" style="margin-top:6px;">
         Maturity {{ r.maturity }} · Realized vol (HV60) {{ "{:.0%}".format(r.sigma) }} · Credit spread {{ r.spread_bp }}bp

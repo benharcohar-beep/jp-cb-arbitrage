@@ -108,6 +108,501 @@
 
 
 <section class="alerts-head" style="margin-top:32px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">P&L attribution · where the money came from</h3>
+  <p>Hedged trades grouped by issuer. Contribution % = that issuer's share of total net P&L.</p>
+</section>
+
+<div class="callout">
+  <span class="label">The honest finding</span>
+  
+  The top 5 issuers contributed <strong>113%</strong> of total P&L. The rest of the book was roughly flat or slightly negative. This means the strategy's edge is concentrated in a handful of names — not a broad, evenly-distributed signal. An interviewer will ask: <em>"is this signal robust, or are you lucky in a few specific names?"</em> Honest answer: with only 38 trades over 13 months, we can't yet distinguish skill from luck on individual issuers. A 5-year backtest with 200+ trades would be needed to claim statistical significance per-name.
+</div>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th>
+      <th class="num">Trades</th>
+      <th class="num">Win rate</th>
+      <th class="num">Avg entry cheap%</th>
+      <th class="num">Avg days held</th>
+      <th class="num">Total P&L (¥)</th>
+      <th class="num">Avg P&L (¥)</th>
+      <th class="num">Contribution</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr class="cheap-mild">
+      <td><strong>Rohm</strong></td>
+      <td class="num">6</td>
+      <td class="num">100%</td>
+      <td class="num">+9.7%</td>
+      <td class="num">43</td>
+      <td class="num">39,162,116</td>
+      <td class="num">6,527,019</td>
+      <td class="num"><strong>+26.2%</strong></td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Daifuku</strong></td>
+      <td class="num">3</td>
+      <td class="num">67%</td>
+      <td class="num">+8.5%</td>
+      <td class="num">17</td>
+      <td class="num">37,790,160</td>
+      <td class="num">12,596,720</td>
+      <td class="num"><strong>+25.3%</strong></td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Taiyo Yuden</strong></td>
+      <td class="num">4</td>
+      <td class="num">75%</td>
+      <td class="num">+13.3%</td>
+      <td class="num">34</td>
+      <td class="num">35,138,878</td>
+      <td class="num">8,784,720</td>
+      <td class="num"><strong>+23.5%</strong></td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Nikkon Holdings</strong></td>
+      <td class="num">2</td>
+      <td class="num">100%</td>
+      <td class="num">+9.2%</td>
+      <td class="num">10</td>
+      <td class="num">34,910,301</td>
+      <td class="num">17,455,150</td>
+      <td class="num"><strong>+23.4%</strong></td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Obara Group</strong></td>
+      <td class="num">1</td>
+      <td class="num">100%</td>
+      <td class="num">+8.7%</td>
+      <td class="num">52</td>
+      <td class="num">22,027,559</td>
+      <td class="num">22,027,559</td>
+      <td class="num"><strong>+14.7%</strong></td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Rohto Pharm</strong></td>
+      <td class="num">3</td>
+      <td class="num">67%</td>
+      <td class="num">+11.9%</td>
+      <td class="num">45</td>
+      <td class="num">7,810,258</td>
+      <td class="num">2,603,419</td>
+      <td class="num"><strong>+5.2%</strong></td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td><strong>Advantest</strong></td>
+      <td class="num">1</td>
+      <td class="num">100%</td>
+      <td class="num">+11.6%</td>
+      <td class="num">6</td>
+      <td class="num">4,455,602</td>
+      <td class="num">4,455,602</td>
+      <td class="num"><strong>+3.0%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Tokyu</strong></td>
+      <td class="num">1</td>
+      <td class="num">0%</td>
+      <td class="num">+5.6%</td>
+      <td class="num">4</td>
+      <td class="num">-874,522</td>
+      <td class="num">-874,522</td>
+      <td class="num"><strong>-0.6%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>SRS Holdings</strong></td>
+      <td class="num">1</td>
+      <td class="num">0%</td>
+      <td class="num">+14.8%</td>
+      <td class="num">33</td>
+      <td class="num">-980,408</td>
+      <td class="num">-980,408</td>
+      <td class="num"><strong>-0.7%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Mizuno</strong></td>
+      <td class="num">1</td>
+      <td class="num">0%</td>
+      <td class="num">+7.4%</td>
+      <td class="num">31</td>
+      <td class="num">-1,355,354</td>
+      <td class="num">-1,355,354</td>
+      <td class="num"><strong>-0.9%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Sinko</strong></td>
+      <td class="num">2</td>
+      <td class="num">0%</td>
+      <td class="num">+6.0%</td>
+      <td class="num">23</td>
+      <td class="num">-1,735,066</td>
+      <td class="num">-867,533</td>
+      <td class="num"><strong>-1.2%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Hokuto Corp</strong></td>
+      <td class="num">3</td>
+      <td class="num">0%</td>
+      <td class="num">+9.1%</td>
+      <td class="num">36</td>
+      <td class="num">-2,367,097</td>
+      <td class="num">-789,032</td>
+      <td class="num"><strong>-1.6%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Kobe Steel</strong></td>
+      <td class="num">2</td>
+      <td class="num">50%</td>
+      <td class="num">+6.0%</td>
+      <td class="num">22</td>
+      <td class="num">-2,370,740</td>
+      <td class="num">-1,185,370</td>
+      <td class="num"><strong>-1.6%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Park24</strong></td>
+      <td class="num">1</td>
+      <td class="num">0%</td>
+      <td class="num">+6.0%</td>
+      <td class="num">26</td>
+      <td class="num">-2,721,396</td>
+      <td class="num">-2,721,396</td>
+      <td class="num"><strong>-1.8%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Renaissance</strong></td>
+      <td class="num">3</td>
+      <td class="num">0%</td>
+      <td class="num">+19.1%</td>
+      <td class="num">42</td>
+      <td class="num">-3,525,247</td>
+      <td class="num">-1,175,082</td>
+      <td class="num"><strong>-2.4%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>ANA</strong></td>
+      <td class="num">1</td>
+      <td class="num">0%</td>
+      <td class="num">+5.0%</td>
+      <td class="num">18</td>
+      <td class="num">-6,429,000</td>
+      <td class="num">-6,429,000</td>
+      <td class="num"><strong>-4.3%</strong></td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Money Forward</strong></td>
+      <td class="num">3</td>
+      <td class="num">33%</td>
+      <td class="num">+6.6%</td>
+      <td class="num">30</td>
+      <td class="num">-9,572,753</td>
+      <td class="num">-3,190,918</td>
+      <td class="num"><strong>-6.4%</strong></td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Top 10 trades</h3>
+  <p>Biggest winners. Note the realised <strong>delta_used</strong> column — these are the real per-trade hedge ratios, not a fallback.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>RIC</th><th>Entry</th><th>Exit</th>
+      <th class="num">Days</th>
+      <th class="num">Entry cheap%</th>
+      <th class="num">Exit cheap%</th>
+      <th class="num">Δ used</th>
+      <th class="num">Bond entry</th>
+      <th class="num">Bond exit</th>
+      <th class="num">Net P&L (¥)</th>
+      <th class="num">Net bp</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr class="cheap-mild">
+      <td>Taiyo Yuden</td>
+      <td><code>JP270026966=</code></td>
+      <td>2026-01-26</td>
+      <td>2026-04-20</td>
+      <td class="num">60</td>
+      <td class="num">+13.0</td>
+      <td class="num">+21.6</td>
+      <td class="num">0.015</td>
+      <td class="num">107.88</td>
+      <td class="num">150.06</td>
+      <td class="num">40,175,328</td>
+      <td class="num">+4018</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Daifuku</td>
+      <td><code>JP267637369=</code></td>
+      <td>2026-04-01</td>
+      <td>2026-04-29</td>
+      <td class="num">20</td>
+      <td class="num">+12.4</td>
+      <td class="num">+3.7</td>
+      <td class="num">0.025</td>
+      <td class="num">158.06</td>
+      <td class="num">192.38</td>
+      <td class="num">33,387,906</td>
+      <td class="num">+3339</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Obara Group</td>
+      <td><code>JP279390296=</code></td>
+      <td>2026-02-16</td>
+      <td>2026-04-29</td>
+      <td class="num">52</td>
+      <td class="num">+8.7</td>
+      <td class="num">+14.6</td>
+      <td class="num">0.024</td>
+      <td class="num">116.75</td>
+      <td class="num">140.05</td>
+      <td class="num">22,027,559</td>
+      <td class="num">+2203</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Nikkon Holdings</td>
+      <td><code>JP294960325=</code></td>
+      <td>2026-04-07</td>
+      <td>2026-04-29</td>
+      <td class="num">16</td>
+      <td class="num">+9.9</td>
+      <td class="num">+10.1</td>
+      <td class="num">0.044</td>
+      <td class="num">231.88</td>
+      <td class="num">250.50</td>
+      <td class="num">17,707,271</td>
+      <td class="num">+1771</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Nikkon Holdings</td>
+      <td><code>JP294960325=</code></td>
+      <td>2026-03-26</td>
+      <td>2026-03-31</td>
+      <td class="num">3</td>
+      <td class="num">+8.5</td>
+      <td class="num">-3.4</td>
+      <td class="num">0.045</td>
+      <td class="num">224.25</td>
+      <td class="num">241.42</td>
+      <td class="num">17,203,030</td>
+      <td class="num">+1720</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Rohm</td>
+      <td><code>JP279962206=</code></td>
+      <td>2025-11-07</td>
+      <td>2026-01-30</td>
+      <td class="num">60</td>
+      <td class="num">+6.5</td>
+      <td class="num">+7.6</td>
+      <td class="num">0.022</td>
+      <td class="num">103.25</td>
+      <td class="num">116.12</td>
+      <td class="num">11,458,726</td>
+      <td class="num">+1146</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Rohm</td>
+      <td><code>JP279962168=</code></td>
+      <td>2025-11-12</td>
+      <td>2026-02-04</td>
+      <td class="num">60</td>
+      <td class="num">+5.1</td>
+      <td class="num">+5.0</td>
+      <td class="num">0.017</td>
+      <td class="num">103.12</td>
+      <td class="num">112.62</td>
+      <td class="num">8,248,974</td>
+      <td class="num">+825</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Rohto Pharm</td>
+      <td><code>JP301652887=</code></td>
+      <td>2025-06-20</td>
+      <td>2025-09-12</td>
+      <td class="num">60</td>
+      <td class="num">+17.7</td>
+      <td class="num">+8.9</td>
+      <td class="num">0.023</td>
+      <td class="num">103.75</td>
+      <td class="num">113.25</td>
+      <td class="num">8,196,840</td>
+      <td class="num">+820</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Rohm</td>
+      <td><code>JP279962168=</code></td>
+      <td>2026-03-06</td>
+      <td>2026-04-29</td>
+      <td class="num">38</td>
+      <td class="num">+10.7</td>
+      <td class="num">+14.2</td>
+      <td class="num">0.024</td>
+      <td class="num">120.28</td>
+      <td class="num">127.12</td>
+      <td class="num">6,055,534</td>
+      <td class="num">+606</td>
+    </tr>
+    
+    <tr class="cheap-mild">
+      <td>Rohm</td>
+      <td><code>JP279962206=</code></td>
+      <td>2026-03-06</td>
+      <td>2026-04-29</td>
+      <td class="num">38</td>
+      <td class="num">+13.0</td>
+      <td class="num">+18.3</td>
+      <td class="num">0.026</td>
+      <td class="num">125.02</td>
+      <td class="num">131.50</td>
+      <td class="num">5,682,752</td>
+      <td class="num">+568</td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Worst 5 trades</h3>
+  <p>The losers. Show these honestly — they're where the strategy's weakness hides.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>RIC</th><th>Entry</th><th>Exit</th>
+      <th class="num">Days</th>
+      <th class="num">Entry cheap%</th>
+      <th class="num">Exit cheap%</th>
+      <th class="num">Δ used</th>
+      <th class="num">Bond entry</th>
+      <th class="num">Bond exit</th>
+      <th class="num">Net P&L (¥)</th>
+      <th class="num">Net bp</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr class="rich-mild">
+      <td>ANA</td>
+      <td><code>JP241370844=</code></td>
+      <td>2026-04-03</td>
+      <td>2026-04-29</td>
+      <td class="num">18</td>
+      <td class="num">+5.0</td>
+      <td class="num">+5.5</td>
+      <td class="num">0.025</td>
+      <td class="num">113.38</td>
+      <td class="num">107.25</td>
+      <td class="num">-6,429,000</td>
+      <td class="num">-643</td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td>Taiyo Yuden</td>
+      <td><code>JP270026966=</code></td>
+      <td>2025-10-27</td>
+      <td>2026-01-19</td>
+      <td class="num">60</td>
+      <td class="num">+6.4</td>
+      <td class="num">+15.0</td>
+      <td class="num">0.016</td>
+      <td class="num">116.00</td>
+      <td class="num">110.12</td>
+      <td class="num">-6,421,578</td>
+      <td class="num">-642</td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td>Money Forward</td>
+      <td><code>JP266263856=</code></td>
+      <td>2026-01-15</td>
+      <td>2026-04-09</td>
+      <td class="num">60</td>
+      <td class="num">+7.7</td>
+      <td class="num">+18.9</td>
+      <td class="num">0.005</td>
+      <td class="num">99.75</td>
+      <td class="num">95.00</td>
+      <td class="num">-5,353,543</td>
+      <td class="num">-535</td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td>Money Forward</td>
+      <td><code>JP266263856=</code></td>
+      <td>2025-10-02</td>
+      <td>2025-10-29</td>
+      <td class="num">19</td>
+      <td class="num">+5.5</td>
+      <td class="num">+0.7</td>
+      <td class="num">0.006</td>
+      <td class="num">102.62</td>
+      <td class="num">97.88</td>
+      <td class="num">-5,221,359</td>
+      <td class="num">-522</td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td>Kobe Steel</td>
+      <td><code>JP272792062=</code></td>
+      <td>2026-03-13</td>
+      <td>2026-04-29</td>
+      <td class="num">33</td>
+      <td class="num">+5.3</td>
+      <td class="num">+6.6</td>
+      <td class="num">0.025</td>
+      <td class="num">110.75</td>
+      <td class="num">107.62</td>
+      <td class="num">-3,593,309</td>
+      <td class="num">-359</td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+
+<section class="alerts-head" style="margin-top:32px;">
   <h3 style="font-size:14px; margin-bottom:4px;">Paper trading · what $1,000,000 would have done</h3>
   <p>Real money simulation. Starts with $1M USD, walks every hedged trade chronologically, allocates equity ÷ open-slots per new trade, cap of 5 concurrent positions. Cash earns nothing, deployed capital absorbs P&L per the hedged backtest. USD/JPY held at 150 for simplicity.</p>
 </section>
@@ -119,12 +614,12 @@
 
 <section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
   <div class="kpi"><span class="lab">Starting</span><span class="val">$1,000,000</span></div>
-  <div class="kpi alert"><span class="lab">Ending equity</span><span class="val">$1,186,294</span></div>
-  <div class="kpi alert"><span class="lab">Total return</span><span class="val">+18.6%</span></div>
-  <div class="kpi alert"><span class="lab">CAGR</span><span class="val">+22.1%</span></div>
-  <div class="kpi"><span class="lab">Max drawdown</span><span class="val" style="color:var(--red);">-1.27%</span></div>
-  <div class="kpi"><span class="lab">Sharpe</span><span class="val">1.47</span></div>
-  <div class="kpi"><span class="lab">Trades taken</span><span class="val">21 <span style="font-size:12px; color:var(--muted);">/ 38</span></span></div>
+  <div class="kpi alert"><span class="lab">Ending equity</span><span class="val">$1,099,797</span></div>
+  <div class="kpi alert"><span class="lab">Total return</span><span class="val">+10.0%</span></div>
+  <div class="kpi alert"><span class="lab">CAGR</span><span class="val">+11.7%</span></div>
+  <div class="kpi"><span class="lab">Max drawdown</span><span class="val" style="color:var(--red);">-1.92%</span></div>
+  <div class="kpi"><span class="lab">Sharpe</span><span class="val">1.27</span></div>
+  <div class="kpi"><span class="lab">Trades taken</span><span class="val">29 <span style="font-size:12px; color:var(--muted);">/ 38</span></span></div>
   <div class="kpi"><span class="lab">Days simulated</span><span class="val">313</span></div>
 </section>
 
@@ -168,10 +663,10 @@
     <tr >
       <td class="num">1</td>
       <td class="num">100% of equity</td>
-      <td class="num">$1,392,828</td>
-      <td class="num">+39.3%</td>
-      <td class="num">+47.2%</td>
-      <td class="num" style="color:var(--red)">-2.45%</td>
+      <td class="num">$1,427,623</td>
+      <td class="num">+42.8%</td>
+      <td class="num">+51.5%</td>
+      <td class="num" style="color:var(--red)">-2.50%</td>
       <td class="num"><strong>0.93</strong></td>
       <td class="num">5 / 38</td>
     </tr>
@@ -180,10 +675,10 @@
     <tr >
       <td class="num">2</td>
       <td class="num">50% of equity</td>
-      <td class="num">$1,349,804</td>
-      <td class="num">+35.0%</td>
-      <td class="num">+41.9%</td>
-      <td class="num" style="color:var(--red)">-2.56%</td>
+      <td class="num">$1,375,089</td>
+      <td class="num">+37.5%</td>
+      <td class="num">+45.0%</td>
+      <td class="num" style="color:var(--red)">-2.63%</td>
       <td class="num"><strong>1.32</strong></td>
       <td class="num">9 / 38</td>
     </tr>
@@ -192,11 +687,11 @@
     <tr >
       <td class="num">3</td>
       <td class="num">33% of equity</td>
-      <td class="num">$1,234,252</td>
-      <td class="num">+23.4%</td>
-      <td class="num">+27.8%</td>
-      <td class="num" style="color:var(--red)">-2.14%</td>
-      <td class="num"><strong>1.31</strong></td>
+      <td class="num">$1,252,445</td>
+      <td class="num">+25.2%</td>
+      <td class="num">+30.0%</td>
+      <td class="num" style="color:var(--red)">-2.18%</td>
+      <td class="num"><strong>1.32</strong></td>
       <td class="num">13 / 38</td>
     </tr>
     
@@ -204,11 +699,11 @@
     <tr class="cheap-strong">
       <td class="num">5</td>
       <td class="num">20% of equity</td>
-      <td class="num">$1,186,294</td>
-      <td class="num">+18.6%</td>
-      <td class="num">+22.1%</td>
-      <td class="num" style="color:var(--red)">-1.27%</td>
-      <td class="num"><strong>1.47</strong></td>
+      <td class="num">$1,200,406</td>
+      <td class="num">+20.0%</td>
+      <td class="num">+23.8%</td>
+      <td class="num" style="color:var(--red)">-1.44%</td>
+      <td class="num"><strong>1.49</strong></td>
       <td class="num">21 / 38</td>
     </tr>
     
@@ -216,11 +711,11 @@
     <tr >
       <td class="num">8</td>
       <td class="num">12% of equity</td>
-      <td class="num">$1,093,726</td>
-      <td class="num">+9.4%</td>
-      <td class="num">+11.0%</td>
-      <td class="num" style="color:var(--red)">-1.74%</td>
-      <td class="num"><strong>1.28</strong></td>
+      <td class="num">$1,099,797</td>
+      <td class="num">+10.0%</td>
+      <td class="num">+11.7%</td>
+      <td class="num" style="color:var(--red)">-1.92%</td>
+      <td class="num"><strong>1.27</strong></td>
       <td class="num">29 / 38</td>
     </tr>
     
@@ -238,7 +733,7 @@
 </section>
 
 <script>
-const scenarioCurves = {"1": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-08-08", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-08-22", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-09-12", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-09-16", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-09-17", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-10-29", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-11-06", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-11-07", "equity_usd": 990735.6359331112, "drawdown_pct": -0.9264364066888686}, {"date": "2025-12-15", "equity_usd": 981040.0447673756, "drawdown_pct": -1.8959955232624393}, {"date": "2025-12-22", "equity_usd": 981040.0447673756, "drawdown_pct": -1.8959955232624393}, {"date": "2025-12-29", "equity_usd": 981040.0447673756, "drawdown_pct": -1.8959955232624393}, {"date": "2026-01-16", "equity_usd": 981040.0447673756, "drawdown_pct": -1.8959955232624393}, {"date": "2026-01-16", "equity_usd": 975527.3185512144, "drawdown_pct": -2.447268144878545}, {"date": "2026-01-16", "equity_usd": 975527.3185512144, "drawdown_pct": -2.447268144878545}, {"date": "2026-01-19", "equity_usd": 975527.3185512144, "drawdown_pct": -2.447268144878545}, {"date": "2026-01-26", "equity_usd": 975527.3185512144, "drawdown_pct": -2.447268144878545}, {"date": "2026-01-30", "equity_usd": 975527.3185512144, "drawdown_pct": -2.447268144878545}, {"date": "2026-02-04", "equity_usd": 975527.3185512144, "drawdown_pct": -2.447268144878545}, {"date": "2026-03-31", "equity_usd": 975527.3185512144, "drawdown_pct": -2.447268144878545}, {"date": "2026-04-09", "equity_usd": 975527.3185512144, "drawdown_pct": -2.447268144878545}, {"date": "2026-04-20", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1339214.7516147092, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1392828.0229566563, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1392828.0229566563, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1392828.0229566563, "drawdown_pct": 0.0}], "2": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 995367.8179665556, "drawdown_pct": -0.4632182033444287}, {"date": "2025-08-08", "equity_usd": 991133.1136267168, "drawdown_pct": -0.8866886373283145}, {"date": "2025-08-22", "equity_usd": 991133.1136267168, "drawdown_pct": -0.8866886373283145}, {"date": "2025-09-12", "equity_usd": 991133.1136267168, "drawdown_pct": -0.8866886373283145}, {"date": "2025-09-16", "equity_usd": 991133.1136267168, "drawdown_pct": -0.8866886373283145}, {"date": "2025-09-17", "equity_usd": 991133.1136267168, "drawdown_pct": -0.8866886373283145}, {"date": "2025-09-19", "equity_usd": 991133.1136267168, "drawdown_pct": -0.8866886373283145}, {"date": "2025-10-29", "equity_usd": 991133.1136267168, "drawdown_pct": -0.8866886373283145}, {"date": "2025-11-06", "equity_usd": 982028.8988963912, "drawdown_pct": -1.7971101103608889}, {"date": "2025-11-07", "equity_usd": 982028.8988963912, "drawdown_pct": -1.7971101103608889}, {"date": "2025-11-07", "equity_usd": 982028.8988963912, "drawdown_pct": -1.7971101103608889}, {"date": "2025-12-15", "equity_usd": 977179.1584045712, "drawdown_pct": -2.2820841595428742}, {"date": "2025-12-22", "equity_usd": 977179.1584045712, "drawdown_pct": -2.2820841595428742}, {"date": "2025-12-29", "equity_usd": 977179.1584045712, "drawdown_pct": -2.2820841595428742}, {"date": "2026-01-16", "equity_usd": 977179.1584045712, "drawdown_pct": -2.2820841595428742}, {"date": "2026-01-16", "equity_usd": 974421.6894587564, "drawdown_pct": -2.5578310541243487}, {"date": "2026-01-16", "equity_usd": 974421.6894587564, "drawdown_pct": -2.5578310541243487}, {"date": "2026-01-19", "equity_usd": 974421.6894587564, "drawdown_pct": -2.5578310541243487}, {"date": "2026-01-26", "equity_usd": 974421.6894587564, "drawdown_pct": -2.5578310541243487}, {"date": "2026-01-30", "equity_usd": 1025864.9101787122, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 1025864.9101787122, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1025864.9101787122, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 1025864.9101787122, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 1025864.9101787122, "drawdown_pct": 0.0}, {"date": "2026-04-20", "equity_usd": 1207781.5814104038, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1207781.5814104038, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1322986.5675948402, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1349803.9579407575, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1349803.9579407575, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1349803.9579407575, "drawdown_pct": 0.0}], "3": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1002547.490685764, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1002547.490685764, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1002547.490685764, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1002547.490685764, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1002547.490685764, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 999459.3693301348, "drawdown_pct": -0.30802743853231}, {"date": "2025-08-08", "equity_usd": 996636.2331035757, "drawdown_pct": -0.589623697341779}, {"date": "2025-08-22", "equity_usd": 996636.2331035757, "drawdown_pct": -0.589623697341779}, {"date": "2025-09-12", "equity_usd": 996636.2331035757, "drawdown_pct": -0.589623697341779}, {"date": "2025-09-16", "equity_usd": 996636.2331035757, "drawdown_pct": -0.589623697341779}, {"date": "2025-09-17", "equity_usd": 996636.2331035757, "drawdown_pct": -0.589623697341779}, {"date": "2025-09-19", "equity_usd": 996636.2331035752, "drawdown_pct": -0.5896236973418012}, {"date": "2025-10-01", "equity_usd": 996636.2331035752, "drawdown_pct": -0.5896236973418012}, {"date": "2025-10-29", "equity_usd": 996636.2331035752, "drawdown_pct": -0.5896236973418012}, {"date": "2025-11-06", "equity_usd": 990533.0567495294, "drawdown_pct": -1.198390504974134}, {"date": "2025-11-07", "equity_usd": 990533.0567495294, "drawdown_pct": -1.198390504974134}, {"date": "2025-11-07", "equity_usd": 990533.0567495294, "drawdown_pct": -1.198390504974134}, {"date": "2025-12-15", "equity_usd": 987281.944778901, "drawdown_pct": -1.522675588806388}, {"date": "2025-12-22", "equity_usd": 987281.944778901, "drawdown_pct": -1.522675588806388}, {"date": "2025-12-29", "equity_usd": 985187.9359005804, "drawdown_pct": -1.731544385324757}, {"date": "2026-01-08", "equity_usd": 985187.9359005804, "drawdown_pct": -1.731544385324757}, {"date": "2026-01-16", "equity_usd": 985187.9359005804, "drawdown_pct": -1.731544385324757}, {"date": "2026-01-16", "equity_usd": 983339.4163120588, "drawdown_pct": -1.9159266321205903}, {"date": "2026-01-16", "equity_usd": 981101.568869121, "drawdown_pct": -2.139142735470178}, {"date": "2026-01-19", "equity_usd": 981101.568869121, "drawdown_pct": -2.139142735470178}, {"date": "2026-01-26", "equity_usd": 981101.568869121, "drawdown_pct": -2.139142735470178}, {"date": "2026-01-30", "equity_usd": 1015587.469913194, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 1015587.469913194, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1015587.469913194, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1015587.469913194, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 1015587.469913194, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 1015587.469913194, "drawdown_pct": 0.0}, {"date": "2026-04-20", "equity_usd": 1137681.7451818022, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1137681.7451818022, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1211367.1049510613, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1216252.9284849078, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1234251.5528919587, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1234251.5528919587, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1234251.5528919587, "drawdown_pct": 0.0}], "5": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 999063.3848744156, "drawdown_pct": -0.0936615125584405}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 998739.0064724964, "drawdown_pct": -0.1851776785056658}, {"date": "2025-08-08", "equity_usd": 997045.124736561, "drawdown_pct": -0.3544656540531377}, {"date": "2025-08-22", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-12", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-16", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-17", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-19", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-01", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-02", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-10", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-29", "equity_usd": 997896.5368382564, "drawdown_pct": -0.8998295232176878}, {"date": "2025-11-06", "equity_usd": 994196.7081851664, "drawdown_pct": -1.267256041619924}, {"date": "2025-11-07", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-07", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-12", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-21", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-12-15", "equity_usd": 1000972.014432866, "drawdown_pct": -0.5944067236868023}, {"date": "2025-12-22", "equity_usd": 1000972.014432866, "drawdown_pct": -0.5944067236868023}, {"date": "2025-12-29", "equity_usd": 999702.597722877, "drawdown_pct": -0.7204713082624381}, {"date": "2026-01-08", "equity_usd": 999702.597722877, "drawdown_pct": -0.7204713082624381}, {"date": "2026-01-16", "equity_usd": 997054.0660276052, "drawdown_pct": -0.98349451039339}, {"date": "2026-01-16", "equity_usd": 995933.468269542, "drawdown_pct": -1.094780024232178}, {"date": "2026-01-16", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-19", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-26", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-30", "equity_usd": 1015732.4207020048, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 1030210.0674212544, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1030210.0674212544, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-06", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-06", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-31", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-04-09", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-04-20", "equity_usd": 1104085.10741696, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1104085.10741696, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1148635.9996140334, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1151590.0165073748, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1163868.9150855727, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}], "8": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 999414.61554651, "drawdown_pct": -0.05853844534901}, {"date": "2025-07-08", "equity_usd": 1000369.9245536716, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000298.22461815, "drawdown_pct": -0.0071673421762952}, {"date": "2025-07-08", "equity_usd": 1000298.22461815, "drawdown_pct": -0.0071673421762952}, {"date": "2025-07-10", "equity_usd": 1000298.22461815, "drawdown_pct": -0.0071673421762952}, {"date": "2025-07-14", "equity_usd": 1002326.827446134, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 1001168.7819377728, "drawdown_pct": -0.1155357191537809}, {"date": "2025-08-08", "equity_usd": 1000110.1058528132, "drawdown_pct": -0.2211575638426}, {"date": "2025-08-22", "equity_usd": 1006305.3011074086, "drawdown_pct": 0.0}, {"date": "2025-09-12", "equity_usd": 1006305.3011074086, "drawdown_pct": 0.0}, {"date": "2025-09-16", "equity_usd": 1006305.3011074086, "drawdown_pct": 0.0}, {"date": "2025-09-17", "equity_usd": 1004012.4037845022, "drawdown_pct": -0.2278530502008879}, {"date": "2025-09-19", "equity_usd": 1004012.403784502, "drawdown_pct": -0.2278530502009101}, {"date": "2025-10-01", "equity_usd": 1004012.403784502, "drawdown_pct": -0.2278530502009101}, {"date": "2025-10-02", "equity_usd": 1004012.4037845022, "drawdown_pct": -0.2278530502008879}, {"date": "2025-10-10", "equity_usd": 1004012.4037845022, "drawdown_pct": -0.2278530502008879}, {"date": "2025-10-27", "equity_usd": 1004012.4037845024, "drawdown_pct": -0.2278530502008768}, {"date": "2025-10-29", "equity_usd": 998368.4696117372, "drawdown_pct": -0.7887100949321324}, {"date": "2025-11-06", "equity_usd": 996063.8874329096, "drawdown_pct": -1.0177243092358457}, {"date": "2025-11-07", "equity_usd": 1001511.7824689368, "drawdown_pct": -0.4763483441055705}, {"date": "2025-11-07", "equity_usd": 1001511.7824689368, "drawdown_pct": -0.4763483441055705}, {"date": "2025-11-12", "equity_usd": 1001511.7824689368, "drawdown_pct": -0.4763483441055705}, {"date": "2025-11-21", "equity_usd": 1001511.7824689368, "drawdown_pct": -0.4763483441055705}, {"date": "2025-12-15", "equity_usd": 1000279.685604774, "drawdown_pct": -0.5987860240827203}, {"date": "2025-12-22", "equity_usd": 1000279.685604774, "drawdown_pct": -0.5987860240827203}, {"date": "2025-12-29", "equity_usd": 999488.9800338816, "drawdown_pct": -0.6773611413977365}, {"date": "2026-01-08", "equity_usd": 999488.9800338816, "drawdown_pct": -0.6773611413977365}, {"date": "2026-01-15", "equity_usd": 999488.9800338816, "drawdown_pct": -0.6773611413977365}, {"date": "2026-01-16", "equity_usd": 997834.824914577, "drawdown_pct": -0.8417401939063707}, {"date": "2026-01-16", "equity_usd": 997133.2454340956, "drawdown_pct": -0.911458546747146}, {"date": "2026-01-16", "equity_usd": 996287.3280408724, "drawdown_pct": -0.9955202517080708}, {"date": "2026-01-19", "equity_usd": 988758.8761440712, "drawdown_pct": -1.743648268972453}, {"date": "2026-01-26", "equity_usd": 988758.8761440712, "drawdown_pct": -1.743648268972453}, {"date": "2026-01-30", "equity_usd": 1001971.7019256896, "drawdown_pct": -0.4306445744596598}, {"date": "2026-02-04", "equity_usd": 1011013.796260026, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1011013.796260026, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1011013.796260026, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 1011013.796260026, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 1011013.796260026, "drawdown_pct": 0.0}, {"date": "2026-03-13", "equity_usd": 1011013.796260026, "drawdown_pct": 0.0}, {"date": "2026-03-17", "equity_usd": 1011013.796260026, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 1011013.796260026, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 1005764.1541476272, "drawdown_pct": -0.5192453487596671}, {"date": "2026-04-20", "equity_usd": 1051551.6096929794, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1051551.6096929794, "drawdown_pct": 0.0}, {"date": "2026-04-23", "equity_usd": 1051551.6096929794, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1078801.971512644, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1080608.8495614352, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1088119.460741178, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1095175.0154841456, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1090815.6137609333, "drawdown_pct": -0.3980552570663986}, {"date": "2026-04-29", "equity_usd": 1089172.0325887902, "drawdown_pct": -0.5481300075770745}, {"date": "2026-04-29", "equity_usd": 1089172.0325887902, "drawdown_pct": -0.5481300075770745}, {"date": "2026-04-29", "equity_usd": 1089172.0325887902, "drawdown_pct": -0.5481300075770745}, {"date": "2026-04-29", "equity_usd": 1089172.0325887902, "drawdown_pct": -0.5481300075770745}, {"date": "2026-04-29", "equity_usd": 1089172.0325887902, "drawdown_pct": -0.5481300075770745}, {"date": "2026-04-29", "equity_usd": 1094939.6561078534, "drawdown_pct": -0.0214905720971159}, {"date": "2026-04-29", "equity_usd": 1093726.1872879586, "drawdown_pct": -0.1322919328602956}, {"date": "2026-04-29", "equity_usd": 1093726.1872879586, "drawdown_pct": -0.1322919328602956}]};
+const scenarioCurves = {"1": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-08-08", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-08-22", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-09-12", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-09-16", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-09-17", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-10-29", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-11-06", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-11-07", "equity_usd": 990195.9212218852, "drawdown_pct": -0.9804078778114844}, {"date": "2025-12-15", "equity_usd": 980525.9232131346, "drawdown_pct": -1.9474076786865413}, {"date": "2025-12-22", "equity_usd": 980525.9232131346, "drawdown_pct": -1.9474076786865413}, {"date": "2025-12-29", "equity_usd": 980525.9232131346, "drawdown_pct": -1.9474076786865413}, {"date": "2026-01-16", "equity_usd": 980525.9232131346, "drawdown_pct": -1.9474076786865413}, {"date": "2026-01-16", "equity_usd": 975012.559098538, "drawdown_pct": -2.4987440901461877}, {"date": "2026-01-16", "equity_usd": 975012.559098538, "drawdown_pct": -2.4987440901461877}, {"date": "2026-01-19", "equity_usd": 975012.559098538, "drawdown_pct": -2.4987440901461877}, {"date": "2026-01-26", "equity_usd": 975012.559098538, "drawdown_pct": -2.4987440901461877}, {"date": "2026-01-30", "equity_usd": 975012.559098538, "drawdown_pct": -2.4987440901461877}, {"date": "2026-02-04", "equity_usd": 975012.559098538, "drawdown_pct": -2.4987440901461877}, {"date": "2026-03-31", "equity_usd": 975012.559098538, "drawdown_pct": -2.4987440901461877}, {"date": "2026-04-09", "equity_usd": 975012.559098538, "drawdown_pct": -2.4987440901461877}, {"date": "2026-04-20", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1366727.0560226114, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1427622.9715210935, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1427622.9715210935, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1427622.9715210935, "drawdown_pct": 0.0}], "2": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 995097.9606109424, "drawdown_pct": -0.4902039389057533}, {"date": "2025-08-08", "equity_usd": 990956.7765222866, "drawdown_pct": -0.9043223477713468}, {"date": "2025-08-22", "equity_usd": 990956.7765222866, "drawdown_pct": -0.9043223477713468}, {"date": "2025-09-12", "equity_usd": 990956.7765222866, "drawdown_pct": -0.9043223477713468}, {"date": "2025-09-16", "equity_usd": 990956.7765222866, "drawdown_pct": -0.9043223477713468}, {"date": "2025-09-17", "equity_usd": 990956.7765222866, "drawdown_pct": -0.9043223477713468}, {"date": "2025-09-19", "equity_usd": 990956.7765222866, "drawdown_pct": -0.9043223477713468}, {"date": "2025-10-29", "equity_usd": 990956.7765222866, "drawdown_pct": -0.9043223477713468}, {"date": "2025-11-06", "equity_usd": 981271.7253512696, "drawdown_pct": -1.8728274648730392}, {"date": "2025-11-07", "equity_usd": 981271.7253512696, "drawdown_pct": -1.8728274648730392}, {"date": "2025-11-07", "equity_usd": 981271.7253512696, "drawdown_pct": -1.8728274648730392}, {"date": "2025-12-15", "equity_usd": 976433.0111885696, "drawdown_pct": -2.356698881143049}, {"date": "2025-12-22", "equity_usd": 976433.0111885696, "drawdown_pct": -2.356698881143049}, {"date": "2025-12-29", "equity_usd": 976433.0111885696, "drawdown_pct": -2.356698881143049}, {"date": "2026-01-16", "equity_usd": 976433.0111885696, "drawdown_pct": -2.356698881143049}, {"date": "2026-01-16", "equity_usd": 973674.2109280856, "drawdown_pct": -2.6325789071914407}, {"date": "2026-01-16", "equity_usd": 973674.2109280856, "drawdown_pct": -2.6325789071914407}, {"date": "2026-01-19", "equity_usd": 973674.2109280856, "drawdown_pct": -2.6325789071914407}, {"date": "2026-01-26", "equity_usd": 973674.2109280856, "drawdown_pct": -2.6325789071914407}, {"date": "2026-01-30", "equity_usd": 1029339.940780062, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 1029339.940780062, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1029339.940780062, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 1029339.940780062, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 1029339.940780062, "drawdown_pct": 0.0}, {"date": "2026-04-20", "equity_usd": 1225347.6837275033, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1225347.6837275033, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1344617.901761203, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1375089.2553753871, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1375089.2553753871, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1375089.2553753871, "drawdown_pct": 0.0}], "3": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1003340.494582245, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1003340.494582245, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1003340.494582245, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1003340.494582245, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1003340.494582245, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 1000072.4683228732, "drawdown_pct": -0.3257145781534909}, {"date": "2025-08-08", "equity_usd": 997311.678930436, "drawdown_pct": -0.6008743476778711}, {"date": "2025-08-22", "equity_usd": 997311.678930436, "drawdown_pct": -0.6008743476778711}, {"date": "2025-09-12", "equity_usd": 997311.678930436, "drawdown_pct": -0.6008743476778711}, {"date": "2025-09-16", "equity_usd": 997311.678930436, "drawdown_pct": -0.6008743476778711}, {"date": "2025-09-17", "equity_usd": 997311.678930436, "drawdown_pct": -0.6008743476778711}, {"date": "2025-09-19", "equity_usd": 997311.678930436, "drawdown_pct": -0.6008743476778711}, {"date": "2025-10-01", "equity_usd": 997311.678930436, "drawdown_pct": -0.6008743476778711}, {"date": "2025-10-29", "equity_usd": 997311.678930436, "drawdown_pct": -0.6008743476778711}, {"date": "2025-11-06", "equity_usd": 990813.572001365, "drawdown_pct": -1.248521578519135}, {"date": "2025-11-07", "equity_usd": 990813.572001365, "drawdown_pct": -1.248521578519135}, {"date": "2025-11-07", "equity_usd": 990813.572001365, "drawdown_pct": -1.248521578519135}, {"date": "2025-12-15", "equity_usd": 987567.075780206, "drawdown_pct": -1.5720903210037718}, {"date": "2025-12-22", "equity_usd": 987567.075780206, "drawdown_pct": -1.5720903210037718}, {"date": "2025-12-29", "equity_usd": 985884.4841983654, "drawdown_pct": -1.7397892817181404}, {"date": "2026-01-08", "equity_usd": 985884.4841983654, "drawdown_pct": -1.7397892817181404}, {"date": "2026-01-16", "equity_usd": 985884.4841983654, "drawdown_pct": -1.7397892817181404}, {"date": "2026-01-16", "equity_usd": 984033.489425904, "drawdown_pct": -1.9242724937938216}, {"date": "2026-01-16", "equity_usd": 981427.393057412, "drawdown_pct": -2.1840144639987513}, {"date": "2026-01-19", "equity_usd": 981427.393057412, "drawdown_pct": -2.1840144639987513}, {"date": "2026-01-26", "equity_usd": 981427.393057412, "drawdown_pct": -2.1840144639987513}, {"date": "2026-01-30", "equity_usd": 1018775.8653035264, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 1018775.8653035264, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1018775.8653035264, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1018775.8653035264, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 1018775.8653035264, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 1018775.8653035264, "drawdown_pct": 0.0}, {"date": "2026-04-20", "equity_usd": 1150448.1483765522, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1150448.1483765522, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1226556.8608852676, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1231974.911559943, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1252444.6778986177, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1252444.6778986177, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1252444.6778986177, "drawdown_pct": 0.0}], "5": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 999039.9216190444, "drawdown_pct": -0.0960078380955464}, {"date": "2025-07-08", "equity_usd": 1001044.2183683916, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1001044.2183683916, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1001044.2183683916, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1001044.2183683916, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1001044.2183683916, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 999083.4026127683, "drawdown_pct": -0.1958770371621621}, {"date": "2025-08-08", "equity_usd": 997426.928977306, "drawdown_pct": -0.3613516091208635}, {"date": "2025-08-22", "equity_usd": 1008750.7017483003, "drawdown_pct": 0.0}, {"date": "2025-09-12", "equity_usd": 1008750.7017483003, "drawdown_pct": 0.0}, {"date": "2025-09-16", "equity_usd": 1008750.7017483003, "drawdown_pct": 0.0}, {"date": "2025-09-17", "equity_usd": 1008750.7017483003, "drawdown_pct": 0.0}, {"date": "2025-09-19", "equity_usd": 1008750.7017483003, "drawdown_pct": 0.0}, {"date": "2025-10-01", "equity_usd": 1008750.7017483003, "drawdown_pct": 0.0}, {"date": "2025-10-02", "equity_usd": 1008750.7017483003, "drawdown_pct": 0.0}, {"date": "2025-10-10", "equity_usd": 1008750.7017483003, "drawdown_pct": 0.0}, {"date": "2025-10-29", "equity_usd": 998216.6021777476, "drawdown_pct": -1.044271845590361}, {"date": "2025-11-06", "equity_usd": 994273.0186040952, "drawdown_pct": -1.4352092265327077}, {"date": "2025-11-07", "equity_usd": 1003258.4653181, "drawdown_pct": -0.5444592425741579}, {"date": "2025-11-07", "equity_usd": 1003258.4653181, "drawdown_pct": -0.5444592425741579}, {"date": "2025-11-12", "equity_usd": 1003258.4653181, "drawdown_pct": -0.5444592425741579}, {"date": "2025-11-21", "equity_usd": 1003258.4653181, "drawdown_pct": -0.5444592425741579}, {"date": "2025-12-15", "equity_usd": 1001288.2254760304, "drawdown_pct": -0.739774084849365}, {"date": "2025-12-22", "equity_usd": 1001288.2254760304, "drawdown_pct": -0.739774084849365}, {"date": "2025-12-29", "equity_usd": 1000267.0910755438, "drawdown_pct": -0.8410017121230573}, {"date": "2026-01-08", "equity_usd": 1000267.0910755438, "drawdown_pct": -0.8410017121230573}, {"date": "2026-01-16", "equity_usd": 997758.0485227134, "drawdown_pct": -1.089729425370933}, {"date": "2026-01-16", "equity_usd": 996634.7132714976, "drawdown_pct": -1.2010884806131106}, {"date": "2026-01-16", "equity_usd": 995053.1205180512, "drawdown_pct": -1.3578757572618727}, {"date": "2026-01-19", "equity_usd": 995053.1205180512, "drawdown_pct": -1.3578757572618727}, {"date": "2026-01-26", "equity_usd": 995053.1205180512, "drawdown_pct": -1.3578757572618727}, {"date": "2026-01-30", "equity_usd": 1017961.3371968286, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 1034452.6363464422, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1034452.6363464422, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1034452.6363464422, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 1034452.6363464422, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 1034452.6363464422, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 1034452.6363464422, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 1034452.6363464422, "drawdown_pct": 0.0}, {"date": "2026-04-20", "equity_usd": 1114162.4069077556, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1114162.4069077556, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1160202.6417878638, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1163480.168334195, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1176136.9595409243, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1188014.5907315142, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1188014.5907315142, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1188014.5907315142, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1188014.5907315142, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1188014.5907315142, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1188014.5907315142, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1188014.5907315142, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1200406.2675538452, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1200406.2675538452, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1200406.2675538452, "drawdown_pct": 0.0}], "8": [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 999399.9510119028, "drawdown_pct": -0.0600048988097068}, {"date": "2025-07-08", "equity_usd": 1000652.6364802448, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000588.2673075208, "drawdown_pct": -0.0064327190452906}, {"date": "2025-07-08", "equity_usd": 1000588.2673075208, "drawdown_pct": -0.0064327190452906}, {"date": "2025-07-10", "equity_usd": 1000588.2673075208, "drawdown_pct": -0.0064327190452906}, {"date": "2025-07-14", "equity_usd": 1003156.0704830284, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 1001930.5606357638, "drawdown_pct": -0.1221654220438961}, {"date": "2025-08-08", "equity_usd": 1000895.2646135996, "drawdown_pct": -0.2253693055298877}, {"date": "2025-08-22", "equity_usd": 1007972.6225954712, "drawdown_pct": 0.0}, {"date": "2025-09-12", "equity_usd": 1007972.6225954712, "drawdown_pct": 0.0}, {"date": "2025-09-16", "equity_usd": 1007972.6225954712, "drawdown_pct": 0.0}, {"date": "2025-09-17", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-09-19", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-01", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-02", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-10", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-27", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-29", "equity_usd": 998626.7735346728, "drawdown_pct": -0.9271927482249808}, {"date": "2025-11-06", "equity_usd": 996172.1204541737, "drawdown_pct": -1.1707165330455016}, {"date": "2025-11-07", "equity_usd": 1001765.042233124, "drawdown_pct": -0.6158481116642633}, {"date": "2025-11-07", "equity_usd": 1001765.042233124, "drawdown_pct": -0.6158481116642633}, {"date": "2025-11-12", "equity_usd": 1001765.042233124, "drawdown_pct": -0.6158481116642633}, {"date": "2025-11-21", "equity_usd": 1001765.042233124, "drawdown_pct": -0.6158481116642633}, {"date": "2025-12-15", "equity_usd": 1000533.2018151558, "drawdown_pct": -0.7380578215665401}, {"date": "2025-12-22", "equity_usd": 1000533.2018151558, "drawdown_pct": -0.7380578215665401}, {"date": "2025-12-29", "equity_usd": 999897.604608974, "drawdown_pct": -0.801114812593251}, {"date": "2026-01-08", "equity_usd": 999897.604608974, "drawdown_pct": -0.801114812593251}, {"date": "2026-01-15", "equity_usd": 999897.604608974, "drawdown_pct": -0.801114812593251}, {"date": "2026-01-16", "equity_usd": 998330.149905698, "drawdown_pct": -0.9566204948051492}, {"date": "2026-01-16", "equity_usd": 997627.8629886652, "drawdown_pct": -1.02629370827243}, {"date": "2026-01-16", "equity_usd": 996643.6428151611, "drawdown_pct": -1.1239372505116751}, {"date": "2026-01-19", "equity_usd": 988579.5651028592, "drawdown_pct": -1.9239666889638296}, {"date": "2026-01-26", "equity_usd": 988579.5651028592, "drawdown_pct": -1.9239666889638185}, {"date": "2026-01-30", "equity_usd": 1002890.8377181086, "drawdown_pct": -0.5041590181563915}, {"date": "2026-02-04", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-13", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-17", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 1006506.0472093034, "drawdown_pct": -0.6600193521826392}, {"date": "2026-04-20", "equity_usd": 1055831.5758621355, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1055831.5758621355, "drawdown_pct": 0.0}, {"date": "2026-04-23", "equity_usd": 1055831.5758621355, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1083935.240210642, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1085935.892600693, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1093661.7917567105, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1100912.0797082144, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1096327.5890942975, "drawdown_pct": -0.4164265883186524}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1101066.2787944493, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1099796.792571218, "drawdown_pct": -0.1152960768738831}, {"date": "2026-04-29", "equity_usd": 1099796.792571218, "drawdown_pct": -0.1152960768738831}]};
 const slotColors = {
   1: '#b91c1c',  // red — concentrated
   2: '#ea580c',
@@ -319,7 +814,7 @@ const slotColors = {
 
 
 <script>
-const paperCurve = [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 999063.3848744156, "drawdown_pct": -0.0936615125584405}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 998739.0064724964, "drawdown_pct": -0.1851776785056658}, {"date": "2025-08-08", "equity_usd": 997045.124736561, "drawdown_pct": -0.3544656540531377}, {"date": "2025-08-22", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-12", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-16", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-17", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-19", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-01", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-02", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-10", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-29", "equity_usd": 997896.5368382564, "drawdown_pct": -0.8998295232176878}, {"date": "2025-11-06", "equity_usd": 994196.7081851664, "drawdown_pct": -1.267256041619924}, {"date": "2025-11-07", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-07", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-12", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-21", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-12-15", "equity_usd": 1000972.014432866, "drawdown_pct": -0.5944067236868023}, {"date": "2025-12-22", "equity_usd": 1000972.014432866, "drawdown_pct": -0.5944067236868023}, {"date": "2025-12-29", "equity_usd": 999702.597722877, "drawdown_pct": -0.7204713082624381}, {"date": "2026-01-08", "equity_usd": 999702.597722877, "drawdown_pct": -0.7204713082624381}, {"date": "2026-01-16", "equity_usd": 997054.0660276052, "drawdown_pct": -0.98349451039339}, {"date": "2026-01-16", "equity_usd": 995933.468269542, "drawdown_pct": -1.094780024232178}, {"date": "2026-01-16", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-19", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-26", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-30", "equity_usd": 1015732.4207020048, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 1030210.0674212544, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1030210.0674212544, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-06", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-06", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-31", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-04-09", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-04-20", "equity_usd": 1104085.10741696, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1104085.10741696, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1148635.9996140334, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1151590.0165073748, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1163868.9150855727, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}];
+const paperCurve = [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 999399.9510119028, "drawdown_pct": -0.0600048988097068}, {"date": "2025-07-08", "equity_usd": 1000652.6364802448, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000588.2673075208, "drawdown_pct": -0.0064327190452906}, {"date": "2025-07-08", "equity_usd": 1000588.2673075208, "drawdown_pct": -0.0064327190452906}, {"date": "2025-07-10", "equity_usd": 1000588.2673075208, "drawdown_pct": -0.0064327190452906}, {"date": "2025-07-14", "equity_usd": 1003156.0704830284, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 1001930.5606357638, "drawdown_pct": -0.1221654220438961}, {"date": "2025-08-08", "equity_usd": 1000895.2646135996, "drawdown_pct": -0.2253693055298877}, {"date": "2025-08-22", "equity_usd": 1007972.6225954712, "drawdown_pct": 0.0}, {"date": "2025-09-12", "equity_usd": 1007972.6225954712, "drawdown_pct": 0.0}, {"date": "2025-09-16", "equity_usd": 1007972.6225954712, "drawdown_pct": 0.0}, {"date": "2025-09-17", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-09-19", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-01", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-02", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-10", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-27", "equity_usd": 1005183.6423009136, "drawdown_pct": -0.2766920680222551}, {"date": "2025-10-29", "equity_usd": 998626.7735346728, "drawdown_pct": -0.9271927482249808}, {"date": "2025-11-06", "equity_usd": 996172.1204541737, "drawdown_pct": -1.1707165330455016}, {"date": "2025-11-07", "equity_usd": 1001765.042233124, "drawdown_pct": -0.6158481116642633}, {"date": "2025-11-07", "equity_usd": 1001765.042233124, "drawdown_pct": -0.6158481116642633}, {"date": "2025-11-12", "equity_usd": 1001765.042233124, "drawdown_pct": -0.6158481116642633}, {"date": "2025-11-21", "equity_usd": 1001765.042233124, "drawdown_pct": -0.6158481116642633}, {"date": "2025-12-15", "equity_usd": 1000533.2018151558, "drawdown_pct": -0.7380578215665401}, {"date": "2025-12-22", "equity_usd": 1000533.2018151558, "drawdown_pct": -0.7380578215665401}, {"date": "2025-12-29", "equity_usd": 999897.604608974, "drawdown_pct": -0.801114812593251}, {"date": "2026-01-08", "equity_usd": 999897.604608974, "drawdown_pct": -0.801114812593251}, {"date": "2026-01-15", "equity_usd": 999897.604608974, "drawdown_pct": -0.801114812593251}, {"date": "2026-01-16", "equity_usd": 998330.149905698, "drawdown_pct": -0.9566204948051492}, {"date": "2026-01-16", "equity_usd": 997627.8629886652, "drawdown_pct": -1.02629370827243}, {"date": "2026-01-16", "equity_usd": 996643.6428151611, "drawdown_pct": -1.1239372505116751}, {"date": "2026-01-19", "equity_usd": 988579.5651028592, "drawdown_pct": -1.9239666889638296}, {"date": "2026-01-26", "equity_usd": 988579.5651028592, "drawdown_pct": -1.9239666889638185}, {"date": "2026-01-30", "equity_usd": 1002890.8377181086, "drawdown_pct": -0.5041590181563915}, {"date": "2026-02-04", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-06", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-13", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-17", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-03-31", "equity_usd": 1013193.3191909856, "drawdown_pct": 0.0}, {"date": "2026-04-09", "equity_usd": 1006506.0472093034, "drawdown_pct": -0.6600193521826392}, {"date": "2026-04-20", "equity_usd": 1055831.5758621355, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1055831.5758621355, "drawdown_pct": 0.0}, {"date": "2026-04-23", "equity_usd": 1055831.5758621355, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1083935.240210642, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1085935.892600693, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1093661.7917567105, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1100912.0797082144, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1096327.5890942975, "drawdown_pct": -0.4164265883186524}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1094598.3722987743, "drawdown_pct": -0.5734978774248223}, {"date": "2026-04-29", "equity_usd": 1101066.2787944493, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1099796.792571218, "drawdown_pct": -0.1152960768738831}, {"date": "2026-04-29", "equity_usd": 1099796.792571218, "drawdown_pct": -0.1152960768738831}];
 if (paperCurve && paperCurve.length > 0) {
   const labels = paperCurve.map(p => p.date);
   const equity = paperCurve.map(p => p.equity_usd);
@@ -387,10 +882,10 @@ if (paperCurve && paperCurve.length > 0) {
 <section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
   <div class="kpi"><span class="lab">Trades</span><span class="val">38</span></div>
   <div class="kpi"><span class="lab">Win rate</span><span class="val">50%</span></div>
-  <div class="kpi alert"><span class="lab">Avg net per trade</span><span class="val">+378bp</span></div>
-  <div class="kpi"><span class="lab">Median net</span><span class="val">+14bp</span></div>
+  <div class="kpi alert"><span class="lab">Avg net per trade</span><span class="val">+393bp</span></div>
+  <div class="kpi"><span class="lab">Median net</span><span class="val">+15bp</span></div>
   <div class="kpi"><span class="lab">Avg days held</span><span class="val">31</span></div>
-  <div class="kpi"><span class="lab">Total net P&L</span><span class="val" style="font-size:14px;">¥143,480,928</span></div>
+  <div class="kpi"><span class="lab">Total net P&L</span><span class="val" style="font-size:14px;">¥149,363,291</span></div>
 </section>
 
 
@@ -413,31 +908,31 @@ if (paperCurve && paperCurve.length > 0) {
       <td>5-10%</td>
       <td class="num">24</td>
       <td class="num">30.3</td>
-      <td class="num">+266</td>
-      <td class="num">+204</td>
-      <td class="num">-66</td>
+      <td class="num">+268</td>
+      <td class="num">+206</td>
+      <td class="num">-65</td>
       <td class="num">42</td>
-      <td class="num">51</td>
+      <td class="num">50</td>
     </tr>
     
     <tr class="cheap-strong">
       <td>10-15%</td>
       <td class="num">10</td>
       <td class="num">32.9</td>
-      <td class="num">+944</td>
-      <td class="num">+881</td>
-      <td class="num">+448</td>
+      <td class="num">+990</td>
+      <td class="num">+927</td>
+      <td class="num">+506</td>
       <td class="num">70</td>
-      <td class="num">51</td>
+      <td class="num">50</td>
     </tr>
     
     <tr >
       <td>15-25%</td>
       <td class="num">4</td>
       <td class="num">31.8</td>
-      <td class="num">+226</td>
-      <td class="num">+164</td>
-      <td class="num">-15</td>
+      <td class="num">+244</td>
+      <td class="num">+181</td>
+      <td class="num">-8</td>
       <td class="num">50</td>
       <td class="num">51</td>
     </tr>

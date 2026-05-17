@@ -59,6 +59,130 @@
   </tbody>
 </table>
 
+{% if attribution %}
+<section class="alerts-head" style="margin-top:32px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">P&L attribution · where the money came from</h3>
+  <p>Hedged trades grouped by issuer. Contribution % = that issuer's share of total net P&L.</p>
+</section>
+
+<div class="callout">
+  <span class="label">The honest finding</span>
+  {% set top5_contrib = (attribution[:5] | sum(attribute='contribution_pct')) %}
+  The top 5 issuers contributed <strong>{{ "{:.0f}".format(top5_contrib) }}%</strong> of total P&L. The rest of the book was roughly flat or slightly negative. This means the strategy's edge is concentrated in a handful of names — not a broad, evenly-distributed signal. An interviewer will ask: <em>"is this signal robust, or are you lucky in a few specific names?"</em> Honest answer: with only 38 trades over 13 months, we can't yet distinguish skill from luck on individual issuers. A 5-year backtest with 200+ trades would be needed to claim statistical significance per-name.
+</div>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th>
+      <th class="num">Trades</th>
+      <th class="num">Win rate</th>
+      <th class="num">Avg entry cheap%</th>
+      <th class="num">Avg days held</th>
+      <th class="num">Total P&L (¥)</th>
+      <th class="num">Avg P&L (¥)</th>
+      <th class="num">Contribution</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in attribution %}
+    <tr class="{% if a.total_pnl_jpy > 0 %}cheap-mild{% elif a.total_pnl_jpy < 0 %}rich-mild{% endif %}">
+      <td><strong>{{ a.issuer }}</strong></td>
+      <td class="num">{{ "{:.0f}".format(a.n_trades) }}</td>
+      <td class="num">{{ "{:.0f}".format(a.win_rate_pct) }}%</td>
+      <td class="num">{{ "{:+.1f}".format(a.avg_cheap_at_entry) }}%</td>
+      <td class="num">{{ "{:.0f}".format(a.avg_days_held) }}</td>
+      <td class="num">{{ "{:,.0f}".format(a.total_pnl_jpy) }}</td>
+      <td class="num">{{ "{:,.0f}".format(a.avg_pnl_jpy) }}</td>
+      <td class="num"><strong>{{ "{:+.1f}".format(a.contribution_pct) }}%</strong></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if top_trades_list %}
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Top 10 trades</h3>
+  <p>Biggest winners. Note the realised <strong>delta_used</strong> column — these are the real per-trade hedge ratios, not a fallback.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>RIC</th><th>Entry</th><th>Exit</th>
+      <th class="num">Days</th>
+      <th class="num">Entry cheap%</th>
+      <th class="num">Exit cheap%</th>
+      <th class="num">Δ used</th>
+      <th class="num">Bond entry</th>
+      <th class="num">Bond exit</th>
+      <th class="num">Net P&L (¥)</th>
+      <th class="num">Net bp</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in top_trades_list %}
+    <tr class="cheap-mild">
+      <td>{{ t.issuer }}</td>
+      <td><code>{{ t.ric }}</code></td>
+      <td>{{ t.entry_date }}</td>
+      <td>{{ t.exit_date }}</td>
+      <td class="num">{{ "{:.0f}".format(t.days_held) }}</td>
+      <td class="num">{{ "{:+.1f}".format(t.entry_cheap) }}</td>
+      <td class="num">{{ "{:+.1f}".format(t.exit_cheap) }}</td>
+      <td class="num">{{ "{:.3f}".format(t.delta_used) }}</td>
+      <td class="num">{{ "{:.2f}".format(t.entry_bond) }}</td>
+      <td class="num">{{ "{:.2f}".format(t.exit_bond) }}</td>
+      <td class="num">{{ "{:,.0f}".format(t.net_pnl_jpy) }}</td>
+      <td class="num">{{ "{:+.0f}".format(t.net_return_bp) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if worst_trades_list %}
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Worst 5 trades</h3>
+  <p>The losers. Show these honestly — they're where the strategy's weakness hides.</p>
+</section>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Issuer</th><th>RIC</th><th>Entry</th><th>Exit</th>
+      <th class="num">Days</th>
+      <th class="num">Entry cheap%</th>
+      <th class="num">Exit cheap%</th>
+      <th class="num">Δ used</th>
+      <th class="num">Bond entry</th>
+      <th class="num">Bond exit</th>
+      <th class="num">Net P&L (¥)</th>
+      <th class="num">Net bp</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in worst_trades_list %}
+    <tr class="rich-mild">
+      <td>{{ t.issuer }}</td>
+      <td><code>{{ t.ric }}</code></td>
+      <td>{{ t.entry_date }}</td>
+      <td>{{ t.exit_date }}</td>
+      <td class="num">{{ "{:.0f}".format(t.days_held) }}</td>
+      <td class="num">{{ "{:+.1f}".format(t.entry_cheap) }}</td>
+      <td class="num">{{ "{:+.1f}".format(t.exit_cheap) }}</td>
+      <td class="num">{{ "{:.3f}".format(t.delta_used) }}</td>
+      <td class="num">{{ "{:.2f}".format(t.entry_bond) }}</td>
+      <td class="num">{{ "{:.2f}".format(t.exit_bond) }}</td>
+      <td class="num">{{ "{:,.0f}".format(t.net_pnl_jpy) }}</td>
+      <td class="num">{{ "{:+.0f}".format(t.net_return_bp) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
 {% if paper_kpis %}
 <section class="alerts-head" style="margin-top:32px;">
   <h3 style="font-size:14px; margin-bottom:4px;">Paper trading · what $1,000,000 would have done</h3>
