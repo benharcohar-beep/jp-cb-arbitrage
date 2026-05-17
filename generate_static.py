@@ -231,6 +231,30 @@ def render_backtest(env):
         except Exception:
             paper_curve = []
 
+    # Multi-scenario sizing sweep
+    paper_scenarios = []
+    paper_scenario_curves = {}
+    p = hist_path("paper_scenarios")
+    if os.path.exists(p):
+        try:
+            paper_scenarios = pd.read_csv(p).to_dict("records")
+        except Exception:
+            paper_scenarios = []
+    p = hist_path("paper_scenario_curves")
+    if os.path.exists(p):
+        try:
+            sc = pd.read_csv(p)
+            sc["date"] = pd.to_datetime(sc["date"]).dt.strftime("%Y-%m-%d")
+            for slots, grp in sc.groupby("max_concurrent"):
+                paper_scenario_curves[int(slots)] = [
+                    {"date": r["date"],
+                     "equity_usd": float(r["equity_usd"]) if pd.notna(r["equity_usd"]) else None,
+                     "drawdown_pct": float(r["drawdown_pct"]) if pd.notna(r["drawdown_pct"]) else None}
+                    for _, r in grp.iterrows()
+                ]
+        except Exception:
+            paper_scenario_curves = {}
+
     p = hist_path("panel")
     if os.path.exists(p):
         d = pd.read_csv(p)
@@ -257,6 +281,8 @@ def render_backtest(env):
         hedged_overall=hedged_overall,
         paper_kpis=paper_kpis,
         paper_curve_json=_json.dumps(paper_curve),
+        paper_scenarios=paper_scenarios,
+        paper_scenario_curves_json=_json.dumps(paper_scenario_curves),
         ROOT="",
     )
     write(os.path.join(DOCS, "backtest.html"), html)

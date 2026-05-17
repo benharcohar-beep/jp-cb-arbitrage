@@ -223,6 +223,28 @@ def backtest_view(request: Request):
             ]
         except Exception:
             paper_curve = []
+
+    paper_scenarios_path = os.path.join(histdir, f"{prefix}paper_scenarios.csv")
+    paper_curves_path = os.path.join(histdir, f"{prefix}paper_scenario_curves.csv")
+    paper_scenarios, paper_scenario_curves = [], {}
+    if os.path.exists(paper_scenarios_path):
+        try:
+            paper_scenarios = pd.read_csv(paper_scenarios_path).to_dict("records")
+        except Exception:
+            paper_scenarios = []
+    if os.path.exists(paper_curves_path):
+        try:
+            sc = pd.read_csv(paper_curves_path)
+            sc["date"] = pd.to_datetime(sc["date"]).dt.strftime("%Y-%m-%d")
+            for slots, grp in sc.groupby("max_concurrent"):
+                paper_scenario_curves[int(slots)] = [
+                    {"date": r["date"],
+                     "equity_usd": _clean(r["equity_usd"]),
+                     "drawdown_pct": _clean(r["drawdown_pct"])}
+                    for _, r in grp.iterrows()
+                ]
+        except Exception:
+            paper_scenario_curves = {}
     if os.path.exists(rets_path):
         rets = pd.read_csv(rets_path).sort_values("signal_cheap", ascending=False).head(40).to_dict("records")
     if os.path.exists(panel_path):
@@ -242,7 +264,9 @@ def backtest_view(request: Request):
         {"request": request, "summary": summary, "rets": rets,
          "panel_stats": panel_stats, "buckets": buckets,
          "hedged_buckets": hedged_buckets, "hedged_overall": hedged_overall,
-         "paper_kpis": paper_kpis, "paper_curve_json": json.dumps(paper_curve)},
+         "paper_kpis": paper_kpis, "paper_curve_json": json.dumps(paper_curve),
+         "paper_scenarios": paper_scenarios,
+         "paper_scenario_curves_json": json.dumps(paper_scenario_curves)},
     )
 
 

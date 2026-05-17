@@ -91,6 +91,138 @@
   <canvas id="paper-dd-chart" height="60"></canvas>
 </section>
 
+{% if paper_scenarios %}
+<section class="alerts-head" style="margin-top:32px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Sizing sensitivity · concentration vs diversification</h3>
+  <p>Same trades, different position sizing. Each scenario starts with $1M and caps the number of simultaneous positions. Fewer slots = bigger positions = higher returns when right, deeper drawdowns when wrong. Sharpe is the right yardstick because it adjusts for both.</p>
+</section>
+
+<div class="callout">
+  <span class="label">What this shows</span>
+  At <strong>1 slot</strong> (100% in a single position) the strategy captures the biggest returns but only takes 5 of the 38 available signals — extreme concentration <em>and</em> extreme capacity constraint. At <strong>8 slots</strong> the system takes 29 of 38 signals but each position is so small that wins barely move the equity curve. The <strong>sweet spot for risk-adjusted return is 2-5 slots</strong> — Sharpe sits at 1.3-1.5. Note: drawdowns here are all small (-1 to -3%) because the strategy's wins are much larger than its losses; a bigger loss tail (e.g. in a vol crisis) would scale linearly with slot size.
+</div>
+
+<table class="screen">
+  <thead>
+    <tr>
+      <th class="num">Slots</th>
+      <th class="num">Position size</th>
+      <th class="num">Ending equity</th>
+      <th class="num">Total return</th>
+      <th class="num">CAGR</th>
+      <th class="num">Max drawdown</th>
+      <th class="num">Sharpe</th>
+      <th class="num">Trades taken</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in paper_scenarios %}
+    {% set best_sharpe = paper_scenarios | map(attribute='sharpe') | max %}
+    <tr {% if s.sharpe == best_sharpe %}class="cheap-strong"{% endif %}>
+      <td class="num">{{ "{:.0f}".format(s.max_concurrent) }}</td>
+      <td class="num">{{ "{:.0f}".format(100 / s.max_concurrent) }}% of equity</td>
+      <td class="num">${{ "{:,.0f}".format(s.final_equity_usd) }}</td>
+      <td class="num">{{ "{:+.1f}".format(s.total_return_pct) }}%</td>
+      <td class="num">{{ "{:+.1f}".format(s.cagr_pct) }}%</td>
+      <td class="num" style="color:var(--red)">{{ "{:+.2f}".format(s.max_drawdown_pct) }}%</td>
+      <td class="num"><strong>{{ "{:.2f}".format(s.sharpe) }}</strong></td>
+      <td class="num">{{ "{:.0f}".format(s.n_trades_taken) }} / {{ "{:.0f}".format(s.n_trades_available) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<section class="chart-block" style="margin-top:18px;">
+  <h3>Equity curves · all sizing scenarios</h3>
+  <canvas id="scenarios-equity-chart" height="120"></canvas>
+</section>
+
+<section class="chart-block">
+  <h3>Drawdown curves · all sizing scenarios (lower is worse)</h3>
+  <canvas id="scenarios-dd-chart" height="100"></canvas>
+</section>
+
+<script>
+const scenarioCurves = {{ paper_scenario_curves_json|safe }};
+const slotColors = {
+  1: '#b91c1c',  // red — concentrated
+  2: '#ea580c',
+  3: '#d97706',
+  5: '#047857',  // green — default
+  8: '#3b82f6',  // blue — diversified
+};
+
+(function() {
+  if (!scenarioCurves || Object.keys(scenarioCurves).length === 0) return;
+  const slotKeys = Object.keys(scenarioCurves).map(Number).sort((a,b)=>a-b);
+
+  // Build a unified date axis (union of all dates)
+  const allDates = new Set();
+  slotKeys.forEach(k => scenarioCurves[k].forEach(p => allDates.add(p.date)));
+  const labels = Array.from(allDates).sort();
+
+  // For each slot count, build a value array aligned to labels (forward-fill last value)
+  function align(curve) {
+    const byDate = Object.fromEntries(curve.map(p => [p.date, p]));
+    let last = null;
+    return labels.map(d => {
+      if (byDate[d]) last = byDate[d];
+      return last;
+    });
+  }
+
+  const eqDatasets = slotKeys.map(k => ({
+    label: k + ' slot' + (k>1?'s':''),
+    data: align(scenarioCurves[k]).map(p => p ? p.equity_usd : null),
+    borderColor: slotColors[k] || '#6f8073',
+    backgroundColor: 'transparent',
+    pointRadius: 0,
+    borderWidth: 2,
+    tension: 0.05,
+  }));
+
+  new Chart(document.getElementById('scenarios-equity-chart'), {
+    type: 'line',
+    data: { labels, datasets: eqDatasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#0f1d12', font: { size: 11 } }, position: 'top' },
+        tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + (ctx.parsed.y || 0).toLocaleString(undefined, {maximumFractionDigits:0}) } }
+      },
+      scales: {
+        x: { ticks: { color: '#6f8073', maxTicksLimit: 10 }, grid: { color: '#e3eae0' } },
+        y: { ticks: { color: '#6f8073', callback: v => '$' + (v/1000).toFixed(0) + 'k' }, grid: { color: '#e3eae0' } }
+      }
+    }
+  });
+
+  const ddDatasets = slotKeys.map(k => ({
+    label: k + ' slot' + (k>1?'s':''),
+    data: align(scenarioCurves[k]).map(p => p ? p.drawdown_pct : null),
+    borderColor: slotColors[k] || '#6f8073',
+    backgroundColor: 'transparent',
+    pointRadius: 0,
+    borderWidth: 1.5,
+    tension: 0.05,
+  }));
+
+  new Chart(document.getElementById('scenarios-dd-chart'), {
+    type: 'line',
+    data: { labels, datasets: ddDatasets },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#0f1d12', font: { size: 11 } }, position: 'top' } },
+      scales: {
+        x: { ticks: { color: '#6f8073', maxTicksLimit: 10 }, grid: { color: '#e3eae0' } },
+        y: { ticks: { color: '#6f8073', callback: v => v.toFixed(1) + '%' }, grid: { color: '#e3eae0' }, max: 0 }
+      }
+    }
+  });
+})();
+</script>
+{% endif %}
+
 <script>
 const paperCurve = {{ paper_curve_json|safe }};
 if (paperCurve && paperCurve.length > 0) {

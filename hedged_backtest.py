@@ -373,7 +373,7 @@ def main():
     for k, v in overall.items():
         print(f"  {k:25s} {v:,.2f}")
 
-    print("\n--- Paper trading simulation ($1M starting equity) ---")
+    print("\n--- Paper trading simulation ($1M starting equity, default: 5 slots) ---")
     eq, kpis = simulate_paper_trading(trades=trades)
     print(f"  Starting capital: ${kpis['starting_usd']:,.0f} USD (≈ ¥{kpis['starting_usd']*kpis['usd_jpy_assumed']:,.0f})")
     print(f"  Ending equity:    ${kpis['final_equity_usd']:,.0f} USD")
@@ -383,6 +383,46 @@ def main():
     print(f"  Sharpe (approx):  {kpis['sharpe']:.2f}")
     print(f"  Trades taken:     {kpis['n_trades_taken']} / {kpis['n_trades_available']}")
     print(f"  Days simulated:   {kpis['days_simulated']}")
+
+    # ---------- Multi-scenario sweep ----------
+    print("\n--- Sizing sensitivity: max concurrent positions ---")
+    scenarios = []
+    all_curves = []
+    for slots in (1, 2, 3, 5, 8):
+        eq_s, k = simulate_paper_trading(
+            trades=trades, starting_usd=1_000_000.0,
+            usd_jpy=150.0, max_concurrent=slots,
+        )
+        if k:
+            scenarios.append({
+                "max_concurrent":     slots,
+                "final_equity_usd":   k["final_equity_usd"],
+                "total_return_pct":   k["total_return_pct"],
+                "cagr_pct":           k["cagr_pct"],
+                "max_drawdown_pct":   k["max_drawdown_pct"],
+                "sharpe":             k["sharpe"],
+                "n_trades_taken":     k["n_trades_taken"],
+                "n_trades_available": k["n_trades_available"],
+                "days_simulated":     k["days_simulated"],
+            })
+            eq_s["max_concurrent"] = slots
+            all_curves.append(eq_s[["date", "equity_usd", "drawdown_pct", "max_concurrent"]])
+
+    if scenarios:
+        scen_df = pd.DataFrame(scenarios)
+        scen_df.to_csv(os.path.join(HISTDIR, "paper_scenarios.csv"), index=False)
+        print(scen_df.to_string(index=False))
+
+    if all_curves:
+        curves_df = pd.concat(all_curves, ignore_index=True)
+        curves_df.to_csv(os.path.join(HISTDIR, "paper_scenario_curves.csv"), index=False)
+        # Copy to demo files for static site
+        import shutil
+        for f in ("paper_scenarios.csv", "paper_scenario_curves.csv"):
+            src = os.path.join(HISTDIR, f)
+            dst = os.path.join(HISTDIR, f"demo_{f}")
+            if os.path.exists(src):
+                shutil.copy(src, dst)
 
 
 if __name__ == "__main__":
