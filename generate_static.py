@@ -75,6 +75,34 @@ def setup_docs():
     shutil.copytree(os.path.join(PROJ, "static"), os.path.join(DOCS, "static"))
 
 
+def _read_run_health() -> dict:
+    """Return dict with status, hours_ago, color hint, message — for the header badge."""
+    import json
+    from datetime import datetime
+    p = os.path.join(PROJ, "history", "last_run_status.json")
+    if not os.path.exists(p):
+        return {"status": "unknown", "color": "muted", "label": "no run logged yet"}
+    try:
+        d = json.load(open(p))
+        ts = datetime.fromisoformat(d["timestamp"])
+        hours = (datetime.now() - ts).total_seconds() / 3600
+        ok = d.get("success", False)
+        if not ok:
+            return {"status": "failed", "color": "red",
+                    "label": f"last run FAILED · {ts:%Y-%m-%d %H:%M}",
+                    "error": d.get("error", "")}
+        if hours < 24:
+            return {"status": "fresh", "color": "green",
+                    "label": f"last run OK · {ts:%Y-%m-%d %H:%M} · {hours:.0f}h ago"}
+        if hours < 72:
+            return {"status": "stale", "color": "amber",
+                    "label": f"last run {hours:.0f}h ago"}
+        return {"status": "stale", "color": "amber",
+                "label": f"last run {int(hours/24)}d ago"}
+    except Exception:
+        return {"status": "unknown", "color": "muted", "label": "status unreadable"}
+
+
 def latest_snapshot_label() -> str:
     """Human-readable timestamp from the latest snapshot, for the header badge."""
     import re
@@ -104,6 +132,7 @@ def setup_jinja() -> Environment:
     env.globals["DEMO_MODE"] = True
     env.globals["STATIC_SITE"] = True
     env.globals["LAST_UPDATED"] = latest_snapshot_label()
+    env.globals["RUN_HEALTH"] = _read_run_health()
     return env
 
 

@@ -102,9 +102,13 @@ header {
   border-left: 1px solid var(--line);
 }
 .freshness .dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--profit-500); box-shadow: 0 0 6px var(--profit-500);
+  width: 7px; height: 7px; border-radius: 50%;
 }
+.dot-green { background: var(--profit-500); box-shadow: 0 0 6px rgba(16,185,129,0.6); }
+.dot-amber { background: var(--amber); box-shadow: 0 0 6px rgba(180,83,9,0.5); }
+.dot-red   { background: var(--red);   box-shadow: 0 0 6px rgba(185,28,28,0.6); animation: pulseRed 1.5s ease-in-out infinite; }
+.dot-muted { background: var(--muted); }
+@keyframes pulseRed { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 nav { display: flex; align-items: center; gap: 2px; }
 nav a {
   color: var(--ink-soft); font-size: 13px; font-weight: 500;

@@ -54,9 +54,33 @@ def _latest_label() -> str:
 
 
 # Recompute on each request so it reflects the freshest snapshot after manual refresh
+def _read_run_health() -> dict:
+    from datetime import datetime
+    p = os.path.join(PROJ, "history", "last_run_status.json")
+    if not os.path.exists(p):
+        return {"status": "unknown", "color": "muted", "label": "no run logged yet"}
+    try:
+        d = json.load(open(p))
+        ts = datetime.fromisoformat(d["timestamp"])
+        hours = (datetime.now() - ts).total_seconds() / 3600
+        ok = d.get("success", False)
+        if not ok:
+            return {"status": "failed", "color": "red",
+                    "label": f"last run FAILED · {ts:%Y-%m-%d %H:%M}",
+                    "error": d.get("error", "")}
+        if hours < 24:
+            return {"status": "fresh", "color": "green",
+                    "label": f"last run OK · {ts:%Y-%m-%d %H:%M} · {hours:.0f}h ago"}
+        return {"status": "stale", "color": "amber",
+                "label": f"last run {hours:.0f}h ago"}
+    except Exception:
+        return {"status": "unknown", "color": "muted", "label": "status unreadable"}
+
+
 @app.middleware("http")
 async def freshness_middleware(request, call_next):
     templates.env.globals["LAST_UPDATED"] = _latest_label()
+    templates.env.globals["RUN_HEALTH"] = _read_run_health()
     return await call_next(request)
 
 

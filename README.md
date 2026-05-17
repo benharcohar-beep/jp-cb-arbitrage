@@ -197,6 +197,35 @@ Does the full chain in one command: pull data → price universe → update $5M 
 regenerate static site → git commit + push. The public dashboard refreshes within ~60 seconds.
 Same script is wired to the **Run now** button on the local server.
 
+On success/failure, fires a macOS notification and writes
+`history/last_run_status.json` which the dashboard header reads to show a
+color-coded freshness badge (green = fresh, amber = stale, red = last run failed).
+
+### Make the 8 AM scheduled run actually fire on a sleeping Mac
+
+The Claude Code scheduled task can't wake a sleeping Mac on its own. One-time
+setup:
+
+```bash
+bash scripts/setup_autorefresh.sh
+```
+
+This installs:
+- `pmset repeat wakeorpoweron MTWRF 07:55:00` — wakes your Mac from sleep weekdays at 7:55 AM (needs sudo)
+- `~/Library/LaunchAgents/com.jpcbarb.caffeinate.weekdays.plist` — runs `caffeinate -disu -t 1800` weekdays at 7:55 AM (keeps Mac awake for 30 min while the 8:04 scheduled task runs)
+
+Caveats it can't solve:
+- Claude Code itself must be running for the agent to fire
+- Refinitiv Workspace must be open + logged in for live data (free fallback if not)
+- A locked Mac with FileVault won't auto-login — you still need to type the password
+  on first boot of the day, but once unlocked it stays awake for the run
+
+Reverse with:
+```bash
+bash scripts/setup_autorefresh.sh --uninstall
+sudo pmset repeat cancel
+```
+
 ## Limitations
 
 - Credit spread is rating-based when CDS unavailable.
