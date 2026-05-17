@@ -254,6 +254,13 @@ def render_backtest(env):
         try: regime_summary = pd.read_csv(p).to_dict("records")
         except Exception: pass
 
+    # Ensemble
+    ensemble = []
+    p = hist_path("ensemble_summary")
+    if os.path.exists(p):
+        try: ensemble = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+
     # QuantLib sanity
     ql_sanity = []
     p = hist_path("ql_sanity")
@@ -335,6 +342,7 @@ def render_backtest(env):
         concentration=concentration,
         regime_summary=regime_summary,
         ql_sanity=ql_sanity,
+        ensemble=ensemble,
         ROOT="",
     )
     write(os.path.join(DOCS, "backtest.html"), html)
@@ -348,6 +356,32 @@ def render_methodology(env):
 def render_glossary(env):
     html = env.get_template("glossary.html").render(ROOT="")
     write(os.path.join(DOCS, "glossary.html"), html)
+
+
+def render_risk(env):
+    risk_limits, risk_kpis, risk_breaches = {}, {}, []
+    for name, target in [("risk_limits", "limits"), ("risk_kpis", "kpis")]:
+        p = hist_path(name)
+        if os.path.exists(p):
+            try:
+                df = pd.read_csv(p, header=None, names=["k","v"])
+                if target == "limits":
+                    risk_limits = dict(zip(df["k"], df["v"]))
+                else:
+                    risk_kpis = dict(zip(df["k"], df["v"]))
+            except Exception:
+                pass
+    p = hist_path("risk_breaches")
+    if os.path.exists(p):
+        try:
+            risk_breaches = pd.read_csv(p).to_dict("records")
+        except Exception:
+            pass
+    html = env.get_template("risk.html").render(
+        risk_limits=risk_limits, risk_kpis=risk_kpis,
+        risk_breaches=risk_breaches, ROOT="",
+    )
+    write(os.path.join(DOCS, "risk.html"), html)
 
 
 def render_memos(env, df):
@@ -414,6 +448,8 @@ def main():
     print(f"  ✓ how-it-works.html")
     render_glossary(env)
     print(f"  ✓ glossary.html")
+    render_risk(env)
+    print(f"  ✓ risk.html")
     n = render_memos(env, df)
     print(f"  ✓ {n} investment memos under memo/")
     render_api_snapshot(df)

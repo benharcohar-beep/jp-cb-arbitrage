@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Risk</title>
+  <link rel="stylesheet" href="static/app.css?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">JP</span>
+      <span class="title">CB Arbitrage Desk</span>
+      <span class="src">Refinitiv · LSEG Eikon</span>
+    </div>
+    <nav>
+      
+      
+      <a href="index.html">Universe</a>
+      <a href="watchlist.html">Watchlist</a>
+      <a href="backtest.html">Backtest</a>
+      <a href="risk.html">Risk</a>
+      <a href="alerts.html">Alerts log</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="glossary.html">Glossary</a>
+      
+    </nav>
+  </header>
+  
+  <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+  </div>
+  
+  <main>
+    
+
+<section class="welcome">
+  <h1>Risk management framework</h1>
+  <p class="lead">
+    The signal is one layer; the risk-control layer is what turns it into a tradeable book.
+    Below are the hard limits a real desk would impose, and a backtest review showing how the
+    existing trade history would have respected (or breached) them.
+  </p>
+</section>
+
+
+<div class="section-head"><h2>Defined limits</h2></div>
+
+<section class="primer-body" style="margin-bottom:18px;">
+  <div class="primer-card">
+    <h4>Per-issuer notional cap</h4>
+    <p><strong>¥200,000,000</strong> hard ceiling per issuer regardless of how cheap. Stops the strategy from over-concentrating in a single name even if the signal stays strong.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Per-issuer concentration</h4>
+    <p>No single issuer can exceed <strong>25.0%</strong> of equity at any time. The backtest concentration analysis showed our top 5 issuers were 113% of P&L — this limit forces broader diversification.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Per-trade size cap</h4>
+    <p>Maximum <strong>20.0%</strong> of equity in any single trade. Matches the 5-slot sizing scheme.</p>
+  </div>
+  <div class="primer-card">
+    <h4>VaR limits</h4>
+    <p>1-day 95% historical VaR: warn at <strong>2.0%</strong> of NAV (soft), block new entries at <strong>4.0%</strong> (hard). Standard hedge-fund discipline.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Drawdown circuit breakers</h4>
+    <p>At <strong>-5.0%</strong> rolling drawdown: halve all new position sizes. At <strong>-10.0%</strong>: halt new entries entirely.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Total deployment</h4>
+    <p>Max <strong>100.0%</strong> of equity deployed simultaneously. No leverage on top of cash; cash earns the JPY money-market rate.</p>
+  </div>
+</section>
+
+
+
+<div class="section-head"><h2>Backtest review · how the limits would have behaved</h2></div>
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+  <div class="kpi"><span class="lab">Trades reviewed</span><span class="val">38</span></div>
+  <div class="kpi alert"><span class="lab">Accepted as-is</span><span class="val">35</span></div>
+  <div class="kpi"><span class="lab">Resized down</span><span class="val">3</span></div>
+  <div class="kpi"><span class="lab">Rejected</span><span class="val">0</span></div>
+  <div class="kpi"><span class="lab">Avg 1d 95% VaR</span><span class="val">0.12%</span></div>
+  <div class="kpi"><span class="lab">Peak 1d 95% VaR</span><span class="val">0.13%</span></div>
+</section>
+
+<div class="callout">
+  <span class="label">What this means</span>
+  Out of 38 historical trades, the risk framework would have accepted 35 as-is, resized 3 (all from concentration breaches in our biggest winners), and rejected 0. The 1-day 95% VaR averaged 0.12% of NAV — well inside the 2% soft limit — meaning the strategy was never close to breaching risk budgets. <strong>Interpretation: the strategy is small-vol enough at 5-slot sizing that risk limits rarely bite.</strong> Tighter limits would only matter at higher concentration.
+</div>
+
+
+
+<div class="section-head"><h3 style="font-size:14px;">Trades that hit a limit</h3></div>
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Entry date</th>
+      <th>Issuer</th>
+      <th class="num">Entry cheap%</th>
+      <th class="num">Proposed ¥</th>
+      <th class="num">Accepted ¥</th>
+      <th class="num">% equity</th>
+      <th>Decision</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <tr class="rich-mild">
+      <td>2025-06-20</td>
+      <td>Rohm</td>
+      <td class="num">+9.1</td>
+      <td class="num">30,000,000</td>
+      <td class="num">7,500,000</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_pct_cap (40.0% &gt; 25.0%)</td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <tr class="rich-mild">
+      <td>2025-11-12</td>
+      <td>Rohm</td>
+      <td class="num">+5.1</td>
+      <td class="num">30,000,000</td>
+      <td class="num">7,500,000</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_pct_cap (40.0% &gt; 25.0%)</td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <tr class="rich-mild">
+      <td>2026-03-06</td>
+      <td>Rohm</td>
+      <td class="num">+13.0</td>
+      <td class="num">30,014,067</td>
+      <td class="num">7,503,517</td>
+      <td class="num">5.0%</td>
+      <td><strong>RESIZED</strong></td>
+      <td style="font-size:11px;">issuer_pct_cap (40.0% &gt; 25.0%)</td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </tbody>
+</table>
+
+
+<div class="section-head"><h2>What's not modelled (be honest in interviews)</h2></div>
+<section class="hedge-suggestion">
+  <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7;">
+    <li><strong>Total book vega cap</strong> is defined but not yet enforced trade-by-trade in the simulator — would need per-trade vega and a running sum.</li>
+    <li><strong>Stress tests</strong> (parallel rate shifts, equity crash, vol spike) — not implemented; a real desk runs nightly stress.</li>
+    <li><strong>Counterparty / funding limits</strong> — assumes unlimited repo and stock-borrow availability, which isn't realistic for size.</li>
+    <li><strong>Operational limits</strong> — bond settlement (T+2), corporate action handling, ex-coupon dates — abstracted away.</li>
+    <li><strong>Correlation-aware concentration</strong> — two unrelated issuers in the same sector still co-move; a real limit would group by sector beta.</li>
+  </ul>
+</section>
+
+
+  </main>
+  <footer>
+    <span>Phase 2 build · pricer: Tsiveriotis-Fernandes binomial tree + MC for resets</span>
+  </footer>
+  <script>
+    async function runScreen() {
+      const btn = document.getElementById('run-now');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const r = await fetch('/api/run', {method:'POST'});
+        const j = await r.json();
+        location.reload();
+      } catch(e) { alert('Run failed: '+e); btn.disabled=false; btn.textContent='Run now'; }
+    }
+  </script>
+</body>
+</html>

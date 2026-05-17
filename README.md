@@ -85,6 +85,36 @@ If Refinitiv Workspace isn't running, the agent auto-launches it via macOS
 - Mean absolute difference: 0.46%. Max: 0.88%.
 - Our prices are systematically 0.3-0.9% higher, likely due to credit-spread application differences. Acceptable for directional signal.
 
+**Risk management framework:**
+- Defined per-issuer notional cap (¥200M), per-issuer % equity cap (25%), per-trade cap (20%), VaR limits (2% soft / 4% hard), drawdown circuit breakers (-5% halve / -10% halt).
+- Backtest review: 35 of 38 historical trades accepted as-is, 3 resized (all Rohm — too-concentrated by design), 0 rejected.
+- 1-day 95% VaR averaged 0.12% of NAV, peak 0.13% — well inside the 2% soft limit.
+
+**Regime-filtered ensemble:**
+- Only flag BUY when cheap% ≥ 5 AND Nikkei 30d vol percentile ≥ 33% (mid/high regime).
+- Cuts 40% of historical signals (the low-vol noise).
+- Keeps 96% of the P&L.
+- Median net per trade rises from +15bp to +157bp.
+
+## What I'd build next
+
+| Priority | Item | Why |
+|---|---|---|
+| 1 | **5-year backtest** | Current 13 months can't span a vol-crisis. Need historical CB price coverage further back (the Refinitiv session dropped mid-pull on my 3y attempt; needs a reconnect-on-error loop). |
+| 2 | **Issuer CDS spread integration** | Currently using rating proxy. CDS quotes for ~30% of issuers exist on Refinitiv; pulling them would replace the rating-based default with issuer-specific spreads. |
+| 3 | **Prospectus parsing for reset clauses** | Reset detection is heuristic (zero-coupon + small issue + sub-IG). Real prospectus terms (trigger %, floor %, reset dates) would make the MC pricer more accurate. EDINET API is the path. |
+| 4 | **Total-book vega cap enforcement** | Limit is defined but not yet applied trade-by-trade in the simulator. Would require per-trade vega tracking and a running sum. |
+| 5 | **Stress testing** | Parallel rate shifts, equity crash, vol spike scenarios. A real desk runs these nightly; the limit framework would extend cleanly. |
+| 6 | **Live execution layer** | Currently a screen + paper-trade simulator. Real trading needs FIX connectivity, order management, T+2 settlement handling. Major build (weeks). |
+
+## Live demo
+
+The static demo at the URL above shows a cached snapshot from 2026-04-30. The
+local version (running on a Mac with Refinitiv Workspace open) refreshes daily
+at 08:04 via a Claude Code scheduled agent: pulls fresh Refinitiv data, reprices
+the universe, generates a snapshot, regenerates the static site, and pushes to
+GitHub Pages — fully autonomous.
+
 ## Architecture
 
 ```

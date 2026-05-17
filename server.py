@@ -175,6 +175,35 @@ def glossary_view(request: Request):
     return templates.TemplateResponse("glossary.html", {"request": request})
 
 
+@app.get("/risk", response_class=HTMLResponse)
+def risk_view(request: Request):
+    histdir = os.path.join(PROJ, "history")
+    prefix = "demo_" if DEMO_MODE else ""
+    risk_limits, risk_kpis, risk_breaches = {}, {}, []
+    for fname, target in [("risk_limits", "limits"), ("risk_kpis", "kpis")]:
+        p = os.path.join(histdir, f"{prefix}{fname}.csv")
+        if os.path.exists(p):
+            try:
+                df = pd.read_csv(p, header=None, names=["k","v"])
+                if target == "limits":
+                    risk_limits = dict(zip(df["k"], df["v"]))
+                else:
+                    risk_kpis = dict(zip(df["k"], df["v"]))
+            except Exception:
+                pass
+    p = os.path.join(histdir, f"{prefix}risk_breaches.csv")
+    if os.path.exists(p):
+        try:
+            risk_breaches = pd.read_csv(p).to_dict("records")
+        except Exception:
+            pass
+    return templates.TemplateResponse(
+        "risk.html",
+        {"request": request, "risk_limits": risk_limits,
+         "risk_kpis": risk_kpis, "risk_breaches": risk_breaches},
+    )
+
+
 @app.get("/memo/{ric:path}", response_class=HTMLResponse)
 def memo_view(request: Request, ric: str):
     df, _ = load_latest()
@@ -270,6 +299,12 @@ def backtest_view(request: Request):
     if os.path.exists(p):
         try: regime_summary = pd.read_csv(p).to_dict("records")
         except Exception: pass
+    # Ensemble
+    ensemble = []
+    p = os.path.join(histdir, f"{prefix}ensemble_summary.csv")
+    if os.path.exists(p):
+        try: ensemble = pd.read_csv(p).to_dict("records")
+        except Exception: pass
     # QuantLib sanity
     ql_sanity = []
     p = os.path.join(histdir, f"{prefix}ql_sanity.csv")
@@ -346,7 +381,8 @@ def backtest_view(request: Request):
          "walk_forward": walk_forward,
          "concentration": concentration,
          "regime_summary": regime_summary,
-         "ql_sanity": ql_sanity},
+         "ql_sanity": ql_sanity,
+         "ensemble": ensemble},
     )
 
 

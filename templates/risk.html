@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Risk{% endblock %}
+{% block content %}
+
+<section class="welcome">
+  <h1>Risk management framework</h1>
+  <p class="lead">
+    The signal is one layer; the risk-control layer is what turns it into a tradeable book.
+    Below are the hard limits a real desk would impose, and a backtest review showing how the
+    existing trade history would have respected (or breached) them.
+  </p>
+</section>
+
+{% if risk_limits %}
+<div class="section-head"><h2>Defined limits</h2></div>
+
+<section class="primer-body" style="margin-bottom:18px;">
+  <div class="primer-card">
+    <h4>Per-issuer notional cap</h4>
+    <p><strong>¥{{ "{:,.0f}".format(risk_limits.max_notional_per_issuer_jpy) }}</strong> hard ceiling per issuer regardless of how cheap. Stops the strategy from over-concentrating in a single name even if the signal stays strong.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Per-issuer concentration</h4>
+    <p>No single issuer can exceed <strong>{{ risk_limits.max_pct_equity_per_issuer }}%</strong> of equity at any time. The backtest concentration analysis showed our top 5 issuers were 113% of P&L — this limit forces broader diversification.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Per-trade size cap</h4>
+    <p>Maximum <strong>{{ risk_limits.max_pct_equity_per_trade }}%</strong> of equity in any single trade. Matches the 5-slot sizing scheme.</p>
+  </div>
+  <div class="primer-card">
+    <h4>VaR limits</h4>
+    <p>1-day 95% historical VaR: warn at <strong>{{ risk_limits.var_soft_limit_pct }}%</strong> of NAV (soft), block new entries at <strong>{{ risk_limits.var_hard_limit_pct }}%</strong> (hard). Standard hedge-fund discipline.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Drawdown circuit breakers</h4>
+    <p>At <strong>{{ risk_limits.dd_halve_threshold_pct }}%</strong> rolling drawdown: halve all new position sizes. At <strong>{{ risk_limits.dd_halt_threshold_pct }}%</strong>: halt new entries entirely.</p>
+  </div>
+  <div class="primer-card">
+    <h4>Total deployment</h4>
+    <p>Max <strong>{{ risk_limits.max_total_deployed_pct_equity }}%</strong> of equity deployed simultaneously. No leverage on top of cash; cash earns the JPY money-market rate.</p>
+  </div>
+</section>
+{% endif %}
+
+{% if risk_kpis %}
+<div class="section-head"><h2>Backtest review · how the limits would have behaved</h2></div>
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+  <div class="kpi"><span class="lab">Trades reviewed</span><span class="val">{{ "{:.0f}".format(risk_kpis.n_trades_evaluated) }}</span></div>
+  <div class="kpi alert"><span class="lab">Accepted as-is</span><span class="val">{{ "{:.0f}".format(risk_kpis.n_accepted) }}</span></div>
+  <div class="kpi"><span class="lab">Resized down</span><span class="val">{{ "{:.0f}".format(risk_kpis.n_resized) }}</span></div>
+  <div class="kpi"><span class="lab">Rejected</span><span class="val">{{ "{:.0f}".format(risk_kpis.n_rejected) }}</span></div>
+  <div class="kpi"><span class="lab">Avg 1d 95% VaR</span><span class="val">{{ "{:.2f}".format(risk_kpis.var_1d_95_avg_pct) }}%</span></div>
+  <div class="kpi"><span class="lab">Peak 1d 95% VaR</span><span class="val">{{ "{:.2f}".format(risk_kpis.var_1d_95_peak_pct) }}%</span></div>
+</section>
+
+<div class="callout">
+  <span class="label">What this means</span>
+  Out of {{ "{:.0f}".format(risk_kpis.n_trades_evaluated) }} historical trades, the risk framework would have accepted {{ "{:.0f}".format(risk_kpis.n_accepted) }} as-is, resized {{ "{:.0f}".format(risk_kpis.n_resized) }} (all from concentration breaches in our biggest winners), and rejected {{ "{:.0f}".format(risk_kpis.n_rejected) }}. The 1-day 95% VaR averaged {{ "{:.2f}".format(risk_kpis.var_1d_95_avg_pct) }}% of NAV — well inside the 2% soft limit — meaning the strategy was never close to breaching risk budgets. <strong>Interpretation: the strategy is small-vol enough at 5-slot sizing that risk limits rarely bite.</strong> Tighter limits would only matter at higher concentration.
+</div>
+{% endif %}
+
+{% if risk_breaches %}
+<div class="section-head"><h3 style="font-size:14px;">Trades that hit a limit</h3></div>
+<table class="screen">
+  <thead>
+    <tr>
+      <th>Entry date</th>
+      <th>Issuer</th>
+      <th class="num">Entry cheap%</th>
+      <th class="num">Proposed ¥</th>
+      <th class="num">Accepted ¥</th>
+      <th class="num">% equity</th>
+      <th>Decision</th>
+      <th>Why</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in risk_breaches %}
+    {% if r.decision != 'ACCEPTED' %}
+    <tr class="rich-mild">
+      <td>{{ r.entry_date }}</td>
+      <td>{{ r.issuer }}</td>
+      <td class="num">{{ "{:+.1f}".format(r.entry_cheap) }}</td>
+      <td class="num">{{ "{:,.0f}".format(r.proposed_notional_jpy) }}</td>
+      <td class="num">{{ "{:,.0f}".format(r.accepted_notional_jpy) }}</td>
+      <td class="num">{{ "{:.1f}".format(r.accepted_pct_equity) }}%</td>
+      <td><strong>{{ r.decision }}</strong></td>
+      <td style="font-size:11px;">{{ r.breaches }}</td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<div class="section-head"><h2>What's not modelled (be honest in interviews)</h2></div>
+<section class="hedge-suggestion">
+  <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7;">
+    <li><strong>Total book vega cap</strong> is defined but not yet enforced trade-by-trade in the simulator — would need per-trade vega and a running sum.</li>
+    <li><strong>Stress tests</strong> (parallel rate shifts, equity crash, vol spike) — not implemented; a real desk runs nightly stress.</li>
+    <li><strong>Counterparty / funding limits</strong> — assumes unlimited repo and stock-borrow availability, which isn't realistic for size.</li>
+    <li><strong>Operational limits</strong> — bond settlement (T+2), corporate action handling, ex-coupon dates — abstracted away.</li>
+    <li><strong>Correlation-aware concentration</strong> — two unrelated issuers in the same sector still co-move; a real limit would group by sector beta.</li>
+  </ul>
+</section>
+
+{% endblock %}
