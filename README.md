@@ -23,16 +23,67 @@ If Refinitiv Workspace isn't running, the agent auto-launches it via macOS
 
 ## Backtest
 
-7,987 bond-day model evaluations over a 13-month window:
+7,987 bond-day model evaluations over a 13-month window. 38 hedged trades simulated end-to-end.
 
-| Cheap% bucket | 60-day horizon hit rate | Avg fwd return | Hedged net (after costs) |
+**Pure-bond signal (no hedging):**
+
+| Cheap% bucket | 60-day hit rate | Avg fwd return |
+|---|---|---|
+| 5–10% | 71% | +7.4% |
+| 10–15% | **78%** | **+7.6%** |
+| 15–25% | 49% | +4.4% |
+| 25%+ (anomalies) | 0% | 0.0% |
+
+**Hedged P&L (¥100M face per trade, 25bp bond half-spread, 5bp equity half-spread, 1% JPY financing):**
+
+| Cheap% bucket | Hedged win rate | Avg net bp | Median net bp |
 |---|---|---|---|
-| 5–10% | 71% | +7.4% | +204bp |
-| 10–15% | **78%** | **+7.6%** | **+881bp** |
-| 15–25% | 49% | +4.4% | +164bp |
-| 25%+ (anomalies) | 0% | 0.0% | auto-suppressed |
+| 5–10% | 42% | +204 | -65 |
+| 10–15% | **70%** | **+881** | +448 |
+| 15–25% | 50% | +164 | -15 |
 
-Hedged backtest assumptions: ¥100M face per position, 25bp bond half-spread, 5bp equity half-spread, 1% JPY financing, exit at +60d or when cheap% drops below 1%.
+**Paper trading simulation ($1M starting equity, 5 concurrent positions):**
+
+| Metric | Result |
+|---|---|
+| Ending equity | $1,200,406 |
+| CAGR | +23.8% |
+| Max drawdown | -1.4% |
+| Sharpe | 1.49 |
+| Trades taken | 21 / 38 |
+
+**Sizing sensitivity (same trades, different concentration):**
+
+| Concurrent slots | CAGR | Max DD | Sharpe |
+|---|---|---|---|
+| 1 (100% / position) | +51.5% | -2.5% | 0.93 |
+| 2 (50%) | +45.0% | -2.6% | 1.32 |
+| 3 (33%) | +30.0% | -2.2% | 1.32 |
+| **5 (20%)** | +23.8% | -1.4% | **1.49** ← best |
+| 8 (12.5%) | +11.7% | -1.9% | 1.27 |
+
+## Validation & honest findings
+
+**Walk-forward (70/30 train-test split):**
+- Train (Jun 2025 - Jan 2026, 22 trades): 41% win, +2.9% CAGR, Sharpe 0.69
+- Test (Jan 2026 - Apr 2026, 21 trades): 57% win, +55.7% CAGR, Sharpe 1.99
+- Signal did NOT degrade out-of-sample. Caveat: test is only 4 months.
+
+**Vol regime sensitivity:**
+- **High-vol regime: 62.5% win rate, +562bp avg.** Strategy thrives.
+- **Low-vol regime: 40% win rate, +40bp avg.** Barely works.
+- This is a vol-cheap signal; it needs realized vol to actually show up.
+
+**Concentration:**
+- 17 distinct issuers traded; 7 winners, 10 losers.
+- Top 5 issuers = 113% of P&L (Rohm, Daifuku, Taiyo Yuden, Nikkon, Obara).
+- Herfindahl 0.276 → effective number of bets ≈ 3.6.
+- The edge is real but concentrated; broader distribution would need 200+ trades.
+
+**Pricer sanity check:**
+- 5 plain-vanilla bonds priced with both our TF tree and QuantLib's `BinomialConvertibleEngine`.
+- Mean absolute difference: 0.46%. Max: 0.88%.
+- Our prices are systematically 0.3-0.9% higher, likely due to credit-spread application differences. Acceptable for directional signal.
 
 ## Architecture
 

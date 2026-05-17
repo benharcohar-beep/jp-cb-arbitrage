@@ -231,6 +231,36 @@ def render_backtest(env):
         except Exception:
             paper_curve = []
 
+    # Walk-forward
+    walk_forward = []
+    p = hist_path("walk_forward")
+    if os.path.exists(p):
+        try: walk_forward = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+
+    # Concentration
+    concentration = {}
+    p = hist_path("concentration")
+    if os.path.exists(p):
+        try:
+            c = pd.read_csv(p, header=None, names=["k","v"])
+            concentration = dict(zip(c["k"], c["v"]))
+        except Exception: pass
+
+    # Vol regime
+    regime_summary = []
+    p = hist_path("regime_summary")
+    if os.path.exists(p):
+        try: regime_summary = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+
+    # QuantLib sanity
+    ql_sanity = []
+    p = hist_path("ql_sanity")
+    if os.path.exists(p):
+        try: ql_sanity = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+
     # Attribution
     attribution, top_trades_list, worst_trades_list = [], [], []
     p = hist_path("attribution_by_issuer")
@@ -301,6 +331,10 @@ def render_backtest(env):
         attribution=attribution,
         top_trades_list=top_trades_list,
         worst_trades_list=worst_trades_list,
+        walk_forward=walk_forward,
+        concentration=concentration,
+        regime_summary=regime_summary,
+        ql_sanity=ql_sanity,
         ROOT="",
     )
     write(os.path.join(DOCS, "backtest.html"), html)
@@ -314,6 +348,35 @@ def render_methodology(env):
 def render_glossary(env):
     html = env.get_template("glossary.html").render(ROOT="")
     write(os.path.join(DOCS, "glossary.html"), html)
+
+
+def render_memos(env, df):
+    """One investment-memo page per bond (linked from bond detail)."""
+    count = 0
+    for _, row in df.iterrows():
+        bond = {k: _clean(v) for k, v in row.to_dict().items()}
+        cheap = bond.get("cheap_pct") or 0
+        action = ("BUY" if cheap >= 5 and bond.get("confidence") != "Low" and bond.get("reset_flag") != "RESET"
+                  else "WATCH" if cheap >= 5
+                  else "AVOID" if cheap <= -5
+                  else "HOLD")
+        thesis = (
+            f"Buy ¥100M face of the {bond['issuer']} convertible at "
+            f"{(bond.get('mkt_px') or 0):.2f} (model fair {(bond.get('model_px') or 0):.2f}, "
+            f"{cheap:+.1f}% cheap). Short {int((bond.get('delta') or 0) * 1_000_000):,} "
+            f"shares of {bond.get('underlying','')} to neutralize stock direction. "
+            f"Target convergence over the next 60 days."
+        )
+        safe = safe_ric(bond.get("ric") or "")
+        html = env.get_template("memo.html").render(
+            bond=bond, action=action, thesis_one_liner=thesis,
+            STATIC_SITE=True, ROOT="../../",
+        )
+        memo_dir = os.path.join(DOCS, "memo", safe)
+        os.makedirs(memo_dir, exist_ok=True)
+        write(os.path.join(memo_dir, "index.html"), html)
+        count += 1
+    return count
 
 
 def render_api_snapshot(df: pd.DataFrame):
@@ -351,6 +414,8 @@ def main():
     print(f"  ✓ how-it-works.html")
     render_glossary(env)
     print(f"  ✓ glossary.html")
+    n = render_memos(env, df)
+    print(f"  ✓ {n} investment memos under memo/")
     render_api_snapshot(df)
     print(f"  ✓ api/snapshot.json")
 

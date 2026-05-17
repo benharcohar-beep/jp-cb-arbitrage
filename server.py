@@ -175,6 +175,32 @@ def glossary_view(request: Request):
     return templates.TemplateResponse("glossary.html", {"request": request})
 
 
+@app.get("/memo/{ric:path}", response_class=HTMLResponse)
+def memo_view(request: Request, ric: str):
+    df, _ = load_latest()
+    if df.empty:
+        raise HTTPException(404, "no snapshots")
+    sub = df[df["ric"] == ric]
+    if sub.empty:
+        raise HTTPException(404, f"bond {ric} not in latest screen")
+    bond_row = sub.iloc[0].to_dict()
+    bond = {k: _clean(v) for k, v in bond_row.items()}
+    cheap = bond.get("cheap_pct") or 0
+    action = "BUY" if cheap >= 5 and bond.get("confidence") != "Low" and bond.get("reset_flag") != "RESET" \
+             else "WATCH" if cheap >= 5 else "AVOID" if cheap <= -5 else "HOLD"
+    thesis = (
+        f"Buy ¥100M face of the {bond['issuer']} convertible at "
+        f"{bond['mkt_px']:.2f} (model fair {bond['model_px']:.2f}, +{cheap:.1f}% cheap). "
+        f"Short {int((bond.get('delta') or 0) * 1_000_000):,} shares of {bond['underlying']} to neutralize stock direction. "
+        f"Target convergence over the next 60 days."
+    )
+    return templates.TemplateResponse(
+        "memo.html",
+        {"request": request, "bond": bond, "action": action,
+         "thesis_one_liner": thesis},
+    )
+
+
 @app.get("/backtest", response_class=HTMLResponse)
 def backtest_view(request: Request):
     histdir = os.path.join(PROJ, "history")
@@ -223,6 +249,33 @@ def backtest_view(request: Request):
             ]
         except Exception:
             paper_curve = []
+
+    # Walk-forward
+    walk_forward = []
+    p = os.path.join(histdir, f"{prefix}walk_forward.csv")
+    if os.path.exists(p):
+        try: walk_forward = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+    # Concentration
+    concentration = {}
+    p = os.path.join(histdir, f"{prefix}concentration.csv")
+    if os.path.exists(p):
+        try:
+            c = pd.read_csv(p, header=None, names=["k","v"])
+            concentration = dict(zip(c["k"], c["v"]))
+        except Exception: pass
+    # Vol regime
+    regime_summary = []
+    p = os.path.join(histdir, f"{prefix}regime_summary.csv")
+    if os.path.exists(p):
+        try: regime_summary = pd.read_csv(p).to_dict("records")
+        except Exception: pass
+    # QuantLib sanity
+    ql_sanity = []
+    p = os.path.join(histdir, f"{prefix}ql_sanity.csv")
+    if os.path.exists(p):
+        try: ql_sanity = pd.read_csv(p).to_dict("records")
+        except Exception: pass
 
     attr_path = os.path.join(histdir, f"{prefix}attribution_by_issuer.csv")
     top_path  = os.path.join(histdir, f"{prefix}top_trades.csv")
@@ -289,7 +342,11 @@ def backtest_view(request: Request):
          "paper_scenario_curves_json": json.dumps(paper_scenario_curves),
          "attribution": attribution,
          "top_trades_list": top_trades_list,
-         "worst_trades_list": worst_trades_list},
+         "worst_trades_list": worst_trades_list,
+         "walk_forward": walk_forward,
+         "concentration": concentration,
+         "regime_summary": regime_summary,
+         "ql_sanity": ql_sanity},
     )
 
 

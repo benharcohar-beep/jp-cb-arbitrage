@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Memo · {{ bond.issuer }}{% endblock %}
+{% block content %}
+
+<section class="welcome">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;">
+    <div>
+      <span class="back"><a href="{% if STATIC_SITE %}{{ ROOT|default('') }}{% else %}/{% endif %}">← back to universe</a></span>
+      <h1 style="margin:6px 0 4px;">Investment Memo · {{ bond.issuer }}</h1>
+      <div style="color:var(--muted); font-size:13px; font-family:var(--mono);">
+        {{ bond.ric }} · convertible into {{ bond.underlying }} · matures {{ bond.maturity }}
+      </div>
+    </div>
+    <div class="rating-block">
+      <span class="rtg-big">{{ bond.rating }}</span>
+      <span class="action action-{{ action|lower }}" style="font-size:14px; padding:6px 16px;">{{ action }}</span>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:14px;">
+    <strong>The trade:</strong> {{ thesis_one_liner }}
+  </p>
+</section>
+
+<div class="section-head"><h2>Trade summary</h2></div>
+<section class="kpis">
+  <div class="kpi"><span class="lab">Market price</span><span class="val">{{ "{:.2f}".format(bond.mkt_px) }}</span></div>
+  <div class="kpi"><span class="lab">Model fair value</span><span class="val">{{ "{:.2f}".format(bond.model_px) }}</span></div>
+  <div class="kpi cheap"><span class="lab">Cheap to model</span><span class="val">{{ "{:+.1f}%".format(bond.cheap_pct) }}</span></div>
+  <div class="kpi"><span class="lab">Suggested face</span><span class="val">¥100M</span></div>
+  <div class="kpi"><span class="lab">Hedge: short shares</span><span class="val">{{ "{:,.0f}".format((bond.delta or 0) * 1_000_000) }}</span></div>
+  <div class="kpi"><span class="lab">Exit horizon</span><span class="val">~60d</span></div>
+</section>
+
+<div class="section-head"><h2>Why this is mispriced</h2></div>
+<section class="hedge-suggestion">
+  <p style="font-size:14px; line-height:1.7;">
+    The bond trades at <strong>{{ "{:.2f}".format(bond.mkt_px) }}</strong> (% of par). Our binomial-tree pricer, using the underlying stock at ¥{{ "{:,.0f}".format(bond.spot) }}, 60-day realized vol of <strong>{{ "{:.0%}".format(bond.sigma) }}</strong>, and a credit spread of <strong>{{ bond.spread_bp }}bp</strong> (based on the {{ bond.rating }} issuer rating), arrives at fair value of <strong>{{ "{:.2f}".format(bond.model_px) }}</strong>.
+  </p>
+  <p style="font-size:14px; line-height:1.7;">
+    {% if bond.iv is not none and bond.sigma %}
+      {% set iv_hv_gap = (bond.iv - bond.sigma) * 100 %}
+      {% if iv_hv_gap < -5 %}
+        The bond's <strong>implied volatility ({{ "{:.0%}".format(bond.iv) }})</strong> is well below the underlying's <strong>realized volatility ({{ "{:.0%}".format(bond.sigma) }})</strong> — a gap of <strong>{{ "{:+.0f}".format(iv_hv_gap) }} vol points</strong>. The market is paying for less optionality than the stock has been delivering. <strong>The trade is essentially "buy cheap vol."</strong>
+      {% else %}
+        Implied vol ({{ "{:.0%}".format(bond.iv) }}) is roughly in line with realized vol ({{ "{:.0%}".format(bond.sigma) }}). The mispricing is primarily in the bond's level relative to model, not a vol gap.
+      {% endif %}
+    {% endif %}
+  </p>
+  <p style="font-size:14px; line-height:1.7;">
+    Three convergence paths can close the gap: <strong>(1)</strong> the dealer updates the indicative quote toward fair value (the most common path on illiquid JP CBs), <strong>(2)</strong> realized volatility forces a re-mark of the embedded option, or <strong>(3)</strong> a corporate event (coupon, conversion period start, call window opening) prompts a fresh price.
+  </p>
+</section>
+
+<div class="section-head"><h2>Hedge structure</h2></div>
+<section class="kpis">
+  <div class="kpi"><span class="lab">Long bond cost</span><span class="val">¥{{ "{:,.0f}".format(bond.mkt_px * 1_000_000) }}</span></div>
+  <div class="kpi"><span class="lab">Short shares</span><span class="val">{{ "{:,.0f}".format((bond.delta or 0) * 1_000_000) }}</span></div>
+  <div class="kpi"><span class="lab">Short proceeds</span><span class="val">¥{{ "{:,.0f}".format((bond.delta or 0) * 1_000_000 * bond.spot) }}</span></div>
+  <div class="kpi"><span class="lab">Net cash deployed</span><span class="val">¥{{ "{:,.0f}".format((bond.mkt_px * 1_000_000) - ((bond.delta or 0) * 1_000_000 * bond.spot)) }}</span></div>
+</section>
+<section class="hedge-suggestion">
+  <p style="font-size:13px;">
+    For each ¥100M face, buy the bond at {{ "{:.2f}".format(bond.mkt_px) }} (= ¥{{ "{:,.0f}".format(bond.mkt_px * 1_000_000) }} outlay). Short delta × shares of {{ bond.underlying }} ({{ "{:,.0f}".format((bond.delta or 0) * 1_000_000) }} shares at ¥{{ "{:,.0f}".format(bond.spot) }} = ¥{{ "{:,.0f}".format((bond.delta or 0) * 1_000_000 * bond.spot) }} short proceeds). <strong>Rebalance the hedge every 5 trading days</strong> or when delta drifts more than ±10%.
+  </p>
+  <p style="font-size:13px;">
+    <strong>Greeks:</strong> Δ {{ "{:.3f}".format(bond.delta) }} · Γ {{ "{:.5f}".format(bond.gamma) }} · Vega {{ "{:.2f}".format(bond.vega) }} · θ {{ "{:+.3f}".format(bond.theta) }} per day per ¥100 face.
+    Daily theta on a ¥100M position is approximately <strong>¥{{ "{:,.0f}".format(bond.theta * 1_000_000) }}</strong>{% if bond.theta < 0 %} of cost you bleed for holding{% else %} of carry you collect{% endif %}.
+  </p>
+</section>
+
+<div class="section-head"><h2>Historical edge</h2></div>
+<section class="hedge-suggestion">
+  <p style="font-size:13px;">
+    {% if bond.cheap_pct >= 10 %}
+      In the backtest, signals in the <strong>10-15% cheap bucket</strong> had a <strong>70% hedged win rate over 60 days</strong>, with an average net return of <strong>+881bp</strong> per ¥100M trade after transaction costs. Median trade returned <strong>+448bp</strong>.
+    {% elif bond.cheap_pct >= 5 %}
+      Signals in the <strong>5-10% cheap bucket</strong> had a <strong>42% hedged win rate over 60 days</strong>, but average net return was still positive at <strong>+204bp</strong> per ¥100M — driven by a small number of large winners. Median trade returned <strong>-65bp</strong> (most trades break even or lose small).
+    {% endif %}
+    Across the 13-month backtest, the strategy generated 38 trades total. Top 5 issuers contributed 113% of P&L — meaning the rest of the book was net-flat. <strong>This signal is not broadly distributed; it lives in a handful of issuers.</strong>
+  </p>
+</section>
+
+<div class="section-head"><h2>Catalysts to watch</h2></div>
+<section class="hedge-suggestion">
+  <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7;">
+    <li><strong>Earnings release</strong> for {{ bond.issuer }} — usually triggers a fresh dealer mark on the bond</li>
+    <li><strong>Conversion window milestones</strong> — when conversion becomes possible, or close to call dates, dealers re-quote</li>
+    <li><strong>Stock breakout above conversion price × 130%</strong> — triggers the soft call clause; can force convergence</li>
+    <li><strong>Realized vol spike</strong> — option's value re-prices upward; bond catches up</li>
+    <li><strong>Index inclusion / removal</strong> of the equity — forced flow that moves the stock and the option</li>
+  </ul>
+</section>
+
+<div class="section-head"><h2>Risks</h2></div>
+<section class="hedge-suggestion">
+  <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7;">
+    <li><strong>The gap widens before it closes.</strong> Dealer marks the bond down further before catching up — mark-to-market pain even if eventually right.</li>
+    <li><strong>Issuer-specific event:</strong> credit downgrade, profit warning, or M&A invalidates the spread assumption.</li>
+    {% if bond.reset_flag == 'RESET' %}
+      <li><strong>Reset clause complication:</strong> this bond is flagged as likely-reset. The MC pricer handles the most common structure (80/70 trigger/floor with one reset date), but actual prospectus terms may differ. <strong>Read the prospectus before sizing.</strong></li>
+    {% endif %}
+    <li><strong>Realized vol crashes:</strong> the option loses value faster than the dealer catches up. Theta bleed exceeds gap-closure.</li>
+    <li><strong>Liquidity:</strong> bid-ask spreads on this bond may be 50-100bp; entry/exit slippage erodes the edge.</li>
+    <li><strong>Stale conversion price:</strong> if a corporate action (split, special dividend) has hit the underlying without the conversion price being adjusted in our data, the model is wrong. Always cross-check parity.</li>
+  </ul>
+</section>
+
+<div class="section-head"><h2>Decision</h2></div>
+<section class="hedge-suggestion" style="border-left: 4px solid var(--green-700);">
+  <p style="font-size:14px; line-height:1.7; margin:0;">
+    <strong style="font-size:16px;">Recommendation: {{ action }}</strong> at ¥100M face, Δ-hedged with {{ "{:,.0f}".format((bond.delta or 0) * 1_000_000) }} shares of {{ bond.underlying }}.
+    Target convergence within 60 days. Hard stop if cheap% widens past <strong>{{ "{:+.0f}".format(bond.cheap_pct + 5) }}%</strong> (gap blowing out) or narrows below <strong>+1%</strong> (take profit).
+  </p>
+</section>
+
+{% endblock %}

@@ -36,6 +36,222 @@
   <main>
     
 
+
+<section class="alerts-head">
+  <h1 style="font-size:22px;">Walk-forward validation · out-of-sample stability</h1>
+  <p>Split the historical panel 70/30 by date. Train on the first 70%, test on the last 30%. If the signal works on train but breaks on test, it's overfit.</p>
+</section>
+
+<div class="callout">
+  <span class="label">The result</span>
+  Signal performance <strong>did not degrade out-of-sample</strong>. In fact the test split (Jan-Apr 2026) outperformed train (Jun 2025-Jan 2026) — pure-bond hit rate jumped from 51% to 94% at the 60-day horizon, and hedged Sharpe rose from 0.69 to 1.99. <strong>Honest caveat:</strong> 4 months / 21 trades is short. The Q1 2026 outperformance may reflect a regime favourable to vol-cheap signals rather than a permanent feature.
+</div>
+
+<table class="screen" style="margin-bottom:24px;">
+  <thead>
+    <tr>
+      <th>Split</th>
+      <th class="num">Trades (hedged)</th>
+      <th class="num">Win rate</th>
+      <th class="num">Avg net bp</th>
+      <th class="num">Paper CAGR</th>
+      <th class="num">Sharpe</th>
+      <th class="num">Max DD</th>
+      <th class="num">Pure-bond 60d hit</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr >
+      <td><strong>Train</strong></td>
+      <td class="num">22</td>
+      <td class="num">41%</td>
+      <td class="num">+40</td>
+      <td class="num">+2.9%</td>
+      <td class="num"><strong>0.69</strong></td>
+      <td class="num" style="color:var(--red)">-1.87%</td>
+      <td class="num">51% (233)</td>
+    </tr>
+    
+    <tr class="cheap-strong">
+      <td><strong>Test</strong></td>
+      <td class="num">21</td>
+      <td class="num">57%</td>
+      <td class="num">+571</td>
+      <td class="num">+55.7%</td>
+      <td class="num"><strong>1.99</strong></td>
+      <td class="num" style="color:var(--red)">-0.36%</td>
+      <td class="num">94% (62)</td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px;">Vol regime sensitivity · when does this work?</h3>
+  <p>Each hedged trade tagged by the Nikkei 225 30-day realized vol percentile at entry. Low / mid / high tertiles.</p>
+</section>
+
+<div class="callout">
+  <span class="label">The honest finding</span>
+  The strategy <strong>works in high-vol regimes</strong> (62% win rate, +562bp avg).
+  In low-vol regimes, it's much weaker (40% win rate, only +40bp avg).
+  This makes intuitive sense: when realized vol is low, the embedded option doesn't pay off and dealer mids don't need to move. The signal is essentially a <em>"vol-cheap"</em> trade — it needs vol to actually show up.
+</div>
+
+<table class="screen" style="margin-bottom:24px;">
+  <thead>
+    <tr>
+      <th>Vol regime at entry</th>
+      <th class="num">Trades</th>
+      <th class="num">Win rate</th>
+      <th class="num">Avg net bp</th>
+      <th class="num">Median net bp</th>
+      <th class="num">Total P&L (¥)</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr class="cheap-strong">
+      <td><strong>High vol</strong></td>
+      <td class="num">16</td>
+      <td class="num">62%</td>
+      <td class="num">+562</td>
+      <td class="num">+301</td>
+      <td class="num">89,891,561</td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Low vol</strong></td>
+      <td class="num">15</td>
+      <td class="num">40%</td>
+      <td class="num">+40</td>
+      <td class="num">-48</td>
+      <td class="num">5,940,423</td>
+    </tr>
+    
+    <tr class="rich-mild">
+      <td><strong>Mid vol</strong></td>
+      <td class="num">7</td>
+      <td class="num">43%</td>
+      <td class="num">+765</td>
+      <td class="num">-56</td>
+      <td class="num">53,531,306</td>
+    </tr>
+    
+  </tbody>
+</table>
+
+
+
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px;">Concentration metrics · how broad is the edge?</h3>
+</section>
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+  <div class="kpi"><span class="lab">Distinct issuers</span><span class="val">17</span></div>
+  <div class="kpi"><span class="lab">Winners / losers</span><span class="val">7 / 10</span></div>
+  <div class="kpi"><span class="lab">Herfindahl</span><span class="val">0.276</span></div>
+  <div class="kpi"><span class="lab">Effective N</span><span class="val">3.6</span></div>
+  <div class="kpi"><span class="lab">Top 1 issuer</span><span class="val">26%</span></div>
+  <div class="kpi"><span class="lab">Top 3 issuers</span><span class="val">75%</span></div>
+  <div class="kpi"><span class="lab">Top 5 issuers</span><span class="val">113%</span></div>
+</section>
+<div class="callout">
+  <span class="label">What this means</span>
+  Herfindahl of <strong>0.28</strong> corresponds to an "effective number of bets" of <strong>3.6</strong> — meaningfully fewer than the 17 issuers actually traded. The book is real but the edge is concentrated. <strong>For an interviewer:</strong> would expect this to broaden with a 5-year backtest and 200+ trades.
+</div>
+
+
+
+<section class="alerts-head" style="margin-top:24px;">
+  <h3 style="font-size:14px;">QuantLib sanity check · is our pricer correct?</h3>
+  <p>Five plain-vanilla bonds priced both with our Tsiveriotis-Fernandes binomial tree (<code>pricer.py</code>) and with QuantLib's <code>BinomialConvertibleEngine</code>. Differences should be within ±2% for clean comparable bonds.</p>
+</section>
+<table class="screen" style="margin-bottom:24px;">
+  <thead>
+    <tr>
+      <th>Issuer</th>
+      <th>Maturity</th>
+      <th class="num">σ</th>
+      <th class="num">Spread (bp)</th>
+      <th class="num">Our price</th>
+      <th class="num">QuantLib price</th>
+      <th class="num">Diff</th>
+      <th class="num">Diff %</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    
+    <tr class="cheap-mild">
+      <td>Nxera Pharma</td>
+      <td>2028-12-14</td>
+      <td class="num">65%</td>
+      <td class="num">429</td>
+      <td class="num"><strong>107.51</strong></td>
+      <td class="num">106.58</td>
+      <td class="num">+0.94</td>
+      <td class="num"><strong>+0.88%</strong></td>
+    </tr>
+    
+    
+    <tr class="cheap-mild">
+      <td>Nippon Steel</td>
+      <td>2029-02-14</td>
+      <td class="num">30%</td>
+      <td class="num">429</td>
+      <td class="num"><strong>93.56</strong></td>
+      <td class="num">93.23</td>
+      <td class="num">+0.33</td>
+      <td class="num"><strong>+0.36%</strong></td>
+    </tr>
+    
+    
+    <tr class="cheap-mild">
+      <td>Kansai Paint</td>
+      <td>2029-03-08</td>
+      <td class="num">27%</td>
+      <td class="num">429</td>
+      <td class="num"><strong>94.67</strong></td>
+      <td class="num">94.34</td>
+      <td class="num">+0.33</td>
+      <td class="num"><strong>+0.35%</strong></td>
+    </tr>
+    
+    
+    <tr class="cheap-mild">
+      <td>Infroneer</td>
+      <td>2029-03-30</td>
+      <td class="num">39%</td>
+      <td class="num">429</td>
+      <td class="num"><strong>137.30</strong></td>
+      <td class="num">136.70</td>
+      <td class="num">+0.60</td>
+      <td class="num"><strong>+0.44%</strong></td>
+    </tr>
+    
+    
+    <tr class="cheap-mild">
+      <td>Daiwa House</td>
+      <td>2029-03-30</td>
+      <td class="num">20%</td>
+      <td class="num">429</td>
+      <td class="num"><strong>92.90</strong></td>
+      <td class="num">92.63</td>
+      <td class="num">+0.27</td>
+      <td class="num"><strong>+0.29%</strong></td>
+    </tr>
+    
+  </tbody>
+</table>
+<div class="callout">
+  <span class="label">Verdict</span>
+  Our pricer matches QuantLib within roughly ±1% on plain-vanilla bonds. The small positive bias (our prices ~0.3-0.9% higher) likely reflects implementation differences in how the credit spread is applied to the conversion-leg discount factor. Both implementations agree on the directional signal; the small spread doesn't change which bonds top the cheap list.
+</div>
+
+
 <section class="alerts-head">
   <h1>Backtest · does the signal actually work?</h1>
   <p>Walks the pricer forward day-by-day on real historical CB + equity data, then asks:

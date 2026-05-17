@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Memo · Kansai Paint</title>
+  <link rel="stylesheet" href="../../static/app.css?v=5">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">JP</span>
+      <span class="title">CB Arbitrage Desk</span>
+      <span class="src">Refinitiv · LSEG Eikon</span>
+    </div>
+    <nav>
+      
+      
+      <a href="../../index.html">Universe</a>
+      <a href="../../watchlist.html">Watchlist</a>
+      <a href="../../backtest.html">Backtest</a>
+      <a href="../../alerts.html">Alerts log</a>
+      <a href="../../how-it-works.html">How it works</a>
+      <a href="../../glossary.html">Glossary</a>
+      
+    </nav>
+  </header>
+  
+  <div style="background:var(--amber-50); border-bottom:1px solid #fde68a; color:var(--amber); padding:8px 24px; font-size:12.5px; text-align:center; font-weight:500;">
+    <strong>DEMO MODE</strong> · Static snapshot. The live version (running locally) pulls fresh Refinitiv data every weekday at 08:04. <a href="https://github.com/benharcohar-beep/jp-cb-arbitrage" style="color:var(--amber); text-decoration:underline;">View code on GitHub</a>.
+  </div>
+  
+  <main>
+    
+
+<section class="welcome">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;">
+    <div>
+      <span class="back"><a href="../../">← back to universe</a></span>
+      <h1 style="margin:6px 0 4px;">Investment Memo · Kansai Paint</h1>
+      <div style="color:var(--muted); font-size:13px; font-family:var(--mono);">
+        JP277142317= · convertible into 4613.T · matures 2029-03-08
+      </div>
+    </div>
+    <div class="rating-block">
+      <span class="rtg-big">NR</span>
+      <span class="action action-avoid" style="font-size:14px; padding:6px 16px;">AVOID</span>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:14px;">
+    <strong>The trade:</strong> Buy ¥100M face of the Kansai Paint convertible at 103.00 (model fair 94.59, -8.2% cheap). Short 15,439 shares of 4613.T to neutralize stock direction. Target convergence over the next 60 days.
+  </p>
+</section>
+
+<div class="section-head"><h2>Trade summary</h2></div>
+<section class="kpis">
+  <div class="kpi"><span class="lab">Market price</span><span class="val">103.00</span></div>
+  <div class="kpi"><span class="lab">Model fair value</span><span class="val">94.59</span></div>
+  <div class="kpi cheap"><span class="lab">Cheap to model</span><span class="val">-8.2%</span></div>
+  <div class="kpi"><span class="lab">Suggested face</span><span class="val">¥100M</span></div>
+  <div class="kpi"><span class="lab">Hedge: short shares</span><span class="val">15,440</span></div>
+  <div class="kpi"><span class="lab">Exit horizon</span><span class="val">~60d</span></div>
+</section>
+
+<div class="section-head"><h2>Why this is mispriced</h2></div>
+<section class="hedge-suggestion">
+  <p style="font-size:14px; line-height:1.7;">
+    The bond trades at <strong>103.00</strong> (% of par). Our binomial-tree pricer, using the underlying stock at ¥2,300, 60-day realized vol of <strong>27%</strong>, and a credit spread of <strong>429bp</strong> (based on the NR issuer rating), arrives at fair value of <strong>94.59</strong>.
+  </p>
+  <p style="font-size:14px; line-height:1.7;">
+    
+      
+      
+        Implied vol (44%) is roughly in line with realized vol (27%). The mispricing is primarily in the bond's level relative to model, not a vol gap.
+      
+    
+  </p>
+  <p style="font-size:14px; line-height:1.7;">
+    Three convergence paths can close the gap: <strong>(1)</strong> the dealer updates the indicative quote toward fair value (the most common path on illiquid JP CBs), <strong>(2)</strong> realized volatility forces a re-mark of the embedded option, or <strong>(3)</strong> a corporate event (coupon, conversion period start, call window opening) prompts a fresh price.
+  </p>
+</section>
+
+<div class="section-head"><h2>Hedge structure</h2></div>
+<section class="kpis">
+  <div class="kpi"><span class="lab">Long bond cost</span><span class="val">¥103,000,000</span></div>
+  <div class="kpi"><span class="lab">Short shares</span><span class="val">15,440</span></div>
+  <div class="kpi"><span class="lab">Short proceeds</span><span class="val">¥35,511,614</span></div>
+  <div class="kpi"><span class="lab">Net cash deployed</span><span class="val">¥67,488,386</span></div>
+</section>
+<section class="hedge-suggestion">
+  <p style="font-size:13px;">
+    For each ¥100M face, buy the bond at 103.00 (= ¥103,000,000 outlay). Short delta × shares of 4613.T (15,440 shares at ¥2,300 = ¥35,511,614 short proceeds). <strong>Rebalance the hedge every 5 trading days</strong> or when delta drifts more than ±10%.
+  </p>
+  <p style="font-size:13px;">
+    <strong>Greeks:</strong> Δ 0.015 · Γ -0.00007 · Vega 0.48 · θ +0.007 per day per ¥100 face.
+    Daily theta on a ¥100M position is approximately <strong>¥6,715</strong> of carry you collect.
+  </p>
+</section>
+
+<div class="section-head"><h2>Historical edge</h2></div>
+<section class="hedge-suggestion">
+  <p style="font-size:13px;">
+    
+    Across the 13-month backtest, the strategy generated 38 trades total. Top 5 issuers contributed 113% of P&L — meaning the rest of the book was net-flat. <strong>This signal is not broadly distributed; it lives in a handful of issuers.</strong>
+  </p>
+</section>
+
+<div class="section-head"><h2>Catalysts to watch</h2></div>
+<section class="hedge-suggestion">
+  <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7;">
+    <li><strong>Earnings release</strong> for Kansai Paint — usually triggers a fresh dealer mark on the bond</li>
+    <li><strong>Conversion window milestones</strong> — when conversion becomes possible, or close to call dates, dealers re-quote</li>
+    <li><strong>Stock breakout above conversion price × 130%</strong> — triggers the soft call clause; can force convergence</li>
+    <li><strong>Realized vol spike</strong> — option's value re-prices upward; bond catches up</li>
+    <li><strong>Index inclusion / removal</strong> of the equity — forced flow that moves the stock and the option</li>
+  </ul>
+</section>
+
+<div class="section-head"><h2>Risks</h2></div>
+<section class="hedge-suggestion">
+  <ul style="margin:0; padding-left:20px; font-size:13px; line-height:1.7;">
+    <li><strong>The gap widens before it closes.</strong> Dealer marks the bond down further before catching up — mark-to-market pain even if eventually right.</li>
+    <li><strong>Issuer-specific event:</strong> credit downgrade, profit warning, or M&A invalidates the spread assumption.</li>
+    
+    <li><strong>Realized vol crashes:</strong> the option loses value faster than the dealer catches up. Theta bleed exceeds gap-closure.</li>
+    <li><strong>Liquidity:</strong> bid-ask spreads on this bond may be 50-100bp; entry/exit slippage erodes the edge.</li>
+    <li><strong>Stale conversion price:</strong> if a corporate action (split, special dividend) has hit the underlying without the conversion price being adjusted in our data, the model is wrong. Always cross-check parity.</li>
+  </ul>
+</section>
+
+<div class="section-head"><h2>Decision</h2></div>
+<section class="hedge-suggestion" style="border-left: 4px solid var(--green-700);">
+  <p style="font-size:14px; line-height:1.7; margin:0;">
+    <strong style="font-size:16px;">Recommendation: AVOID</strong> at ¥100M face, Δ-hedged with 15,440 shares of 4613.T.
+    Target convergence within 60 days. Hard stop if cheap% widens past <strong>-3%</strong> (gap blowing out) or narrows below <strong>+1%</strong> (take profit).
+  </p>
+</section>
+
+
+  </main>
+  <footer>
+    <span>Phase 2 build · pricer: Tsiveriotis-Fernandes binomial tree + MC for resets</span>
+  </footer>
+  <script>
+    async function runScreen() {
+      const btn = document.getElementById('run-now');
+      btn.disabled = true; btn.textContent = 'Running…';
+      try {
+        const r = await fetch('/api/run', {method:'POST'});
+        const j = await r.json();
+        location.reload();
+      } catch(e) { alert('Run failed: '+e); btn.disabled=false; btn.textContent='Run now'; }
+    }
+  </script>
+</body>
+</html>

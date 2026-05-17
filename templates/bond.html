@@ -13,6 +13,7 @@
     <span class="spread-big">{{ bond.spread_bp }}bp</span>
     {% if bond.reset_flag == "RESET" %}<span class="reset-big">MC pricer · {{ "{:.0%}".format(bond.reset_prob or 0) }} reset prob</span>{% endif %}
     {% if bond.anomaly_flags %}<span class="reset-big" style="background:rgba(239,68,68,0.2); color:var(--red)">{{ bond.anomaly_flags }}</span>{% endif %}
+    <a href="{% if STATIC_SITE %}{{ ROOT|default('') }}memo/{{ bond.ric.replace('=','_eq_') }}/{% else %}/memo/{{ bond.ric }}{% endif %}" class="action action-buy" style="text-decoration:none;">View memo →</a>
   </div>
 </section>
 
