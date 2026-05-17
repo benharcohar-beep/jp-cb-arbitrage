@@ -228,6 +228,124 @@ def hedged_summary(trades: pd.DataFrame) -> pd.DataFrame:
     return g
 
 
+def simulate_paper_trading(
+    trades: pd.DataFrame = None,
+    starting_usd: float = 1_000_000.0,
+    usd_jpy: float = 150.0,
+    max_concurrent: int = 5,
+) -> tuple[pd.DataFrame, dict]:
+    """
+    Simulate running the strategy with real (paper) money.
+
+    Walks every hedged trade chronologically. Allocates equity / open_slots
+    JPY notional per new trade (max `max_concurrent` simultaneous positions).
+    On exit, scales the trade's per-¥100M P&L by the actual notional used and
+    adds it to cash. Tracks the equity curve and computes risk-adjusted KPIs.
+    """
+    if trades is None:
+        trades = pd.read_csv(os.path.join(HISTDIR, "hedged_trades.csv"))
+    if trades.empty:
+        return pd.DataFrame(), {}
+
+    trades = trades.copy()
+    trades["entry_date"] = pd.to_datetime(trades["entry_date"])
+    trades["exit_date"]  = pd.to_datetime(trades["exit_date"])
+    trades = trades.sort_values("entry_date").reset_index(drop=True)
+
+    starting_jpy = starting_usd * usd_jpy
+    cash = starting_jpy
+    open_positions = []   # [{trade_idx, notional_jpy, exit_date}]
+    history = []
+    n_skipped_no_slot = 0
+    n_skipped_too_small = 0
+
+    # Build interleaved event timeline: exits before entries on a given day
+    events = []
+    for i, row in trades.iterrows():
+        events.append((row["entry_date"], 1, "entry", i))  # entry sort key=1
+        events.append((row["exit_date"],  0, "exit",  i))  # exit sort key=0
+    events.sort(key=lambda x: (x[0], x[1]))
+
+    for evt_date, _, evt_type, idx in events:
+        if evt_type == "exit":
+            for op in list(open_positions):
+                if op["trade_idx"] == idx:
+                    realized = float(trades.loc[idx, "net_pnl_jpy"]) * (op["notional_jpy"] / 100_000_000.0)
+                    cash += op["notional_jpy"]  # release deployed capital
+                    cash += realized            # add P&L
+                    open_positions.remove(op)
+                    break
+        else:
+            if len(open_positions) >= max_concurrent:
+                n_skipped_no_slot += 1
+                continue
+            slots_open = max_concurrent - len(open_positions)
+            notional = cash / slots_open
+            if notional < 10_000_000:  # minimum ¥10M position
+                n_skipped_too_small += 1
+                continue
+            cash -= notional
+            open_positions.append({
+                "trade_idx": idx,
+                "notional_jpy": notional,
+                "exit_date": trades.loc[idx, "exit_date"],
+            })
+
+        deployed = sum(op["notional_jpy"] for op in open_positions)
+        equity_jpy = cash + deployed
+        history.append({
+            "date":            evt_date,
+            "cash_jpy":        cash,
+            "deployed_jpy":    deployed,
+            "equity_jpy":      equity_jpy,
+            "equity_usd":      equity_jpy / usd_jpy,
+            "open_positions":  len(open_positions),
+            "event":           evt_type,
+        })
+
+    eq = pd.DataFrame(history)
+    if eq.empty:
+        return eq, {}
+
+    # Drawdown
+    eq["running_max"] = eq["equity_usd"].cummax()
+    eq["drawdown_pct"] = (eq["equity_usd"] / eq["running_max"] - 1) * 100.0
+
+    # Daily returns for Sharpe
+    eq_daily = (eq.set_index("date")["equity_usd"]
+                  .resample("D").last().ffill().dropna())
+    if len(eq_daily) > 30:
+        daily_ret = eq_daily.pct_change().dropna()
+        sharpe = (daily_ret.mean() / daily_ret.std()) * (252 ** 0.5) if daily_ret.std() > 0 else 0.0
+    else:
+        sharpe = 0.0
+
+    final_equity_usd = float(eq["equity_usd"].iloc[-1])
+    days = max((eq["date"].max() - eq["date"].min()).days, 1)
+    years = days / 365.25
+    total_ret_pct = (final_equity_usd / starting_usd - 1) * 100.0
+    cagr_pct = ((final_equity_usd / starting_usd) ** (1 / years) - 1) * 100.0 if years > 0 else 0.0
+
+    kpis = {
+        "starting_usd":      starting_usd,
+        "final_equity_usd":  final_equity_usd,
+        "total_return_pct":  total_ret_pct,
+        "cagr_pct":          cagr_pct,
+        "max_drawdown_pct":  float(eq["drawdown_pct"].min()),
+        "sharpe":            float(sharpe),
+        "days_simulated":    days,
+        "n_trades_taken":    int(len(trades) - n_skipped_no_slot - n_skipped_too_small),
+        "n_trades_skipped":  int(n_skipped_no_slot + n_skipped_too_small),
+        "max_concurrent":    int(max_concurrent),
+        "usd_jpy_assumed":   float(usd_jpy),
+        "n_trades_available": int(len(trades)),
+    }
+
+    eq.to_csv(os.path.join(HISTDIR, "paper_equity.csv"), index=False)
+    pd.Series(kpis).to_csv(os.path.join(HISTDIR, "paper_kpis.csv"), header=False)
+    return eq, kpis
+
+
 def main():
     print("Running delta-hedged backtest …")
     trades = run_hedged_backtest()
@@ -254,6 +372,17 @@ def main():
     print("\nOverall:")
     for k, v in overall.items():
         print(f"  {k:25s} {v:,.2f}")
+
+    print("\n--- Paper trading simulation ($1M starting equity) ---")
+    eq, kpis = simulate_paper_trading(trades=trades)
+    print(f"  Starting capital: ${kpis['starting_usd']:,.0f} USD (≈ ¥{kpis['starting_usd']*kpis['usd_jpy_assumed']:,.0f})")
+    print(f"  Ending equity:    ${kpis['final_equity_usd']:,.0f} USD")
+    print(f"  Total return:     {kpis['total_return_pct']:+,.2f}%")
+    print(f"  CAGR:             {kpis['cagr_pct']:+,.2f}%")
+    print(f"  Max drawdown:     {kpis['max_drawdown_pct']:+,.2f}%")
+    print(f"  Sharpe (approx):  {kpis['sharpe']:.2f}")
+    print(f"  Trades taken:     {kpis['n_trades_taken']} / {kpis['n_trades_available']}")
+    print(f"  Days simulated:   {kpis['days_simulated']}")
 
 
 if __name__ == "__main__":

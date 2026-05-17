@@ -207,6 +207,30 @@ def render_backtest(env):
         except Exception:
             hedged_overall = {}
 
+    # Paper trading
+    import json as _json
+    paper_kpis, paper_curve = {}, []
+    p = hist_path("paper_kpis")
+    if os.path.exists(p):
+        try:
+            pk = pd.read_csv(p, header=None, names=["k", "v"])
+            paper_kpis = dict(zip(pk["k"], pk["v"]))
+        except Exception:
+            paper_kpis = {}
+    p = hist_path("paper_equity")
+    if os.path.exists(p):
+        try:
+            pe = pd.read_csv(p)
+            pe["date"] = pd.to_datetime(pe["date"]).dt.strftime("%Y-%m-%d")
+            paper_curve = [
+                {"date": r["date"],
+                 "equity_usd": float(r["equity_usd"]) if pd.notna(r["equity_usd"]) else None,
+                 "drawdown_pct": float(r["drawdown_pct"]) if pd.notna(r.get("drawdown_pct")) else None}
+                for _, r in pe.iterrows()
+            ]
+        except Exception:
+            paper_curve = []
+
     p = hist_path("panel")
     if os.path.exists(p):
         d = pd.read_csv(p)
@@ -230,7 +254,10 @@ def render_backtest(env):
     html = env.get_template("backtest.html").render(
         summary=summary, rets=rets, panel_stats=panel_stats,
         buckets=buckets, hedged_buckets=hedged_buckets,
-        hedged_overall=hedged_overall, ROOT="",
+        hedged_overall=hedged_overall,
+        paper_kpis=paper_kpis,
+        paper_curve_json=_json.dumps(paper_curve),
+        ROOT="",
     )
     write(os.path.join(DOCS, "backtest.html"), html)
 

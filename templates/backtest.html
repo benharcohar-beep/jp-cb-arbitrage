@@ -59,6 +59,98 @@
   </tbody>
 </table>
 
+{% if paper_kpis %}
+<section class="alerts-head" style="margin-top:32px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Paper trading · what $1,000,000 would have done</h3>
+  <p>Real money simulation. Starts with $1M USD, walks every hedged trade chronologically, allocates equity ÷ open-slots per new trade, cap of 5 concurrent positions. Cash earns nothing, deployed capital absorbs P&L per the hedged backtest. USD/JPY held at 150 for simplicity.</p>
+</section>
+
+<div class="callout">
+  <span class="label">How to read this</span>
+  Bar chart below is the <strong>equity curve</strong> — your account value over time. Flat stretches = no open positions. Step changes = trades closing. <strong>CAGR</strong> is the annualised return; <strong>Max drawdown</strong> is the deepest peak-to-trough dip during the simulation; <strong>Sharpe</strong> is risk-adjusted return (above 1 is good, above 2 is great). The "trades taken vs available" line tells you how often the strategy was capacity-constrained — i.e. the model flagged a signal but you had no open slot.
+</div>
+
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+  <div class="kpi"><span class="lab">Starting</span><span class="val">${{ "{:,.0f}".format(paper_kpis.starting_usd) }}</span></div>
+  <div class="kpi alert"><span class="lab">Ending equity</span><span class="val">${{ "{:,.0f}".format(paper_kpis.final_equity_usd) }}</span></div>
+  <div class="kpi alert"><span class="lab">Total return</span><span class="val">{{ "{:+,.1f}".format(paper_kpis.total_return_pct) }}%</span></div>
+  <div class="kpi alert"><span class="lab">CAGR</span><span class="val">{{ "{:+,.1f}".format(paper_kpis.cagr_pct) }}%</span></div>
+  <div class="kpi"><span class="lab">Max drawdown</span><span class="val" style="color:var(--red);">{{ "{:+,.2f}".format(paper_kpis.max_drawdown_pct) }}%</span></div>
+  <div class="kpi"><span class="lab">Sharpe</span><span class="val">{{ "{:.2f}".format(paper_kpis.sharpe) }}</span></div>
+  <div class="kpi"><span class="lab">Trades taken</span><span class="val">{{ "{:.0f}".format(paper_kpis.n_trades_taken) }} <span style="font-size:12px; color:var(--muted);">/ {{ "{:.0f}".format(paper_kpis.n_trades_available) }}</span></span></div>
+  <div class="kpi"><span class="lab">Days simulated</span><span class="val">{{ "{:.0f}".format(paper_kpis.days_simulated) }}</span></div>
+</section>
+
+<section class="chart-block">
+  <h3>Equity curve · $1M paper account</h3>
+  <canvas id="paper-equity-chart" height="100"></canvas>
+</section>
+
+<section class="chart-block">
+  <h3>Drawdown · how deep did it dip from peak</h3>
+  <canvas id="paper-dd-chart" height="60"></canvas>
+</section>
+
+<script>
+const paperCurve = {{ paper_curve_json|safe }};
+if (paperCurve && paperCurve.length > 0) {
+  const labels = paperCurve.map(p => p.date);
+  const equity = paperCurve.map(p => p.equity_usd);
+  const dd = paperCurve.map(p => p.drawdown_pct);
+
+  new Chart(document.getElementById('paper-equity-chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Equity (USD)',
+        data: equity,
+        borderColor: '#047857',
+        backgroundColor: 'rgba(16,185,129,0.10)',
+        fill: true,
+        tension: 0.05,
+        pointRadius: 0,
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => '$' + ctx.parsed.y.toLocaleString(undefined, {maximumFractionDigits:0}) } } },
+      scales: {
+        x: { ticks: { color: '#6f8073', maxTicksLimit: 10 }, grid: { color: '#e3eae0' } },
+        y: { ticks: { color: '#6f8073', callback: v => '$' + (v/1000).toFixed(0) + 'k' }, grid: { color: '#e3eae0' } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('paper-dd-chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Drawdown %',
+        data: dd,
+        borderColor: '#b91c1c',
+        backgroundColor: 'rgba(185,28,28,0.15)',
+        fill: true,
+        tension: 0.05,
+        pointRadius: 0,
+        borderWidth: 1.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#6f8073', maxTicksLimit: 10 }, grid: { color: '#e3eae0' } },
+        y: { ticks: { color: '#6f8073', callback: v => v.toFixed(1) + '%' }, grid: { color: '#e3eae0' } }
+      }
+    }
+  });
+}
+</script>
+{% endif %}
+
 {% if hedged_overall %}
 <section class="alerts-head" style="margin-top:32px;">
   <h3 style="font-size:14px; margin-bottom:4px;">Δ-hedged backtest · realistic P&L with costs</h3>

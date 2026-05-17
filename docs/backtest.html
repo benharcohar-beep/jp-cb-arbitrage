@@ -108,6 +108,98 @@
 
 
 <section class="alerts-head" style="margin-top:32px;">
+  <h3 style="font-size:14px; margin-bottom:4px;">Paper trading · what $1,000,000 would have done</h3>
+  <p>Real money simulation. Starts with $1M USD, walks every hedged trade chronologically, allocates equity ÷ open-slots per new trade, cap of 5 concurrent positions. Cash earns nothing, deployed capital absorbs P&L per the hedged backtest. USD/JPY held at 150 for simplicity.</p>
+</section>
+
+<div class="callout">
+  <span class="label">How to read this</span>
+  Bar chart below is the <strong>equity curve</strong> — your account value over time. Flat stretches = no open positions. Step changes = trades closing. <strong>CAGR</strong> is the annualised return; <strong>Max drawdown</strong> is the deepest peak-to-trough dip during the simulation; <strong>Sharpe</strong> is risk-adjusted return (above 1 is good, above 2 is great). The "trades taken vs available" line tells you how often the strategy was capacity-constrained — i.e. the model flagged a signal but you had no open slot.
+</div>
+
+<section class="summary" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+  <div class="kpi"><span class="lab">Starting</span><span class="val">$1,000,000</span></div>
+  <div class="kpi alert"><span class="lab">Ending equity</span><span class="val">$1,186,294</span></div>
+  <div class="kpi alert"><span class="lab">Total return</span><span class="val">+18.6%</span></div>
+  <div class="kpi alert"><span class="lab">CAGR</span><span class="val">+22.1%</span></div>
+  <div class="kpi"><span class="lab">Max drawdown</span><span class="val" style="color:var(--red);">-1.27%</span></div>
+  <div class="kpi"><span class="lab">Sharpe</span><span class="val">1.47</span></div>
+  <div class="kpi"><span class="lab">Trades taken</span><span class="val">21 <span style="font-size:12px; color:var(--muted);">/ 38</span></span></div>
+  <div class="kpi"><span class="lab">Days simulated</span><span class="val">313</span></div>
+</section>
+
+<section class="chart-block">
+  <h3>Equity curve · $1M paper account</h3>
+  <canvas id="paper-equity-chart" height="100"></canvas>
+</section>
+
+<section class="chart-block">
+  <h3>Drawdown · how deep did it dip from peak</h3>
+  <canvas id="paper-dd-chart" height="60"></canvas>
+</section>
+
+<script>
+const paperCurve = [{"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-06-20", "equity_usd": 1000000.0, "drawdown_pct": 0.0}, {"date": "2025-07-03", "equity_usd": 999063.3848744156, "drawdown_pct": -0.0936615125584405}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-08", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-10", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-07-14", "equity_usd": 1000591.8792858742, "drawdown_pct": 0.0}, {"date": "2025-08-07", "equity_usd": 998739.0064724964, "drawdown_pct": -0.1851776785056658}, {"date": "2025-08-08", "equity_usd": 997045.124736561, "drawdown_pct": -0.3544656540531377}, {"date": "2025-08-22", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-12", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-16", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-17", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-09-19", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-01", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-02", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-10", "equity_usd": 1006957.4371439136, "drawdown_pct": 0.0}, {"date": "2025-10-29", "equity_usd": 997896.5368382564, "drawdown_pct": -0.8998295232176878}, {"date": "2025-11-06", "equity_usd": 994196.7081851664, "drawdown_pct": -1.267256041619924}, {"date": "2025-11-07", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-07", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-12", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-11-21", "equity_usd": 1002942.8828013284, "drawdown_pct": -0.3986816318644059}, {"date": "2025-12-15", "equity_usd": 1000972.014432866, "drawdown_pct": -0.5944067236868023}, {"date": "2025-12-22", "equity_usd": 1000972.014432866, "drawdown_pct": -0.5944067236868023}, {"date": "2025-12-29", "equity_usd": 999702.597722877, "drawdown_pct": -0.7204713082624381}, {"date": "2026-01-08", "equity_usd": 999702.597722877, "drawdown_pct": -0.7204713082624381}, {"date": "2026-01-16", "equity_usd": 997054.0660276052, "drawdown_pct": -0.98349451039339}, {"date": "2026-01-16", "equity_usd": 995933.468269542, "drawdown_pct": -1.094780024232178}, {"date": "2026-01-16", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-19", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-26", "equity_usd": 994576.854662082, "drawdown_pct": -1.229504051029939}, {"date": "2026-01-30", "equity_usd": 1015732.4207020048, "drawdown_pct": 0.0}, {"date": "2026-02-04", "equity_usd": 1030210.0674212544, "drawdown_pct": 0.0}, {"date": "2026-02-16", "equity_usd": 1030210.0674212544, "drawdown_pct": 0.0}, {"date": "2026-03-04", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-06", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-06", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-03-31", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-04-09", "equity_usd": 1030210.0674212544, "drawdown_pct": -1.1102230246251564e-14}, {"date": "2026-04-20", "equity_usd": 1104085.10741696, "drawdown_pct": 0.0}, {"date": "2026-04-21", "equity_usd": 1104085.10741696, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1148635.9996140334, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1151590.0165073748, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1163868.9150855727, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1175403.8539911425, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}, {"date": "2026-04-29", "equity_usd": 1186294.201593545, "drawdown_pct": 0.0}];
+if (paperCurve && paperCurve.length > 0) {
+  const labels = paperCurve.map(p => p.date);
+  const equity = paperCurve.map(p => p.equity_usd);
+  const dd = paperCurve.map(p => p.drawdown_pct);
+
+  new Chart(document.getElementById('paper-equity-chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Equity (USD)',
+        data: equity,
+        borderColor: '#047857',
+        backgroundColor: 'rgba(16,185,129,0.10)',
+        fill: true,
+        tension: 0.05,
+        pointRadius: 0,
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => '$' + ctx.parsed.y.toLocaleString(undefined, {maximumFractionDigits:0}) } } },
+      scales: {
+        x: { ticks: { color: '#6f8073', maxTicksLimit: 10 }, grid: { color: '#e3eae0' } },
+        y: { ticks: { color: '#6f8073', callback: v => '$' + (v/1000).toFixed(0) + 'k' }, grid: { color: '#e3eae0' } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('paper-dd-chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Drawdown %',
+        data: dd,
+        borderColor: '#b91c1c',
+        backgroundColor: 'rgba(185,28,28,0.15)',
+        fill: true,
+        tension: 0.05,
+        pointRadius: 0,
+        borderWidth: 1.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#6f8073', maxTicksLimit: 10 }, grid: { color: '#e3eae0' } },
+        y: { ticks: { color: '#6f8073', callback: v => v.toFixed(1) + '%' }, grid: { color: '#e3eae0' } }
+      }
+    }
+  });
+}
+</script>
+
+
+
+<section class="alerts-head" style="margin-top:32px;">
   <h3 style="font-size:14px; margin-bottom:4px;">Δ-hedged backtest · realistic P&L with costs</h3>
   <p>Each trade: long ¥100M face, short Δ × shares. 25bp half-spread on bond, 5bp on equity, 1% JPY financing carry, exit at +60d or when cheap% &lt; 1%.</p>
 </section>

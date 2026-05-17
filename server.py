@@ -200,6 +200,29 @@ def backtest_view(request: Request):
             hedged_overall = dict(zip(ov["k"], ov["v"]))
         except Exception:
             hedged_overall = {}
+
+    # Paper trading sim
+    paper_kpis_path = os.path.join(histdir, f"{prefix}paper_kpis.csv")
+    paper_equity_path = os.path.join(histdir, f"{prefix}paper_equity.csv")
+    paper_kpis, paper_curve = {}, []
+    if os.path.exists(paper_kpis_path):
+        try:
+            pk = pd.read_csv(paper_kpis_path, header=None, names=["k","v"])
+            paper_kpis = dict(zip(pk["k"], pk["v"]))
+        except Exception:
+            paper_kpis = {}
+    if os.path.exists(paper_equity_path):
+        try:
+            pe = pd.read_csv(paper_equity_path)
+            pe["date"] = pd.to_datetime(pe["date"]).dt.strftime("%Y-%m-%d")
+            paper_curve = [
+                {"date": r["date"],
+                 "equity_usd": _clean(r["equity_usd"]),
+                 "drawdown_pct": _clean(r.get("drawdown_pct"))}
+                for _, r in pe.iterrows()
+            ]
+        except Exception:
+            paper_curve = []
     if os.path.exists(rets_path):
         rets = pd.read_csv(rets_path).sort_values("signal_cheap", ascending=False).head(40).to_dict("records")
     if os.path.exists(panel_path):
@@ -218,7 +241,8 @@ def backtest_view(request: Request):
         "backtest.html",
         {"request": request, "summary": summary, "rets": rets,
          "panel_stats": panel_stats, "buckets": buckets,
-         "hedged_buckets": hedged_buckets, "hedged_overall": hedged_overall},
+         "hedged_buckets": hedged_buckets, "hedged_overall": hedged_overall,
+         "paper_kpis": paper_kpis, "paper_curve_json": json.dumps(paper_curve)},
     )
 
 
