@@ -71,11 +71,11 @@
 
 <section class="summary">
   <div class="kpi timestamp" title="When this snapshot was taken. The agent runs every weekday at 08:04."><span class="lab">Snapshot</span><span class="val">demo_screen</span></div>
-  <div class="kpi" title="Number of bonds the system successfully priced today. Bonds with no live quote get dropped."><span class="lab">Bonds priced</span><span class="val">18</span></div>
-  <div class="kpi" title="How many of those bonds have a credit rating (the rest use a default spread)."><span class="lab">Rated</span><span class="val">16</span></div>
-  <div class="kpi" title="Bonds priced with Monte Carlo because they have reset clauses (the binomial tree can't handle those properly)."><span class="lab">MC priced</span><span class="val">2</span></div>
-  <div class="kpi alert" title="Bonds the model says are at least 5% cheap to fair value."><span class="lab">Buy signals</span><span class="val">2</span></div>
-  <div class="kpi" title="Median credit spread across all bonds, in basis points. 100bp = 1%."><span class="lab">Median spread</span><span class="val">90bp</span></div>
+  <div class="kpi" title="Number of bonds the system successfully priced today. Bonds with no live quote get dropped."><span class="lab">Bonds priced</span><span class="val">15</span></div>
+  <div class="kpi" title="How many of those bonds have a credit rating (the rest use a default spread)."><span class="lab">Rated</span><span class="val">0</span></div>
+  <div class="kpi" title="Bonds priced with Monte Carlo because they have reset clauses (the binomial tree can't handle those properly)."><span class="lab">MC priced</span><span class="val">5</span></div>
+  <div class="kpi alert" title="Bonds the model says are at least 5% cheap to fair value."><span class="lab">Buy signals</span><span class="val">3</span></div>
+  <div class="kpi" title="Median credit spread across all bonds, in basis points. 100bp = 1%."><span class="lab">Median spread</span><span class="val">429bp</span></div>
 </section>
 
 
@@ -91,25 +91,25 @@
   
   
   
-  <a href="bond/JP279962206_eq_/" class="play-row">
+  <a href="bond/JP279962168_eq_/" class="play-row">
     <div class="play-rank">1</div>
     <div class="play-main">
       <div class="play-title">
         <strong>Rohm</strong>
-        <span class="rtg ig">A+</span>
+        <span class="rtg nr">NR</span>
         <span class="engine engine-tree">Tree</span>
         
       </div>
       <div class="play-thesis">
-        <strong>The thesis:</strong> the bond trades at 131.50, but our model says fair value is 149.48 — a <strong>+13.7% gap</strong>. Buy ¥100M face of the bond and short <strong>25,836 shares</strong> of 6963.T to neutralize stock direction. If the gap closes over the next 60 days (78% historical hit rate for this signal strength), you collect the convergence.
+        <strong>The thesis:</strong> the bond trades at 128.38, but our model says fair value is 157.04 — a <strong>+22.3% gap</strong>. Buy ¥100M face of the bond and short <strong>25,638 shares</strong> of 6963.T to neutralize stock direction. If the gap closes over the next 60 days (78% historical hit rate for this signal strength), you collect the convergence.
       </div>
       <div class="play-detail" style="margin-top:6px;">
-        Maturity 2031-04-24 · Realized vol (HV60) 62% · Credit spread 70bp
+        Maturity 2029-04-24 · Realized vol (HV60) 64% · Credit spread 429bp
       </div>
     </div>
     <div class="play-numbers">
       <div class="play-cheap">
-        +13.7%
+        +22.3%
         <span class="lab">cheap</span>
       </div>
       <div class="play-prices">
@@ -120,25 +120,25 @@
   
   
   
-  <a href="bond/JP330437685_eq_/" class="play-row">
+  <a href="bond/JP270026966_eq_/" class="play-row">
     <div class="play-rank">2</div>
     <div class="play-main">
       <div class="play-title">
-        <strong>Advantest</strong>
-        <span class="rtg ig">A+</span>
+        <strong>Taiyo Yuden</strong>
+        <span class="rtg nr">NR</span>
         <span class="engine engine-tree">Tree</span>
         
       </div>
       <div class="play-thesis">
-        <strong>The thesis:</strong> the bond trades at 121.45, but our model says fair value is 131.72 — a <strong>+8.5% gap</strong>. Buy ¥100M face of the bond and short <strong>2,163 shares</strong> of 6857.T to neutralize stock direction. If the gap closes over the next 60 days (78% historical hit rate for this signal strength), you collect the convergence.
+        <strong>The thesis:</strong> the bond trades at 148.38, but our model says fair value is 179.95 — a <strong>+21.3% gap</strong>. Buy ¥100M face of the bond and short <strong>19,190 shares</strong> of 6976.T to neutralize stock direction. If the gap closes over the next 60 days (78% historical hit rate for this signal strength), you collect the convergence.
       </div>
       <div class="play-detail" style="margin-top:6px;">
-        Maturity 2031-03-28 · Realized vol (HV60) 74% · Credit spread 70bp
+        Maturity 2030-10-18 · Realized vol (HV60) 73% · Credit spread 429bp
       </div>
     </div>
     <div class="play-numbers">
       <div class="play-cheap">
-        +8.5%
+        +21.3%
         <span class="lab">cheap</span>
       </div>
       <div class="play-prices">
@@ -162,12 +162,12 @@
 </div>
 
 <div class="tabs" id="universe-tabs">
-  <button class="tab active" data-filter="all">All <span class="tab-count">18</span></button>
-  <button class="tab" data-filter="ig">Investment Grade <span class="tab-count">16</span></button>
+  <button class="tab active" data-filter="all">All <span class="tab-count">15</span></button>
+  <button class="tab" data-filter="ig">Investment Grade <span class="tab-count">0</span></button>
   <button class="tab" data-filter="sub">Sub-IG <span class="tab-count">0</span></button>
-  <button class="tab" data-filter="nr">Unrated <span class="tab-count">2</span></button>
-  <button class="tab" data-filter="reset">Reset <span class="tab-count">2</span></button>
-  <button class="tab" data-filter="anomaly">⚠ Anomaly <span class="tab-count">3</span></button>
+  <button class="tab" data-filter="nr">Unrated <span class="tab-count">15</span></button>
+  <button class="tab" data-filter="reset">Reset <span class="tab-count">5</span></button>
+  <button class="tab" data-filter="anomaly">⚠ Anomaly <span class="tab-count">2</span></button>
 </div>
 
 <table class="screen" id="universe-table">
@@ -198,154 +198,30 @@
     
     
     
-    <tr class="cheap-strong"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP279962206_eq_/">Rohm</a></td>
-      <td>6963.T</td>
-      <td><span class="rtg ig">A+</span></td>
-      <td class="num">70</td>
+    <tr class="cheap-strong low-conf"
+        data-tier="nr" data-reset="0" data-anomaly="1">
+      <td><a href="bond/JP271701055_eq_/">Nxera Pharma</a></td>
+      <td>4565.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
-      <td>2031-04-24</td>
-      <td class="num">131.50</td>
-      <td class="num">149.48</td>
-      <td class="num cheap-cell">+13.7</td>
-      <td class="num">14</td>
-      <td class="num">0.62</td>
-      <td class="num">0.37</td>
-      <td class="num">0.026</td>
-      <td class="num">0.68</td>
-      <td>
-        <span class="conf-high">High</span>
-        
-      </td>
-      <td><button class="small" onclick="addWatch(event, 'JP279962206=')">⊕</button></td>
-    </tr>
-    
-    
-    
-    
-    
-    
-    <tr class="cheap-strong"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP330437685_eq_/">Advantest</a></td>
-      <td>6857.T</td>
-      <td><span class="rtg ig">A+</span></td>
-      <td class="num">70</td>
-      <td>
-        <span class="engine engine-tree">Tree</span>
-        
-      </td>
-      <td>2031-03-28</td>
-      <td class="num">121.45</td>
-      <td class="num">131.72</td>
-      <td class="num cheap-cell">+8.5</td>
-      <td class="num">55</td>
-      <td class="num">0.74</td>
-      <td class="num">0.56</td>
-      <td class="num">0.002</td>
-      <td class="num">0.52</td>
-      <td>
-        <span class="conf-high">High</span>
-        
-      </td>
-      <td><button class="small" onclick="addWatch(event, 'JP330437685=')">⊕</button></td>
-    </tr>
-    
-    
-    
-    
-    
-    
-    <tr class="cheap-mild"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP325149639_eq_/">HEPCO</a></td>
-      <td>9509.T</td>
-      <td><span class="rtg ig">a-1</span></td>
-      <td class="num">90</td>
-      <td>
-        <span class="engine engine-tree">Tree</span>
-        
-      </td>
-      <td>2031-03-03</td>
-      <td class="num">104.38</td>
-      <td class="num">107.90</td>
-      <td class="num cheap-cell">+3.4</td>
-      <td class="num">40</td>
-      <td class="num">0.43</td>
-      <td class="num">0.37</td>
-      <td class="num">0.037</td>
-      <td class="num">0.57</td>
-      <td>
-        <span class="conf-high">High</span>
-        
-      </td>
-      <td><button class="small" onclick="addWatch(event, 'JP325149639=')">⊕</button></td>
-    </tr>
-    
-    
-    
-    
-    
-    
-    <tr class="cheap-mild"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP295253037_eq_/">Hosiden</a></td>
-      <td>6804.T</td>
-      <td><span class="rtg ig">A-</span></td>
-      <td class="num">120</td>
-      <td>
-        <span class="engine engine-tree">Tree</span>
-        
-      </td>
-      <td>2031-12-19</td>
-      <td class="num">113.75</td>
-      <td class="num">116.85</td>
-      <td class="num cheap-cell">+2.7</td>
-      <td class="num">14</td>
-      <td class="num">0.34</td>
-      <td class="num">0.30</td>
-      <td class="num">0.026</td>
-      <td class="num">0.74</td>
-      <td>
-        <span class="conf-high">High</span>
-        
-      </td>
-      <td><button class="small" onclick="addWatch(event, 'JP295253037=')">⊕</button></td>
-    </tr>
-    
-    
-    
-    
-    
-    
-    <tr class="cheap-mild low-conf"
-        data-tier="ig" data-reset="0" data-anomaly="1">
-      <td><a href="bond/JP294960325_eq_/">Nikkon Holdings</a></td>
-      <td>9072.T</td>
-      <td><span class="rtg ig">a-1</span></td>
-      <td class="num">90</td>
-      <td>
-        <span class="engine engine-tree">Tree</span>
-        
-      </td>
-      <td>2031-12-12</td>
-      <td class="num">250.50</td>
-      <td class="num">257.24</td>
-      <td class="num cheap-cell">+2.7</td>
-      <td class="num">3</td>
-      <td class="num">0.58</td>
-      <td class="num">0.49</td>
-      <td class="num">0.043</td>
-      <td class="num">0.79</td>
+      <td>2028-12-14</td>
+      <td class="num">81.75</td>
+      <td class="num">107.39</td>
+      <td class="num cheap-cell">+31.4</td>
+      <td class="num">24</td>
+      <td class="num">0.65</td>
+      <td class="num">—</td>
+      <td class="num">0.031</td>
+      <td class="num">0.39</td>
       <td>
         <span class="conf-low">Low</span>
-        <span class="anomaly" title="PRICE&gt;200">⚠</span>
+        <span class="anomaly" title="MODEL_NO_FIT">⚠</span>
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP294960325=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP271701055=')">⊕</button></td>
     </tr>
     
     
@@ -353,30 +229,30 @@
     
     
     
-    <tr class="cheap-mild"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP322459319_eq_/">JVCKENWOOD</a></td>
-      <td>6632.T</td>
-      <td><span class="rtg ig">A-</span></td>
-      <td class="num">120</td>
+    <tr class="cheap-strong"
+        data-tier="nr" data-reset="0" data-anomaly="0">
+      <td><a href="bond/JP279962168_eq_/">Rohm</a></td>
+      <td>6963.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
-      <td>2030-12-02</td>
-      <td class="num">99.38</td>
-      <td class="num">101.45</td>
-      <td class="num cheap-cell">+2.1</td>
-      <td class="num">59</td>
-      <td class="num">0.44</td>
-      <td class="num">0.40</td>
+      <td>2029-04-24</td>
+      <td class="num">128.38</td>
+      <td class="num">157.04</td>
+      <td class="num cheap-cell">+22.3</td>
+      <td class="num">-6</td>
+      <td class="num">0.64</td>
+      <td class="num">—</td>
       <td class="num">0.026</td>
-      <td class="num">0.51</td>
+      <td class="num">0.59</td>
       <td>
         <span class="conf-high">High</span>
         
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP322459319=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP279962168=')">⊕</button></td>
     </tr>
     
     
@@ -384,30 +260,30 @@
     
     
     
-    <tr class="cheap-mild"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP273021329_eq_/">OSG Corp</a></td>
-      <td>6136.T</td>
-      <td><span class="rtg ig">A</span></td>
-      <td class="num">90</td>
+    <tr class="cheap-strong"
+        data-tier="nr" data-reset="0" data-anomaly="0">
+      <td><a href="bond/JP270026966_eq_/">Taiyo Yuden</a></td>
+      <td>6976.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
-      <td>2030-12-20</td>
-      <td class="num">156.62</td>
-      <td class="num">159.00</td>
-      <td class="num cheap-cell">+1.5</td>
-      <td class="num">0</td>
-      <td class="num">0.32</td>
-      <td class="num">0.27</td>
-      <td class="num">0.043</td>
-      <td class="num">0.56</td>
+      <td>2030-10-18</td>
+      <td class="num">148.38</td>
+      <td class="num">179.95</td>
+      <td class="num cheap-cell">+21.3</td>
+      <td class="num">-4</td>
+      <td class="num">0.73</td>
+      <td class="num">—</td>
+      <td class="num">0.019</td>
+      <td class="num">0.63</td>
       <td>
         <span class="conf-high">High</span>
         
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP273021329=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP270026966=')">⊕</button></td>
     </tr>
     
     
@@ -417,83 +293,147 @@
     
     <tr class="cheap-mild reset"
         data-tier="nr" data-reset="1" data-anomaly="0">
-      <td><a href="bond/JP329568903_eq_/">Mizuno</a></td>
-      <td>8022.T</td>
-      <td><span class="rtg nr">WR</span></td>
+      <td><a href="bond/JP267637423_eq_/">Daifuku</a></td>
+      <td>6383.T</td>
+      <td><span class="rtg nr">NR</span></td>
       <td class="num">429</td>
       <td>
         <span class="engine engine-mc">MC</span>
-        <span class="reset-prob">86%</span>
+        <span class="reset-prob">0%</span>
       </td>
-      <td>2031-03-31</td>
-      <td class="num">98.75</td>
-      <td class="num">100.24</td>
-      <td class="num cheap-cell">+1.5</td>
-      <td class="num">49</td>
-      <td class="num">0.41</td>
-      <td class="num">0.55</td>
-      <td class="num">0.010</td>
-      <td class="num">0.51</td>
+      <td>2030-09-13</td>
+      <td class="num">199.62</td>
+      <td class="num">207.14</td>
+      <td class="num cheap-cell">+3.8</td>
+      <td class="num">-4</td>
+      <td class="num">0.50</td>
+      <td class="num">—</td>
+      <td class="num">0.026</td>
+      <td class="num">0.57</td>
       <td>
         <span class="conf-high">High</span>
         
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP329568903=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP267637423=')">⊕</button></td>
     </tr>
     
     
     
     
     
-    <tr class="neutral"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP241370844_eq_/">ANA</a></td>
-      <td>9202.T</td>
-      <td><span class="rtg ig">A</span></td>
-      <td class="num">90</td>
+    
+    <tr class="cheap-mild"
+        data-tier="nr" data-reset="0" data-anomaly="0">
+      <td><a href="bond/JP279091213_eq_/">Infroneer</a></td>
+      <td>5076.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
-      <td>2031-12-10</td>
-      <td class="num">107.25</td>
-      <td class="num">107.93</td>
-      <td class="num cheap-cell">+0.6</td>
-      <td class="num">19</td>
-      <td class="num">0.29</td>
-      <td class="num">0.28</td>
-      <td class="num">0.019</td>
-      <td class="num">0.70</td>
+      <td>2029-03-30</td>
+      <td class="num">133.38</td>
+      <td class="num">137.35</td>
+      <td class="num cheap-cell">+3.0</td>
+      <td class="num">-1</td>
+      <td class="num">0.39</td>
+      <td class="num">—</td>
+      <td class="num">0.044</td>
+      <td class="num">0.47</td>
       <td>
         <span class="conf-high">High</span>
         
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP241370844=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP279091213=')">⊕</button></td>
     </tr>
     
     
     
     
     
-    <tr class="neutral"
-        data-tier="ig" data-reset="0" data-anomaly="0">
+    
+    <tr class="rich-mild"
+        data-tier="nr" data-reset="0" data-anomaly="0">
+      <td><a href="bond/JP255056425_eq_/">CyberAgent</a></td>
+      <td>4751.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
+      <td>
+        <span class="engine engine-tree">Tree</span>
+        
+      </td>
+      <td>2029-11-16</td>
+      <td class="num">107.25</td>
+      <td class="num">103.84</td>
+      <td class="num cheap-cell">-3.2</td>
+      <td class="num">23</td>
+      <td class="num">0.36</td>
+      <td class="num">0.42</td>
+      <td class="num">0.037</td>
+      <td class="num">0.57</td>
+      <td>
+        <span class="conf-high">High</span>
+        
+      </td>
+      <td><button class="small" onclick="addWatch(event, 'JP255056425=')">⊕</button></td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    <tr class="rich-strong reset"
+        data-tier="nr" data-reset="1" data-anomaly="0">
+      <td><a href="bond/JP277456621_eq_/">FRANCE BED HLDGS</a></td>
+      <td>7840.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
+      <td>
+        <span class="engine engine-mc">MC</span>
+        <span class="reset-prob">32%</span>
+      </td>
+      <td>2029-03-14</td>
+      <td class="num">105.00</td>
+      <td class="num">98.24</td>
+      <td class="num cheap-cell">-6.4</td>
+      <td class="num">14</td>
+      <td class="num">0.22</td>
+      <td class="num">0.36</td>
+      <td class="num">0.040</td>
+      <td class="num">0.52</td>
+      <td>
+        <span class="conf-high">High</span>
+        
+      </td>
+      <td><button class="small" onclick="addWatch(event, 'JP277456621=')">⊕</button></td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    <tr class="rich-strong"
+        data-tier="nr" data-reset="0" data-anomaly="0">
       <td><a href="bond/JP329882250_eq_/">Nippon Steel</a></td>
       <td>5401.T</td>
-      <td><span class="rtg ig">a-1</span></td>
-      <td class="num">90</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
       <td>2031-02-14</td>
-      <td class="num">102.25</td>
-      <td class="num">102.37</td>
-      <td class="num cheap-cell">+0.1</td>
-      <td class="num">32</td>
-      <td class="num">0.31</td>
+      <td class="num">102.00</td>
+      <td class="num">95.08</td>
+      <td class="num cheap-cell">-6.8</td>
+      <td class="num">34</td>
       <td class="num">0.30</td>
-      <td class="num">0.045</td>
-      <td class="num">0.49</td>
+      <td class="num">0.43</td>
+      <td class="num">0.073</td>
+      <td class="num">0.44</td>
       <td>
         <span class="conf-high">High</span>
         
@@ -506,61 +446,30 @@
     
     
     
-    <tr class="rich-mild"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP277142333_eq_/">Kansai Paint</a></td>
-      <td>4613.T</td>
-      <td><span class="rtg ig">a-1</span></td>
-      <td class="num">90</td>
-      <td>
-        <span class="engine engine-tree">Tree</span>
-        
-      </td>
-      <td>2031-03-07</td>
-      <td class="num">103.12</td>
-      <td class="num">100.17</td>
-      <td class="num cheap-cell">-2.9</td>
-      <td class="num">22</td>
-      <td class="num">0.26</td>
-      <td class="num">0.31</td>
-      <td class="num">0.017</td>
-      <td class="num">0.65</td>
-      <td>
-        <span class="conf-high">High</span>
-        
-      </td>
-      <td><button class="small" onclick="addWatch(event, 'JP277142333=')">⊕</button></td>
-    </tr>
-    
-    
-    
-    
-    
-    
     <tr class="rich-strong"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP272792062_eq_/">Kobe Steel</a></td>
-      <td>5406.T</td>
-      <td><span class="rtg ig">A</span></td>
-      <td class="num">90</td>
+        data-tier="nr" data-reset="0" data-anomaly="0">
+      <td><a href="bond/JP329882225_eq_/">Nippon Steel</a></td>
+      <td>5401.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
-      <td>2030-12-13</td>
-      <td class="num">107.62</td>
-      <td class="num">101.02</td>
-      <td class="num cheap-cell">-6.1</td>
-      <td class="num">31</td>
-      <td class="num">0.32</td>
+      <td>2029-02-14</td>
+      <td class="num">101.55</td>
+      <td class="num">93.48</td>
+      <td class="num cheap-cell">-7.9</td>
+      <td class="num">32</td>
+      <td class="num">0.30</td>
+      <td class="num">0.47</td>
+      <td class="num">0.049</td>
       <td class="num">0.43</td>
-      <td class="num">0.020</td>
-      <td class="num">0.59</td>
       <td>
         <span class="conf-high">High</span>
         
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP272792062=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP329882225=')">⊕</button></td>
     </tr>
     
     
@@ -569,60 +478,29 @@
     
     
     <tr class="rich-strong"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP301652887_eq_/">Rohto Pharm</a></td>
-      <td>4527.T</td>
-      <td><span class="rtg ig">A+</span></td>
-      <td class="num">70</td>
+        data-tier="nr" data-reset="0" data-anomaly="0">
+      <td><a href="bond/JP277142317_eq_/">Kansai Paint</a></td>
+      <td>4613.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
-      <td>2032-03-15</td>
-      <td class="num">106.38</td>
-      <td class="num">99.73</td>
-      <td class="num cheap-cell">-6.2</td>
-      <td class="num">31</td>
-      <td class="num">0.25</td>
-      <td class="num">0.35</td>
-      <td class="num">0.021</td>
-      <td class="num">0.84</td>
-      <td>
-        <span class="conf-high">High</span>
-        
-      </td>
-      <td><button class="small" onclick="addWatch(event, 'JP301652887=')">⊕</button></td>
-    </tr>
-    
-    
-    
-    
-    
-    
-    <tr class="rich-strong"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP282920476_eq_/">Nagoya Railroad</a></td>
-      <td>9048.T</td>
-      <td><span class="rtg ig">A+</span></td>
-      <td class="num">70</td>
-      <td>
-        <span class="engine engine-tree">Tree</span>
-        
-      </td>
-      <td>2033-06-17</td>
-      <td class="num">103.88</td>
-      <td class="num">97.16</td>
-      <td class="num cheap-cell">-6.5</td>
-      <td class="num">23</td>
-      <td class="num">0.16</td>
+      <td>2029-03-08</td>
+      <td class="num">103.00</td>
+      <td class="num">94.59</td>
+      <td class="num cheap-cell">-8.2</td>
+      <td class="num">24</td>
       <td class="num">0.27</td>
-      <td class="num">0.013</td>
-      <td class="num">0.46</td>
+      <td class="num">0.44</td>
+      <td class="num">0.015</td>
+      <td class="num">0.48</td>
       <td>
         <span class="conf-high">High</span>
         
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP282920476=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP277142317=')">⊕</button></td>
     </tr>
     
     
@@ -631,29 +509,29 @@
     
     
     <tr class="rich-strong"
-        data-tier="ig" data-reset="0" data-anomaly="0">
-      <td><a href="bond/JP282920492_eq_/">Nagoya Railroad</a></td>
-      <td>9048.T</td>
-      <td><span class="rtg ig">A+</span></td>
-      <td class="num">70</td>
+        data-tier="nr" data-reset="0" data-anomaly="0">
+      <td><a href="bond/JP274301619_eq_/">Daiwa House</a></td>
+      <td>1925.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
-      <td>2034-06-16</td>
-      <td class="num">104.62</td>
-      <td class="num">96.53</td>
-      <td class="num cheap-cell">-7.7</td>
-      <td class="num">22</td>
-      <td class="num">0.16</td>
-      <td class="num">0.27</td>
-      <td class="num">0.019</td>
-      <td class="num">0.61</td>
+      <td>2029-03-30</td>
+      <td class="num">102.25</td>
+      <td class="num">93.04</td>
+      <td class="num cheap-cell">-9.0</td>
+      <td class="num">21</td>
+      <td class="num">0.20</td>
+      <td class="num">0.37</td>
+      <td class="num">0.011</td>
+      <td class="num">0.51</td>
       <td>
         <span class="conf-high">High</span>
         
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP282920492=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP274301619=')">⊕</button></td>
     </tr>
     
     
@@ -663,28 +541,28 @@
     
     <tr class="rich-strong reset"
         data-tier="nr" data-reset="1" data-anomaly="0">
-      <td><a href="bond/JP283337251_eq_/">TORIDOLL Hldg</a></td>
-      <td>3397.T</td>
+      <td><a href="bond/JP315410355_eq_/">AZ-Com Maruwa</a></td>
+      <td>9090.T</td>
       <td><span class="rtg nr">NR</span></td>
       <td class="num">429</td>
       <td>
         <span class="engine engine-mc">MC</span>
-        <span class="reset-prob">24%</span>
+        <span class="reset-prob">99%</span>
       </td>
-      <td>2031-06-20</td>
-      <td class="num">109.25</td>
-      <td class="num">100.24</td>
-      <td class="num cheap-cell">-8.2</td>
-      <td class="num">18</td>
-      <td class="num">0.19</td>
-      <td class="num">0.33</td>
-      <td class="num">0.023</td>
-      <td class="num">1.21</td>
+      <td>2030-09-24</td>
+      <td class="num">98.75</td>
+      <td class="num">89.37</td>
+      <td class="num cheap-cell">-9.5</td>
+      <td class="num">65</td>
+      <td class="num">0.27</td>
+      <td class="num">0.54</td>
+      <td class="num">0.020</td>
+      <td class="num">0.26</td>
       <td>
         <span class="conf-high">High</span>
         
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP283337251=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP315410355=')">⊕</button></td>
     </tr>
     
     
@@ -692,30 +570,61 @@
     
     
     
-    <tr class="rich-strong low-conf"
-        data-tier="ig" data-reset="0" data-anomaly="1">
-      <td><a href="bond/JP285724031_eq_/">SBI Holdings</a></td>
-      <td>8473.T</td>
-      <td><span class="rtg ig">A-</span></td>
-      <td class="num">120</td>
+    <tr class="rich-strong"
+        data-tier="nr" data-reset="0" data-anomaly="0">
+      <td><a href="bond/JP274301660_eq_/">Daiwa House</a></td>
+      <td>1925.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
         <span class="engine engine-tree">Tree</span>
         
       </td>
-      <td>2031-07-25</td>
-      <td class="num">145.88</td>
-      <td class="num">102.75</td>
-      <td class="num cheap-cell">-29.6</td>
-      <td class="num">126</td>
+      <td>2030-03-29</td>
+      <td class="num">102.50</td>
+      <td class="num">91.62</td>
+      <td class="num cheap-cell">-10.6</td>
+      <td class="num">19</td>
+      <td class="num">0.20</td>
+      <td class="num">0.39</td>
+      <td class="num">0.011</td>
+      <td class="num">0.57</td>
+      <td>
+        <span class="conf-high">High</span>
+        
+      </td>
+      <td><button class="small" onclick="addWatch(event, 'JP274301660=')">⊕</button></td>
+    </tr>
+    
+    
+    
+    
+    
+    
+    <tr class="rich-strong reset"
+        data-tier="nr" data-reset="1" data-anomaly="0">
+      <td><a href="bond/JP263516796_eq_/">Tokyu</a></td>
+      <td>9005.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
+      <td>
+        <span class="engine engine-mc">MC</span>
+        <span class="reset-prob">40%</span>
+      </td>
+      <td>2030-09-30</td>
+      <td class="num">102.25</td>
+      <td class="num">90.88</td>
+      <td class="num cheap-cell">-11.1</td>
+      <td class="num">25</td>
+      <td class="num">0.18</td>
       <td class="num">0.43</td>
-      <td class="num">—</td>
-      <td class="num">0.009</td>
-      <td class="num">0.50</td>
+      <td class="num">0.025</td>
+      <td class="num">0.59</td>
       <td>
-        <span class="conf-low">Low</span>
-        <span class="anomaly" title="STALE_CONV_PX,MODEL_NO_FIT">⚠</span>
+        <span class="conf-high">High</span>
+        
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP285724031=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP263516796=')">⊕</button></td>
     </tr>
     
     
@@ -723,30 +632,30 @@
     
     
     
-    <tr class="rich-strong low-conf"
-        data-tier="ig" data-reset="0" data-anomaly="1">
-      <td><a href="bond/JP277431122_eq_/">Ibiden</a></td>
-      <td>4062.T</td>
-      <td><span class="rtg ig">a-1</span></td>
-      <td class="num">90</td>
+    <tr class="rich-strong reset low-conf"
+        data-tier="nr" data-reset="1" data-anomaly="1">
+      <td><a href="bond/JP292052243_eq_/">Kasumigaseki Cap</a></td>
+      <td>3498.T</td>
+      <td><span class="rtg nr">NR</span></td>
+      <td class="num">429</td>
       <td>
-        <span class="engine engine-tree">Tree</span>
-        
+        <span class="engine engine-mc">MC</span>
+        <span class="reset-prob">96%</span>
       </td>
-      <td>2031-03-14</td>
-      <td class="num">284.56</td>
-      <td class="num">199.05</td>
-      <td class="num cheap-cell">-30.0</td>
-      <td class="num">90</td>
-      <td class="num">0.87</td>
-      <td class="num">—</td>
-      <td class="num">0.010</td>
-      <td class="num">0.60</td>
+      <td>2029-11-05</td>
+      <td class="num">102.12</td>
+      <td class="num">86.93</td>
+      <td class="num cheap-cell">-14.9</td>
+      <td class="num">200</td>
+      <td class="num">0.47</td>
+      <td class="num">1.00</td>
+      <td class="num">0.000</td>
+      <td class="num">0.14</td>
       <td>
         <span class="conf-low">Low</span>
-        <span class="anomaly" title="PRICE&gt;200,MODEL_NO_FIT">⚠</span>
+        <span class="anomaly" title="STALE_CONV_PX">⚠</span>
       </td>
-      <td><button class="small" onclick="addWatch(event, 'JP277431122=')">⊕</button></td>
+      <td><button class="small" onclick="addWatch(event, 'JP292052243=')">⊕</button></td>
     </tr>
     
   </tbody>

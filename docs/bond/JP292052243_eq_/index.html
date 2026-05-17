@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Advantest · JP330437685=</title>
+  <title>Kasumigaseki Cap · JP292052243=</title>
   <link rel="stylesheet" href="../../static/app.css?v=5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,36 +39,38 @@
 <section class="bond-head">
   <div>
     <a href="../../index.html" class="back">← back to universe</a>
-    <h1>Advantest</h1>
-    <div class="sub">JP330437685= · underlying 6857.T · matures 2031-03-28</div>
+    <h1>Kasumigaseki Cap</h1>
+    <div class="sub">JP292052243= · underlying 3498.T · matures 2029-11-05</div>
   </div>
   <div class="rating-block">
-    <span class="rtg-big">A+</span>
-    <span class="spread-big">70bp</span>
-    
-    
+    <span class="rtg-big">NR</span>
+    <span class="spread-big">429bp</span>
+    <span class="reset-big">MC pricer · 96% reset prob</span>
+    <span class="reset-big" style="background:rgba(239,68,68,0.2); color:var(--red)">STALE_CONV_PX</span>
   </div>
 </section>
 
 <div class="callout">
   <span class="label">Plain-English summary</span>
-  This bond looks <strong>cheap to model by +8.5%</strong>. The market is paying 121.45 (% of par) while our pricer says fair value is 131.72. To trade it: buy ¥100M face, short delta × shares of 6857.T to neutralize stock direction, hold until the gap closes (typical: 1-3 months). Greeks below show how the bond responds to changes in stock price, vol, time, and interest rates — these drive your hedge ratios.
+  This bond looks <strong>rich to model by -14.9%</strong>. The market is paying more than our pricer says is fair. Either avoid, or short if you can borrow. Greeks below show how the bond responds to changes in stock price, vol, time, and interest rates — these drive your hedge ratios.
 </div>
 
 <section class="kpis">
-  <div class="kpi" title="Current market price of the bond, quoted as % of par. 100 = at par."><span class="lab">Market</span><span class="val">121.45</span></div>
-  <div class="kpi" title="Our pricer's fair value. Tree = which pricing engine was used."><span class="lab">Model · Tree</span><span class="val">131.72</span></div>
-  <div class="kpi cheap" title="(Model − Market) / Market. Positive = market is too cheap vs model."><span class="lab">Cheap</span><span class="val">+8.5%</span></div>
+  <div class="kpi" title="Current market price of the bond, quoted as % of par. 100 = at par."><span class="lab">Market</span><span class="val">102.12</span></div>
+  <div class="kpi" title="Our pricer's fair value. MC = which pricing engine was used."><span class="lab">Model · MC</span><span class="val">86.93</span></div>
+  <div class="kpi cheap" title="(Model − Market) / Market. Positive = market is too cheap vs model."><span class="lab">Cheap</span><span class="val">-14.9%</span></div>
   
-  <div class="kpi" title="Bond floor: what this would be worth as a pure debt instrument (ignoring conversion option). The downside protection."><span class="lab">Bond floor</span><span class="val">88.11</span></div>
-  <div class="kpi" title="Parity: value if you converted to stock right now. Stock price × conversion ratio."><span class="lab">Parity</span><span class="val">78.50</span></div>
-  <div class="kpi" title="Premium: how much extra you pay above conversion value. High premium = bond-like; low = equity-like."><span class="lab">Premium</span><span class="val">55%</span></div>
-  <div class="kpi" title="60-day realized volatility of the underlying stock, annualized."><span class="lab">HV60</span><span class="val">74%</span></div>
-  <div class="kpi" title="Implied vol: the σ that would make the model match the market price. Low IV vs HV = market underpricing future vol."><span class="lab">IV</span><span class="val">56%</span></div>
-  <div class="kpi" title="Delta: how much the bond moves per ¥1 stock move. Also your hedge ratio."><span class="lab">Δ Delta</span><span class="val">0.002</span></div>
-  <div class="kpi" title="Gamma: how fast delta changes. Higher = need to rehedge more often."><span class="lab">Γ Gamma</span><span class="val">-0.00000</span></div>
-  <div class="kpi" title="Vega: bond price change per 1 percentage-point change in volatility."><span class="lab">Vega</span><span class="val">0.52</span></div>
-  <div class="kpi" title="Theta: bond price change per day from time decay. Negative = costs you to hold."><span class="lab">θ /day</span><span class="val">-0.006</span></div>
+  <div class="kpi" title="How much extra value the Monte Carlo reset model gives over the plain tree. Positive = reset clause is valuable."><span class="lab">MC vs Tree</span><span class="val">-5.56</span></div>
+  
+  <div class="kpi" title="Bond floor: what this would be worth as a pure debt instrument (ignoring conversion option). The downside protection."><span class="lab">Bond floor</span><span class="val">81.36</span></div>
+  <div class="kpi" title="Parity: value if you converted to stock right now. Stock price × conversion ratio."><span class="lab">Parity</span><span class="val">33.99</span></div>
+  <div class="kpi" title="Premium: how much extra you pay above conversion value. High premium = bond-like; low = equity-like."><span class="lab">Premium</span><span class="val">200%</span></div>
+  <div class="kpi" title="60-day realized volatility of the underlying stock, annualized."><span class="lab">HV60</span><span class="val">47%</span></div>
+  <div class="kpi" title="Implied vol: the σ that would make the model match the market price. Low IV vs HV = market underpricing future vol."><span class="lab">IV</span><span class="val">100%</span></div>
+  <div class="kpi" title="Delta: how much the bond moves per ¥1 stock move. Also your hedge ratio."><span class="lab">Δ Delta</span><span class="val">0.000</span></div>
+  <div class="kpi" title="Gamma: how fast delta changes. Higher = need to rehedge more often."><span class="lab">Γ Gamma</span><span class="val">0.00000</span></div>
+  <div class="kpi" title="Vega: bond price change per 1 percentage-point change in volatility."><span class="lab">Vega</span><span class="val">0.14</span></div>
+  <div class="kpi" title="Theta: bond price change per day from time decay. Negative = costs you to hold."><span class="lab">θ /day</span><span class="val">+0.141</span></div>
 </section>
 
 <section class="hedge-suggestion">
@@ -95,8 +97,8 @@
         <div class="kpi"><span class="lab">Vega /1 vol pt</span><span class="val" id="s-vega">—</span></div>
       </div>
       <p style="margin-top:14px; font-size:12.5px; line-height:1.6; color:var(--ink-soft);">
-        Buy <strong>¥<span id="s-face">100</span>M face</strong> of this CB at market <strong>121.45</strong> = <strong id="s-bond-cost-2">—</strong>.
-        Short <strong id="s-shares-2">—</strong> shares of 6857.T at ¥<strong>28,260</strong>.
+        Buy <strong>¥<span id="s-face">100</span>M face</strong> of this CB at market <strong>102.12</strong> = <strong id="s-bond-cost-2">—</strong>.
+        Short <strong id="s-shares-2">—</strong> shares of 3498.T at ¥<strong>6,020</strong>.
         If model is right, expected gross convergence P&amp;L is <strong id="s-edge-2">—</strong>.
         After 25bp bond round-trip + 5bp equity round-trip transaction costs, net edge is <strong id="s-net">—</strong>.
         At 1% JPY financing on the long bond, daily carry costs <strong id="s-carry">—</strong> (offset by short rebate).
@@ -107,13 +109,13 @@
 
 <script>
 const bondData = {
-  mkt: 121.45,
-  model: 131.72365396132176,
-  cheap: 8.459163409898522,
-  delta: 0.0021627449829073,
-  vega: 0.5231592130406852,
-  theta: -0.0055026635910166,
-  spot: 28260.0
+  mkt: 102.125,
+  model: 86.9302996056153,
+  cheap: -14.878531597928712,
+  delta: 0.0004452032745604,
+  vega: 0.1350867560994828,
+  theta: 0.1410291464591608,
+  spot: 6020.0
 };
 
 function fmtJPY(x) {
