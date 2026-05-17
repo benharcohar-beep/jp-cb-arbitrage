@@ -1,56 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
-<section class="welcome">
-  <h1>Japanese Convertible Bond Arbitrage Desk</h1>
-  <p class="lead">
-    Autonomous AI workflow that pulls live convertible-bond data from Refinitiv every weekday morning,
-    prices each bond using a <strong>Tsiveriotis-Fernandes binomial tree</strong>
-    (with Monte Carlo for path-dependent reset clauses), validates the result against real
-    issuer ratings + JGB yields + credit spreads, and surfaces the day's high-confidence cheap-to-model
-    opportunities. Backtested at <strong>71-78% hit rate</strong> over 60 days in the 5-15% cheap range.
-  </p>
-
-  <details class="primer">
-    <summary>What is convertible bond arbitrage? (click to expand)</summary>
-    <div class="primer-body">
-      <div class="primer-card">
-        <h4>The trade</h4>
-        <p>Buy a <strong>convertible bond</strong> (a bond that can be exchanged for the issuer's stock at a fixed conversion price), and short <strong>delta × shares</strong> of the underlying equity. The bond's price has both a debt component and an embedded equity option.</p>
-      </div>
-      <div class="primer-card">
-        <h4>Why mispricings happen</h4>
-        <p>Convertible bonds in Japan are dealer-quoted and illiquid. Dealer indicative quotes lag the underlying equity, so when the stock moves the implied option value gets stale — creating <strong>fair-vs-market gaps</strong> that the model surfaces.</p>
-      </div>
-      <div class="primer-card">
-        <h4>How the model decides "cheap"</h4>
-        <p>For each bond we compute model fair value = <strong>bond floor + embedded option value</strong>, using realised vol of the underlying, the issuer's credit spread, and the JGB yield curve. <strong>Cheap% = (model − market) / market</strong>.</p>
-      </div>
-      <div class="primer-card">
-        <h4>Action labels</h4>
-        <p><strong style="color:var(--green-700)">BUY</strong> = ≥5% cheap, high confidence, no data flags. <strong style="color:var(--amber)">WATCH</strong> = cheap but reset clause or stale-quote risk. <strong style="color:var(--red)">AVOID</strong> = rich vs model. Always Δ-hedge with the underlying short.</p>
-      </div>
-    </div>
-  </details>
-</section>
-
-<section class="summary">
-  <div class="kpi timestamp" title="When this snapshot was taken. The agent runs every weekday at 08:04."><span class="lab">Snapshot</span><span class="val">{{ summary.snapshot.replace('screen_','').replace('.csv','') }}</span></div>
-  <div class="kpi" title="Number of bonds the system successfully priced today. Bonds with no live quote get dropped."><span class="lab">Bonds priced</span><span class="val">{{ summary.n_bonds }}</span></div>
-  <div class="kpi" title="How many of those bonds have a credit rating (the rest use a default spread)."><span class="lab">Rated</span><span class="val">{{ summary.n_rated }}</span></div>
-  <div class="kpi" title="Bonds priced with Monte Carlo because they have reset clauses (the binomial tree can't handle those properly)."><span class="lab">MC priced</span><span class="val">{{ summary.n_reset }}</span></div>
-  <div class="kpi alert" title="Bonds the model says are at least 5% cheap to fair value."><span class="lab">Buy signals</span><span class="val">{{ summary.n_alerts }}</span></div>
-  <div class="kpi" title="Median credit spread across all bonds, in basis points. 100bp = 1%."><span class="lab">Median spread</span><span class="val">{{ summary.median_spread }}bp</span></div>
-</section>
-
 {% if top %}
-<div class="section-head">
+<div class="section-head" style="margin-top:4px;">
   <h2>Today's plays</h2>
-  <span class="sub">Ranked by cheap-to-model · click any row to drill into the bond</span>
-</div>
-<div class="callout">
-  <span class="label">How to read this</span>
-  Each row is a bond the model thinks is mispriced. <strong>Cheap%</strong> is how far below model fair the market is trading. <strong>BUY</strong> = high-confidence signal. <strong>WATCH</strong> = signal but with a reset clause that needs human review. The "thesis" line tells you in plain English what the trade is — buy this bond, short this many shares of the underlying.
+  <span class="sub">Ranked by cheap-to-model · click any row to drill into the bond · <a href="#explainer" style="font-size:11px;">new here? read the primer ↓</a></span>
 </div>
 <section class="hero-list">
   {% for r in top %}
@@ -90,6 +44,15 @@
   {% endfor %}
 </section>
 {% endif %}
+
+<section class="summary" style="margin-top:18px;">
+  <div class="kpi timestamp" title="When this snapshot was taken. The agent runs every weekday at 08:04."><span class="lab">Snapshot</span><span class="val">{{ summary.snapshot.replace('screen_','').replace('.csv','') }}</span></div>
+  <div class="kpi" title="Number of bonds the system successfully priced today. Bonds with no live quote get dropped."><span class="lab">Bonds priced</span><span class="val">{{ summary.n_bonds }}</span></div>
+  <div class="kpi" title="How many of those bonds have a credit rating (the rest use a default spread)."><span class="lab">Rated</span><span class="val">{{ summary.n_rated }}</span></div>
+  <div class="kpi" title="Bonds priced with Monte Carlo because they have reset clauses (the binomial tree can't handle those properly)."><span class="lab">MC priced</span><span class="val">{{ summary.n_reset }}</span></div>
+  <div class="kpi alert" title="Bonds the model says are at least 5% cheap to fair value."><span class="lab">Buy signals</span><span class="val">{{ summary.n_alerts }}</span></div>
+  <div class="kpi" title="Median credit spread across all bonds, in basis points. 100bp = 1%."><span class="lab">Median spread</span><span class="val">{{ summary.median_spread }}bp</span></div>
+</section>
 
 {% if new_rics or dropped_rics %}
 <div class="section-head">
@@ -262,4 +225,41 @@ tabs.forEach(t => t.addEventListener('click', () => {
   });
 })();
 </script>
+
+<section class="welcome" id="explainer" style="margin-top:32px;">
+  <h1>About this dashboard</h1>
+  <p class="lead">
+    Autonomous AI workflow that pulls live convertible-bond data from Refinitiv every weekday morning,
+    prices each bond using a <strong>Tsiveriotis-Fernandes binomial tree</strong>
+    (with Monte Carlo for path-dependent reset clauses), validates against real issuer ratings + JGB yields
+    + credit spreads, and surfaces the day's high-confidence cheap-to-model opportunities.
+    See <a href="{% if STATIC_SITE %}{{ ROOT|default('') }}{% endif %}how-it-works.html">How it works</a>
+    for the 10-step agent loop, the <a href="{% if STATIC_SITE %}{{ ROOT|default('') }}{% endif %}backtest.html">Backtest</a>
+    for the honest performance numbers (5.65% CAGR, Sharpe 0.49 over 3 years after realistic costs), and the
+    <a href="{% if STATIC_SITE %}{{ ROOT|default('') }}{% endif %}glossary.html">Glossary</a> for every term defined.
+  </p>
+
+  <details class="primer" open>
+    <summary>What is convertible bond arbitrage?</summary>
+    <div class="primer-body">
+      <div class="primer-card">
+        <h4>The trade</h4>
+        <p>Buy a <strong>convertible bond</strong> (a bond that can be exchanged for the issuer's stock at a fixed conversion price), and short <strong>delta × shares</strong> of the underlying equity. The bond's price has both a debt component and an embedded equity option.</p>
+      </div>
+      <div class="primer-card">
+        <h4>Why mispricings happen</h4>
+        <p>Convertible bonds in Japan are dealer-quoted and illiquid. Dealer indicative quotes lag the underlying equity, so when the stock moves the implied option value gets stale — creating <strong>fair-vs-market gaps</strong> that the model surfaces.</p>
+      </div>
+      <div class="primer-card">
+        <h4>How the model decides "cheap"</h4>
+        <p>For each bond we compute model fair value = <strong>bond floor + embedded option value</strong>, using realised vol of the underlying, the issuer's credit spread, and the JGB yield curve. <strong>Cheap% = (model − market) / market</strong>.</p>
+      </div>
+      <div class="primer-card">
+        <h4>Action labels</h4>
+        <p><strong style="color:var(--profit-700)">BUY</strong> = ≥5% cheap, high confidence, no data flags. <strong style="color:var(--amber)">WATCH</strong> = cheap but reset clause or stale-quote risk. <strong style="color:var(--red)">AVOID</strong> = rich vs model. Always Δ-hedge with the underlying short.</p>
+      </div>
+    </div>
+  </details>
+</section>
+
 {% endblock %}
